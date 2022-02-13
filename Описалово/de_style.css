@@ -1,0 +1,212 @@
+.detbl
+{
+direction:ltr; border-spacing:0px;
+border-collapse: collapse;
+border: 0px none black;
+}
+.de_list
+{
+margin: 0;padding: 0;
+}
+div.p
+{
+margin-top:0px;
+margin-bottom:0px;
+font-weight:normal;
+}
+
+div.description_on_page div.p,
+ div.description_on_page div.p a,
+ .m-pageContent__side__header div.p,
+ .m-pageContent__side__header div.p a,
+ .m-pageContent__side__footer div.p,
+ .m-pageContent__side__footer div.p a,
+ .m-pageContent__side__right div.p,
+ .m-pageContent__side__right div.p a,
+ .m-pageContent__side__left div.p,
+ .m-pageContent__side__left div.p a
+{
+font-family:"Arial";
+font-size: 11pt;color:#000000;
+font-style:normal;
+text-decoration:none;
+font-weight:normal;
+}
+h1
+{
+font-family:"Arial";
+font-size: 13pt;color:#375db0;
+font-style:normal;
+text-decoration:none;
+font-weight:normal;
+display:inline;
+margin:0;
+padding:0;
+}
+h2
+{
+font-family:"Arial";
+font-size: 11pt;color:#4f87fd;
+font-style:normal;
+text-decoration:none;
+font-weight:normal;
+display:inline;
+margin:0;
+padding:0;
+}
+span.code
+{
+font-family:"Courier New";
+font-size: 11pt;color:#000000;
+font-style:normal;
+text-decoration:none;
+font-weight:normal;
+}
+span.quote
+{
+font-family:"Georgia";
+font-size: 11pt;color:#000000;
+font-style:italic;
+text-decoration:none;
+font-weight:normal;
+}
+img.de_75F9C4A440
+{
+margin-top: 3px; margin-right: 3px; margin-bottom: 3px; margin-left: 3px;}
+span.de_05BA8909AD
+{
+	font-family: "Microsoft YaHei";
+	font-size: 10pt;
+	color:#005032;
+}
+span.de_0C3CEE7D0D
+{
+	font-family: "Microsoft YaHei";
+	font-size: 10pt;
+	color:#0012ff;
+}
+span.de_1317266AD8
+{
+	font-family: "Consolas";
+	color:#0012ff;
+}
+span.de_1BFBFA0C59
+{
+	font-family: "Microsoft YaHei";
+	font-size: 12pt;
+	color:#0000ff;
+}
+span.de_2D2EF74FD8
+{
+	font-family: "Consolas";
+	font-size: 10pt;
+	color:#0012ff;
+}
+span.de_428DFDB72B
+{
+	font-family: "Consolas";
+	font-size: 10pt;
+	color:#008000;
+}
+span.de_4BF8DE67CA
+{
+	font-family: "Georgia";
+	color:#7f7f7f;
+}
+span.de_51752156DC
+{
+	color:#000000;
+}
+span.de_585404FB85
+{
+	font-family: "Consolas";
+}
+span.de_720638CE4E
+{
+	font-family: "Microsoft YaHei";
+}
+span.de_82892DE6FD
+{
+	font-size: 20pt;
+	color:#0000ff;
+	text-decoration:underline;
+}
+span.de_83ED901ADD
+{
+	font-family: "Consolas";
+	font-size: 10pt;
+	color:#ff3600;
+}
+span.de_86A8A5B366
+{
+	font-size: 24pt;
+}
+span.de_86EBB978AB
+{
+	font-family: "Verdana";
+	font-size: 14pt;
+}
+span.de_8B7D6AF64A
+{
+	color:#0012ff;
+}
+span.de_8F0BA45E25
+{
+	font-family: "Microsoft YaHei";
+	font-size: 24pt;
+	color:#000000;
+}
+span.de_A632FFA663
+{
+	font-family: "Microsoft YaHei";
+	font-size: 12pt;
+	color:#495057;
+}
+span.de_A94706516C
+{
+	font-family: "Microsoft YaHei";
+	font-size: 12pt;
+	color:#0012ff;
+}
+span.de_AE51E0F0DE
+{
+	font-family: "Microsoft YaHei";
+	font-size: 10pt;
+	color:#000000;
+}
+span.de_AF75A8CDA0
+{
+	font-family: "Consolas";
+	font-size: 10pt;
+	color:#000000;
+}
+span.de_C234F8EAF9
+{
+	font-family: "Microsoft YaHei";
+	font-size: 24pt;
+	color:#212529;
+}
+span.de_C6F7AEA3F9
+{
+	font-family: "Microsoft YaHei";
+	font-size: 10pt;
+	color:#008000;
+}
+span.de_CDD98FA165
+{
+	font-family: "Georgia";
+}
+span.de_D7D661A6F4
+{
+	font-family: "Microsoft YaHei";
+	font-size: 10pt;
+	color:#7f0055;
+}
+span.de_FD607F1E05
+{
+	font-family: "Consolas";
+	color:#49b64e;
+}
+.list-element {
+	list-style-type: none;
+}

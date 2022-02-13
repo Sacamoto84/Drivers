@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<!-- saved from url=(0042)https://www.markdownguide.org/cheat-sheet/ -->
+<html lang="en">
+<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <style class="anchorjs"></style><link rel="stylesheet" href="style.css">
+</head>
+  
+<body data-spy="scroll" data-target="#toc">
+    
+
+<!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container">
+        <h1 class="no-anchor" data-toc-skip="" id="markdown-cheat-sheet">Описалово</h1>
+      </div>
+    </div>
+	
+<div class="container">
+        
+<h2 id="overview">Overview<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="https://www.markdownguide.org/cheat-sheet/#overview" style="font: 1em / 1 anchorjs-icons; padding-left: 0.375em;"></a></h2>
+
+<p>This Markdown cheat sheet provides a quick overview of all the Markdown syntax elements. It can’t cover every edge case, so if you need more information about any of these elements, refer to the reference guides for <a href="https://www.markdownguide.org/basic-syntax">basic syntax</a> and <a href="https://www.markdownguide.org/extended-syntax">extended syntax</a>.</p>
+
+<h2 id="basic-syntax">SEGGER<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" style="font: 1em / 1 anchorjs-icons; padding-left: 0.375em;"></a></h2>
+<p>These are the elements outlined in John Gruber’s original design document. All Markdown applications support these elements.</p>
+
+<table class="table table-bordered">
+  <thead class="thead-light">
+    <tr>
+      <th>Элемент</th>
+      <th>Синтакс</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>#Include</td>
+      <td><code>
+	      #include "SEGGER.h"<br>
+          #include "SEGGER_RTT.h"<br>
+          #include "SEGGER_RTT_Conf.h"<br>
+		  #include "SEGGER_SYSVIEW.h"
+		  </code></td>
+    </tr>
+	
+    <tr>
+      <td>Инициализация</td>
+      <td><code>
+	  SEGGER_SYSVIEW_Conf();<br>
+	  SEGGER_SYSVIEW_Start();
+	  </code></td>
+    </tr>
+	
+    <tr>
+      <td>Применение</td>
+      <td><code>
+	  SEGGER_RTT_printf(0, "Start\n\r");<br>
+	  </code></td>
+    </tr>
+	
+  </tbody>
+</table>
+
+<h2 id="basic-syntax">Примитивы<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" style="font: 1em / 1 anchorjs-icons; padding-left: 0.375em;"></a></h2>
+
+<table class="table table-bordered">
+  <thead class="thead-light">
+    <tr>
+      <th>Элемент</th>
+      <th>Syntax</th>
+      <th>Описание</th>
+    </tr>
+  </thead>
+
+  <tbody>
+  
+      <tr>
+      <td>Line</td>
+      <td><code>
+        <b><font color="black">Line</font></b>(I16 x0, I16 y0, I16 x1, I16 y1, U16 c);<br>
+        <b><font color="black">LineV</font></b>(I32 X, I32 Y1, I32 Y2, U16 color);<br>
+        <b><font color="black">LineH</font></b>(I32 Y, I32 X1, I32 X2, U16 color);<br>
+        <b><font color="black">LineHW</font></b>(I32 x, I32 y, I32 w, U16 color);<br>
+        <b><font color="black">LineMoveTo</font></b>(I32 x, I32 y, U16 c);
+	  </code></td>
+      </tr>
+	
+	 <tr>
+    <td>Круги</td>
+    <td><code>
+	  <b><font color="black">Circle</font></b>(I16 x, I16 y, I16 r, U16 c);<br>
+	  <b><font color="black">CircleFilled</font></b>(int16_t x0, int16_t y0, int16_t r, uint16_t c);
+	  </code></td>
+    </tr>
+	
+    <tr>
+      <td>Треугольники</td>
+      <td><code>
+	  <b><font color="black">Triangle</font></b>(U16 x1, U16 y1, U16 x2, U16 y2, U16 x3, U16 y3, U16 color);<br>
+	  <b><font color="black">TriangleFilled</font></b>(I16 x1, I16 y1, I16 x2, I16 y2, I16 x3, I16 y3, U16 color);
+	  </code></td>
+    </tr>
+
+    <tr>
+      <td>Прямоугольники</td>
+      <td><code>
+	  <b><font color="black">Rectangle</font></b>(I32 x, I32 y, U16 w, U16 h, U16 c);<br>
+	  <b><font color="black">RectangleFilled</font></b>(U16 x, U16 y, U16 w, U16 h, U16 c);<br>
+
+    <b><font color="black">InvertRectangle</font></b>(U16 x, U16 y, U16 w, U16 h);<br>
+	  <b><font color="black">ChangeColorRectangle</font></b>(I32 x, I32 y, U32 w, I32 h, U16 sColor, U16 dColor);<br>
+	  </code></td>
+
+    <td><code>
+      Контур<br>
+      Заполнение<br>
+      Инверсия цвета<br>
+      Замена цвета в прямоугольнике<br>
+    </code></td>
+    </tr>
+
+  </tbody>
+</table>
+
+<h2 id="basic-syntax">Драйвера<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" style="font: 1em / 1 anchorjs-icons; padding-left: 0.375em;"></a></h2>
+
+<table class="table table-bordered">
+  <thead class="thead-light">
+    <tr>
+      <th>Экран</th>
+      <th>Syntax</th>
+      <th>Описание</th>
+    </tr>
+  </thead>
+
+  <tbody>
+  
+      <tr>
+      <td>SSD1306</td>
+      <td><code>
+        <b>
+        <font color="black">SSD1306_Init</font>(void);<br>
+        <font color="black">SSD1306_UpdateScreen</font>(void);<br>
+        <font color="black">SSD1306_Contrast</font>(uint8_t c);<br>
+      </b>
+	    </code></td>
+      </tr>
+
+      <tr>
+        <td>ST7789</td>
+        <td><code>
+          <b>
+          <font color="black"> ST7789_Init</font>(void);<br>
+          <font color="black">ST7789_Update</font>(void); 4,16 bit<br>
+
+          <font color="black">ST7789_Update_Window</font>(I16 x1, I16 y1, I16 x2, I16 y2); <font color="blue">{ 4 16 bit }</font> <br>
+          <font color="black">ST7789_AddrSet</font>(U16 x0, U16 y0, U16 x1, U16 y1);<br>
+          <font color="black">ST77XX_Rotate </font>(U16 depth); <font color="blue"> { 0 90 180 270 }</font> <br>
+          <font color="black">ST77XX_Update_MADCTL</font>(void);  <font color="blue"> { Обновление регистра MADCTL }</font><br>
+
+          <font color="black">//void ST7789_Update_DMA_Cicle_On</font>(void);  <font color="blue"> { Не готово }</font><br>
+          <font color="black">//void ST7789_Update_DMA_Cicle_Off</font>(void);  <font color="blue"> { Не готово }</font><br>
+          
+        </b>
+        </code></td>
+        </tr>
+  </tbody>
+</table>
+
+<h2 id="basic-syntax">Работа с цветом<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" style="font: 1em / 1 anchorjs-icons; padding-left: 0.375em;"></a></h2>
+
+<table class="table table-bordered">
+  <thead class="thead-light">
+    <tr>
+      <th>Экран</th>
+      <th>Syntax</th>
+    </tr>
+  </thead>
+
+  <tbody>
+  
+      <tr>
+      <td>Пиксель</td>
+      <td><code>
+        <b>
+        <font color="black">SetPixel</font>(I32 x, I32 y, U16 color);<br>
+        uint16_t <font color="black">GetPixel</font>(I32 x, I32 y);<br>
+        <font color="black">SetColorToPallete</font>(U8 index, U16 color); 0..15<br>
+      </b>
+	    </code></td>
+
+    
+
+      </tr>
+
+      <tr>
+        <td>Преобразование цвета</td>
+        <td><code>
+          <b>
+          uint16_t <font color="black">RGB565</font>(uint8_t R, uint8_t G, uint8_t B)<br>
+          uint16_t <font color="black">color565</font>(uint8_t r, uint8_t g, uint8_t b)<br>
+        </b>
+        </code></td>
+        </tr>
+
+
+  </tbody>
+</table>
+
+
+
+<h2 id="basic-syntax">Работа с текстом<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" style="font: 1em / 1 anchorjs-icons; padding-left: 0.375em;"></a></h2>
+
+<table class="table table-bordered">
+  <thead class="thead-light">
+    <tr>
+      <th>Экран</th>
+      <th>Syntax</th>
+    </tr>
+  </thead>
+
+  <tbody>
+  
+      <tr>
+      <td>Базовое</td>
+      <td><code>
+        <b>
+        <font color="black">GotoXY</font>(I16 x, I16 y);<br>
+        <font color="black">SetFontColor</font>(U16 Color, U16 BColor)<br>
+        <font color="black">SetColor</font>(U16 Color)<br>
+        <font color="black">SetBColor</font>(U16 BColor);<br>
+      </b>
+	    </code></td>
+      </tr>
+
+      <tr>
+        <td>Classic</td>
+        <td><code>
+        <b>
+          uint16_t <font color="black">char Font_Classic_Putc(char ch, FontDef_t *Font, uint8_t NoBack = 0);</font><br>
+          uint16_t <font color="black">char Font_Classic_Puts(char *str, FontDef_t *Font, uint8_t NoBack = 0);</font><br>
+          uint16_t <font color="black">char* Font_Classic_GetStringSize(char *str, FONTS_SIZE_t *SizeStruct, FontDef_t *Font);</font><br>
+        </b>
+        </code></td>
+      </tr> 
+
+      <tr>
+        <td>Micro</td>
+        <td><code>
+        <b>
+          <font color="black">Font_Micro_SetFont(FontDefMicroElectronika_t *uFont); // Устновна фонта</font><br>
+          <font color="black">Font_Micro_Putc</font>(U8 ch, uint8_t dx, U8 transparrent); <font color="blue"> { Вывод символа }</font><br>
+          <font color="black">Font_Micro_Puts(char *str, uint8_t dx, uint8_t transparrent);</font><br>
+          uint16_t <font color="black">Font_Micro_Find_Len_Str</font>(char *str, FontDefMicroElectronika_t *uFont);//Определение длинны строки в пикселях по типу текущего шрифта<br>
+          
+        </b>
+        </code></td>
+      </tr>
+
+
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+</body></html>

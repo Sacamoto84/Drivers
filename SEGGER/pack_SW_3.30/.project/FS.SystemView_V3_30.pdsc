@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<package schemaVersion="1.6.3" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="PACK.xsd">
+    <vendor>FS</vendor>
+    <name>SystemView_V3_30</name>
+    <description>- FreeRTOS
+- NoOS</description>
+    <url/>
+    <releases>
+        <release date="2021-10-10" deprecated="2021-10-10" version="1.0.18">+1</release>
+        <release date="2021-10-10" deprecated="2022-10-10" version="1.0.17">+1</release>
+        <release date="2021-10-10" deprecated="2022-10-10" version="1.0.16">+1</release>
+        <release date="2021-10-10" deprecated="2022-10-10" version="1.0.15">+1</release>
+        <release date="2021-10-10" deprecated="2021-10-10" version="1.0.14">+1</release>
+        <release date="2021-10-10" deprecated="2022-10-10" version="1.0.12">+1</release>
+        <release date="2021-10-10" deprecated="2022-10-10" version="1.0.11">+1</release>
+        <release date="2021-10-10" deprecated="2022-10-10" version="1.0.10">+1</release>
+        <release date="2021-10-10" deprecated="2022-10-10" version="1.0.9">+1</release>
+        <release date="2021-10-10" deprecated="2022-10-10" version="1.0.8">+1</release>
+        <release date="2021-10-10" deprecated="2022-10-10" version="1.0.7">+1</release>
+        <release date="2021-10-10" deprecated="2022-10-10" version="1.0.6">+1</release>
+        <release date="2021-10-10" deprecated="2022-10-10" version="1.0.5">+1</release>
+        <release date="2021-10-10" deprecated="2022-10-10" version="1.0.4">+1</release>
+        <release date="2021-10-10" deprecated="2022-10-10" version="1.0.3">+1</release>
+        <release date="2021-10-10" deprecated="2022-10-10" version="1.0.1">+1</release>
+        <release date="2021-10-10" deprecated="2022-10-10" version="1.0.0">Initial</release>
+    </releases>
+    <keywords>
+        <keyword>CUBE_RULES_COMPLIANT</keyword>
+        <keyword>IMPLEMENTED_WITH_STM32CUBEMX</keyword>
+    </keywords>
+    <taxonomy>
+        <description Cclass="Utility">Utility</description>
+    </taxonomy>
+    <conditions>
+        <condition id="Компилятор GCC">
+            <accept Tcompiler="GCC"/>
+        </condition>
+        <condition id="Компилятор KEIL">
+            <accept Tcompiler="ARMCC"/>
+        </condition>
+    </conditions>
+    <components>
+        <component Cclass="Utility" Cgroup="RTT" Cversion="1.0.0" maxInstances="1">
+            <description>Добавить RTT</description>
+            <files>
+                <file category="header" name="Utilities/SystemView/SEGGER.h"/>
+                <file category="source" name="Utilities/SystemView/SEGGER_RTT.c"/>
+                <file category="header" name="Utilities/SystemView/SEGGER_RTT.h"/>
+                <file category="sourceAsm" name="Utilities/SystemView/SEGGER_RTT_ASM_ARMv7M.S"/>
+            </files>
+        </component>
+        <component Cclass="Utility" Cgroup="Syscalls" Cversion="1.0.0" maxInstances="1">
+            <description>Основа SW</description>
+            <files>
+                <file category="source" condition="Компилятор GCC" name="Utilities/SystemView/SEGGER_RTT_Syscalls_GCC.c" public="false"/>
+                <file category="source" condition="Компилятор KEIL" name="Utilities/SystemView/SEGGER_RTT_Syscalls_KEIL.c" public="false"/>
+            </files>
+        </component>
+        <component Cclass="Utility" Cgroup="SystemView" Cversion="1.0.0" maxInstances="1">
+            <description>Ядро</description>
+            <files>
+                <file category="header" name="Utilities/SystemView/Global.h"/>
+                <file category="source" name="Utilities/SystemView/SEGGER_SYSVIEW.c"/>
+                <file category="header" name="Utilities/SystemView/SEGGER_SYSVIEW.h"/>
+                <file category="header" name="Utilities/SystemView/SEGGER_SYSVIEW_Conf.h"/>
+                <file category="header" name="Utilities/SystemView/SEGGER_SYSVIEW_ConfDefaults.h"/>
+                <file category="header" name="Utilities/SystemView/SEGGER_SYSVIEW_Int.h"/>
+            </files>
+        </component>
+        <component Cclass="Utility" Cgroup="SW NO_OS" Cversion="1.0.0" maxInstances="1">
+            <description>NO_OS</description>
+            <files>
+                <file category="doc" name="Utilities/SW NO_OS/untrackedFilesList.txt"/>
+            </files>
+        </component>
+        <component Cclass="Utility" Cgroup="SW FREERTOS 10_3_1" Cversion="1.0.0" maxInstances="1">
+            <description>FREERTOS 10.3.1</description>
+            <files>
+                <file category="source" name="Utilities/SystemView/SEGGER_SYSVIEW_FreeRTOS.c"/>
+                <file category="header" name="Utilities/SystemView/SEGGER_SYSVIEW_FreeRTOS.h"/>
+            </files>
+        </component>
+    </components>
+</package>
