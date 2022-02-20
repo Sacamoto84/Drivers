@@ -78,8 +78,8 @@ void BLE_UART_Decode(void);
 volatile float ii19 = 0.1F;
 char buffer20[30];
 char buffer30[30];
-volatile uint8_t i19 = 0;
 
+volatile uint8_t i19 = 0;
 volatile uint32_t crc = 0xaa;
 
 void USART3_IRQHandler(void)

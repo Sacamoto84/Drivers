@@ -40,7 +40,14 @@ uTFT_LCD_t name={x , y, SPRITE_RAM, 16, NULL , NULL, &name##_buffer16[0],};
 
 //////////////////////////////////////////////
 
-
+typedef struct {
+	int x0;
+	int y0;
+	int x1;
+	int y1;
+	int W;
+	int H;
+} List_Update_Particle;
 
 
 class TFT {
@@ -125,7 +132,11 @@ public:
 	void SetColorToPallete(uint8_t index, uint16_t color);
 
 	__weak void ST7789_Init(void);
+
 	__weak void ST7789_Update(void);
+	__weak void ST7789_Update(int x0, int y0, int x1, int y1);
+	__weak void ST7789_Update(List_Update_Particle U);
+
 	void ST7789_Update_Window(int16_t x1, int16_t y1, int16_t x2, int16_t y2);
 
 	void ST7789_AddrSet(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
@@ -372,17 +383,14 @@ public:
 
 	//32 бит BMP с альфа каналом Сохранять как инвертированая альфа и свап  , customAlpha = 1.0 полная альфа
 	void Bitmap_From_Flash_Alpha(int32_t x0, int32_t y0, Bitmap *bmp, float customAlpha);
-
 	void Bitmap_From_Flash_Background_16bit(Bitmap *bmp);
 
 
-
 	void BMP_From_File(int32_t x0, int32_t y0, char * Name);
-
 	void BMP_From_File_Tr(int32_t x0, int32_t y0, char * Name, uint16_t tr_color);
 
 	//32 ��� BMP � ����� �������
-	void BMP_From_File_Alpha(int32_t x0, int32_t y0, char * Name, int offset);
+	List_Update_Particle BMP_From_File_Alpha(int32_t x0, int32_t y0, char * Name, int offset, int swap);
 
 	/***************************************************************************************
 	** __weak

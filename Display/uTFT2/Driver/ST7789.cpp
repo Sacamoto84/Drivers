@@ -113,7 +113,21 @@ void TFT::ST7789_Init(void) {
 	}
 }
 
-void TFT::ST7789_Update(void) {
+
+
+void TFT::ST7789_Update(void)
+{
+	ST7789_Update(0, 0, LCD->TFT_WIDTH - 1, LCD->TFT_HEIGHT - 1);
+}
+
+
+void TFT::ST7789_Update(List_Update_Particle U)
+{
+	ST7789_Update(U.x0, U.y0, U.x1, U.y1);
+}
+
+
+void TFT::ST7789_Update(int x0, int y0, int x1, int y1) {
 
 	if (blockUpdate) return;
 
@@ -124,37 +138,30 @@ void TFT::ST7789_Update(void) {
 		CS_0;
 	}
 
-	int32_t i = 0;
+	int i;
+	int ii;
+
+    int fullscreen = 0;
+    if ((x0 == 0) && (y0 == 0) && (x1 == LCD->TFT_WIDTH - 1) && (y1==LCD->TFT_HEIGHT - 1)) fullscreen = 1;
 
 
-
-	uint8_t HI;
-	uint8_t LO;
-
-	HI = (LCD->dx + LCD->TFT_WIDTH - 1) >> 8;
-	LO = (LCD->dx + LCD->TFT_WIDTH - 1) & 0xFF;
-
-	SPI.SendCmd(0x2A);     // Column addr set
-	SPI.SendData(0x00);     //??????? ??? XSTART
-	SPI.SendData(LCD->dx);     //??????? ??? XSTART
-	SPI.SendData(HI);     //???????  ??? XEND
-	SPI.SendData(LO);    //??????? ??? XEND
-
+	SPI.SendCmd(0x2A);         // Column addr set
+	SPI.SendData((LCD->dx + x0) >> 8);        // XSTART
+	SPI.SendData((LCD->dx + x0) & 0xFF);      // XSTART
+	SPI.SendData((LCD->dx + x1) >> 8);          // XEND
+	SPI.SendData((LCD->dx + x1) & 0xFF);        // XEND
 	SPI.SendCmd(0x2B); // Row addr set
-	SPI.SendData(0x00);
-	SPI.SendData(LCD->dy); //TFT_YSTART
-	SPI.SendData(0x00);
-	SPI.SendData(LCD->dy + LCD->TFT_HEIGHT - 1); //TFT_YSTART
-
+	SPI.SendData((LCD->dy + y0) >> 8);
+	SPI.SendData((LCD->dy + y0) & 0xFF); //TFT_YSTART
+	SPI.SendData((LCD->dy + y1) >> 8);
+	SPI.SendData((LCD->dy + y1) & 0xFF); //TFT_YSTART
 	SPI.SendCmd(0x2C); //Memory write
 
 	//LCD->hspi->Instance->CR1 |= SPI_CR1_DFF;
 	SPI.Spi8to16();
-
 	DATA;
 
 	/////////////////Spi8to16(LCD); //16bit mode
-
 	if (LCD->Bit == 4) {
 		for (int i = 0; i < (LCD->TFT_HEIGHT * LCD->TFT_WIDTH) - 1; i++) {
 			if (i % 2) {
@@ -167,10 +174,6 @@ void TFT::ST7789_Update(void) {
 				while( !(SPI1->SR & SPI_FLAG_RXNE) ); // wait until receive complete
 				while( SPI1->SR & SPI_FLAG_BSY ); // wait until SPI is not busy anymore
 				LCD->hspi->Instance->DR; // return received data from SPI data register
-
-
-
-
 			} else {
 				//while ((LCD->hspi->Instance->SR & SPI_FLAG_TXE) == 0);
 				//LCD->hspi->Instance->DR = LCD->palete[(LCD->buffer8[i / 2]) >> 4]; //4 bit
@@ -180,19 +183,32 @@ void TFT::ST7789_Update(void) {
 				while( !(SPI1->SR & SPI_FLAG_RXNE) ); // wait until receive complete
 				while( SPI1->SR & SPI_FLAG_BSY ); // wait until SPI is not busy anymore
 				LCD->hspi->Instance->DR; // return received data from SPI data register
-
-
-
 			}
 		}
 	}
 
 	if (LCD->Bit == 16) {
-		for (i = 0; i < (LCD->TFT_HEIGHT * LCD->TFT_WIDTH); i++) {
-			// HAL_SPI_Transmit_DMA(&hspi1,(uint8_t *)LCD_Buffer, 32400*2);
-			while (!(LCD->hspi->Instance->SR & SPI_SR_TXE))
-				;
-			LCD->hspi->Instance->DR = LCD->buffer16[i];
+		if (fullscreen)
+		{
+			int count = (LCD->TFT_HEIGHT * LCD->TFT_WIDTH);
+			for (i = 0; i < count; i++) {
+			  while (!(LCD->hspi->Instance->SR & SPI_SR_TXE));
+			  LCD->hspi->Instance->DR = LCD->buffer16[i];
+			}
+		}
+		else
+		{
+			uint16_t * p;
+			for ( i = y0 ; i <= y1 ; i++)
+			{
+				p = &LCD->buffer16[0] + i * LCD->TFT_WIDTH + (long int)x0;
+
+				for(ii = x0 ;  ii <= x1 ; ii++)
+				{
+					while (!(LCD->hspi->Instance->SR & SPI_SR_TXE));
+					LCD->hspi->Instance->DR = *p++;
+				}
+			}
 		}
 	}
 

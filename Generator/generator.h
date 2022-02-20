@@ -126,6 +126,10 @@ public:
 		CH2.phase_accumulator_fm = 0;
 	}
 
+
+
+
+
 	_structure_ch CH1, CH2; //Используются для чтения настроек из файла save.dat
 
 	UINT buffer_temp[1024+16]; //Сохраняются данные файлов

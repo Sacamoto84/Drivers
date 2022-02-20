@@ -1,10 +1,3 @@
-/*
- * TFT_SPI.h
- *
- *  Created on: 11 мая 2021 г.
- *      Author: Ivan
- */
-
 #ifndef TFT_SPI_H_
 #define TFT_SPI_H_
 

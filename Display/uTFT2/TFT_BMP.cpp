@@ -337,8 +337,6 @@ BITMAPINFOHEADER bmp_header;
 
 //uint8_t buf[5100] CCMRAM; //Буффер данных
 
-
-
 extern char str1[60]; 
  
 //Только для картино кратнях 4 по ширине
@@ -353,16 +351,14 @@ void TFT::BMP_From_File(int32_t x0, int32_t y0, char * Name)
 	uint8_t bmp_header_buffer[54]; //Буффер заголовка
 	UINT bytesread;
 
-	uint8_t * buf =  NULL;
+	uint8_t BMP_From_File_buf[4100];
 
 	res = f_open(&SDFile, Name, FA_READ);
 	
 	if (res == FR_OK)
 	{
-		SEGGER_SYSVIEW_Warn("malloc");
-		buf = (uint8_t*)malloc(4100);
-		SEGGER_SYSVIEW_Warn("END malloc");
 		
+
 		f_read (&SDFile, &bmp_header_buffer[0], 54, &bytesread);
 		
 		bmp_header.bfType     = (uint16_t *)&bmp_header_buffer[0];
@@ -390,11 +386,11 @@ void TFT::BMP_From_File(int32_t x0, int32_t y0, char * Name)
 		  for(index = 0; index < index_max; index++)
 		  {
 			  if (index % 4096 == 0)
-					f_read (&SDFile, &buf[0], 4096, &bytesread);
+					f_read (&SDFile, &BMP_From_File_buf[0], 4096, &bytesread);
 				
 			  x = (index % (*bmp_header.biWidth)) + x0;
 			  y = *bmp_header.biHeight - (index / (*bmp_header.biWidth)) - 1 + y0;	
-				SetPixel(x,y, bmp_color_table[buf[index % 4096]]);
+				SetPixel(x,y, bmp_color_table[BMP_From_File_buf[index % 4096]]);
 		  }
 		
 		}
@@ -407,24 +403,18 @@ void TFT::BMP_From_File(int32_t x0, int32_t y0, char * Name)
 				for(index = 0; index < index_max; index++)
 				{
 					if (index % 1365 == 0) 
-						f_read (&SDFile, &buf[0], 4095, &bytesread);
+						f_read (&SDFile, &BMP_From_File_buf[0], 4095, &bytesread);
 					
 					x = (index % *bmp_header.biWidth) + x0;
 					y = *bmp_header.biHeight - (index / *bmp_header.biWidth) - 1 + y0;
-					SetPixel(x,y, RGB565(buf[(index % 1365)*3+2], buf[(index % 1365)*3+1],buf[(index % 1365)*3]));
+					SetPixel(x,y, RGB565(BMP_From_File_buf[(index % 1365)*3+2], BMP_From_File_buf[(index % 1365)*3+1],BMP_From_File_buf[(index % 1365)*3]));
 				}
 			}
 		}
 		f_close(&SDFile);
 	}
 
-	SEGGER_SYSVIEW_Warn("free");
-	if (buf)
-	{
-		free(buf);
-		buf = NULL;
-	}
-	SEGGER_SYSVIEW_Warn("END free");
+
 }
 
 void TFT::BMP_From_File_Tr(int32_t x0, int32_t y0, char * Name, uint16_t tr_color)
@@ -520,8 +510,10 @@ void TFT::BMP_From_File_Tr(int32_t x0, int32_t y0, char * Name, uint16_t tr_colo
 }
 
 //32 бит BMP с альфа каналом
-void TFT::BMP_From_File_Alpha(int32_t x0, int32_t y0, char * Name, int offset)
+List_Update_Particle TFT::BMP_From_File_Alpha(int32_t x0, int32_t y0, char * Name, int offset, int swap)
 {
+	List_Update_Particle result;
+
 	int res;
 	uint32_t index;
 	uint32_t index_max;
@@ -537,14 +529,12 @@ void TFT::BMP_From_File_Alpha(int32_t x0, int32_t y0, char * Name, int offset)
 	uint8_t bmp_header_buffer[54]; //Буффер заголовка
 	UINT bytesread;
 
-	uint8_t * buf =  NULL;
+	uint8_t BMP_From_File_buf[4100];
 
 	res = f_open(&SDFile, Name, FA_READ);
 	
 	if (res == FR_OK)
 	{
-		buf = (uint8_t*)malloc(4100);
-		
 		f_read (&SDFile, &bmp_header_buffer, 54, &bytesread);
 		
 		bmp_header.bfType     = (uint16_t *)&bmp_header_buffer[0];
@@ -554,25 +544,44 @@ void TFT::BMP_From_File_Alpha(int32_t x0, int32_t y0, char * Name, int offset)
 		bmp_header.biHeight   = (uint32_t *)&bmp_header_buffer[22];
 		bmp_header.biBitCount = (uint16_t *)&bmp_header_buffer[28];
 		bmp_header.biClrUsed  = (uint32_t *)&bmp_header_buffer[46];
-							
+
+		result.H = *bmp_header.biHeight;
+		result.W = *bmp_header.biWidth;
+
+		result.x0  = x0;
+		result.y0  = y0;
+
+		result.x1  = x0 + result.W - 1;
+		result.y1  = y0 + result.H - 1;
+
 		index_max = *bmp_header.biWidth * *bmp_header.biHeight;
 		
-		if (offset) f_read (&SDFile, &buf, offset, &bytesread);
+		if (offset)
+			f_read (&SDFile, &BMP_From_File_buf, offset, &bytesread);
 		
 		for(index = 0; index < index_max; index++)
 		{
 			if (index % 1024 == 0) 
-				f_read (&SDFile, &buf[0], 4096, &bytesread);
+				f_read (&SDFile, &BMP_From_File_buf[0], 4096, &bytesread);
 			
-			x = (index % (*bmp_header.biWidth)) + x0;
-			y = *bmp_header.biHeight - (index / (*bmp_header.biWidth)) - 1 + y0;	
+			    x = (index % (*bmp_header.biWidth)) + x0;
+			    y = *bmp_header.biHeight - (index / (*bmp_header.biWidth)) - 1 + y0;
 
-			  sAlpha_Float = buf[(index % 1024)*4+3] / 255.0;
+			    sAlpha_Float = BMP_From_File_buf[(index % 1024)*4+3] / 255.0;
 			
-				sR = buf[(index % 1024)*4+2];
-				sG = buf[(index % 1024)*4+1];
-				sB = buf[(index % 1024)*4];
-				
+			    if (swap == 0)
+			    {
+				 sR = BMP_From_File_buf[(index % 1024)*4+2];
+				 sG = BMP_From_File_buf[(index % 1024)*4+1];
+				 sB = BMP_From_File_buf[(index % 1024)*4];
+			    }
+			    else
+			    {
+					 sB = BMP_From_File_buf[(index % 1024)*4+2];
+					 sG = BMP_From_File_buf[(index % 1024)*4+1];
+					 sR = BMP_From_File_buf[(index % 1024)*4];
+			    }
+
 				dColor = GetPixel(x, y);
 			
 				dR = (dColor & 0xF800) >> 8;
@@ -582,22 +591,16 @@ void TFT::BMP_From_File_Alpha(int32_t x0, int32_t y0, char * Name, int offset)
 				oneminusalpha = 1.0F - sAlpha_Float;
 				
 				sR = ((sR * sAlpha_Float) + (oneminusalpha * dR));
-        sG = ((sG * sAlpha_Float) + (oneminusalpha * dG));
-        sB = ((sB * sAlpha_Float) + (oneminusalpha * dB));
+                sG = ((sG * sAlpha_Float) + (oneminusalpha * dG));
+                sB = ((sB * sAlpha_Float) + (oneminusalpha * dB));
 		
-			  sColor = RGB565(sR, sG, sB);
+			    sColor = RGB565(sR, sG, sB);
 				SetPixel(x, y, sColor);
-			
 		}	
 		f_close(&SDFile);
 	}
 
-	if (buf)
-	{
-		free(buf);
-		buf = NULL;
-	}
-
+	return result;
 }
 
 #endif

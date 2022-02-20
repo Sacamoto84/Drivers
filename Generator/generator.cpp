@@ -116,6 +116,9 @@ void GENERATOR::Init(void) {
 	HAL_TIM_Base_Start(&htim6);  //Запуск таймера6 для DAC
 }
 
+
+
+
 void GENERATOR::syg_update(int Buffer_Current) {
 	volatile static uint16_t O1;
 	volatile static uint16_t O2;
