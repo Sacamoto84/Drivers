@@ -303,21 +303,3 @@ void GENERATOR::read_save_ini_to_structure_ch(void)
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

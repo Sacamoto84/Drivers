@@ -2,11 +2,11 @@
 #define _INIFILE_H
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
+//#include <stdio.h>
+//#include <stdlib.h>
+//#include <stdint.h>
 
-#include <fcntl.h>
+//#include <fcntl.h>
 
 #include <ctype.h>
 

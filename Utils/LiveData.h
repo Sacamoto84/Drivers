@@ -28,7 +28,7 @@ public:
   //Событие возвращает true если произошло изменение
   bool onChange()  {
 	  if (*value != lastValue)  {	  lastValue = *value;  return true;	  }
-	  else                      {     lastValue = *value;  return false;  }
+
   }
 
   //Событие возвращает true если произошло изменение в сторону увеличения

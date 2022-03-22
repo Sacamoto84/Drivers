@@ -396,7 +396,7 @@ void TFT::BMP_From_File(int32_t x0, int32_t y0, char * Name)
 		}
 		else //Палитра не используется
 		{
-			if (*bmp_header.biBitCount == 24)
+
 			{
 							
 				index_max = *bmp_header.biWidth * *bmp_header.biHeight;				
@@ -554,7 +554,7 @@ List_Update_Particle TFT::BMP_From_File_Alpha(int32_t x0, int32_t y0, char * Nam
 		result.x1  = x0 + result.W - 1;
 		result.y1  = y0 + result.H - 1;
 
-		index_max = *bmp_header.biWidth * *bmp_header.biHeight;
+
 		
 		if (offset)
 			f_read (&SDFile, &BMP_From_File_buf, offset, &bytesread);

@@ -24,6 +24,10 @@
 #define ABS(x)   ((x) > 0 ? (x) : -(x))
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
 
+#define FontId0 (uint8_t *)(tft.getResAdressFontID(0))
+#define FontId1 (uint8_t *)(tft.getResAdressFontID(1))
+#define FontId2 (uint8_t *)(tft.getResAdressFontID(2))
+#define FontId3 (uint8_t *)(tft.getResAdressFontID(3))
 
 //////////////////////////////////////////////
 //Макросы
@@ -62,6 +66,31 @@ public:
     uint32_t needUpdate;
 
     uint32_t blockUpdate;
+
+
+
+
+    //Для ресурсов
+    uint32_t resurce_count;
+    uint32_t resurce_start_adress; //Начало ресурсов
+    //Bitmap   resurce_bmp;
+    uint32_t *resurce_p;
+
+    void setResStartAdress(uint32_t i) {
+      resurce_start_adress = i;
+      resurce_p = (uint32_t *)resurce_start_adress;
+      resurce_count = *resurce_p;       //Получить количество записей
+    }
+
+    //Получить начало ресурсов
+    uint8_t * getResAdressFontID(uint32_t id) {
+    	uint32_t * offset;
+    	offset = (uint32_t *)(resurce_start_adress + 4 + (16*id) + 12);
+    	uint8_t * adress;
+		adress = (uint8_t *)(resurce_start_adress + *offset);
+  	    return adress;
+    }
+
 
 	void init(uTFT_LCD_t *_LCD) {
 		LCD = _LCD;

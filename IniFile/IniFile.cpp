@@ -229,7 +229,9 @@ bool IniFile::getValue(const char* section, const char* key,
 		return false; // error
 
 	char *endptr;
+
 	float tmp = strtod(buffer, &endptr);
+
 	if (endptr == buffer)
 		return false; // no conversion
 	if (*endptr == '\0') {
