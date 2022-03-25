@@ -19,8 +19,6 @@
 
 #include "./Font/Font.h"
 
-
-
 #define ABS(x)   ((x) > 0 ? (x) : -(x))
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
 

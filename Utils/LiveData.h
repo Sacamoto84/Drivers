@@ -15,12 +15,13 @@ template <typename T>
 class LiveData {
 public:
 
-  //Конструктор
-  LiveData(T * in)
-  {
-	  value = in;
-      lastValue =  ~(*value);
-  }
+	void connect(T * in)
+    {
+  	    value = in;
+        lastValue =  ~(*value);
+    }
+
+
 
   void SetValue(T in)  { *value = in; }
   T    GetValue(void)  { return * value; }

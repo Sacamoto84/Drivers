@@ -33,7 +33,7 @@ void BT_Send_RAW(char *str) {
 		//RTT_CTRL_BG_BRIGHT_YELLOW, RTT_CTRL_RESET);
 		//SEGGER_RTT_printf(0, "%s%s%s%s\n", RTT_CTRL_TEXT_BRIGHT_WHITE,
 		//RTT_CTRL_BG_GREEN, str, RTT_CTRL_RESET);
-		LOG("TX",'D', str);
+		LOG((char *)"TX",'D', str);
 	} else {
 		SEGGER_RTT_printf(0, "%s%sTX>%s", RTT_CTRL_TEXT_BLACK,
 		RTT_CTRL_BG_BRIGHT_YELLOW, RTT_CTRL_RESET);

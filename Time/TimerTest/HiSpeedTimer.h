@@ -1,10 +1,3 @@
-/*
- * HiSpeedTimer.h
- *
- *  Created on: 29 дек. 2020 г.
- *      Author: Ivan
- */
-
 #ifndef HISPEEDTIMER_H_
 #define HISPEEDTIMER_H_
 
@@ -29,6 +22,8 @@ private:
     uint32_t StartCount;
     uint32_t EndCount;
 
+    uint32_t result;
+
 public:
 
 	void Start(void){*Count = 0;}
@@ -49,7 +44,6 @@ public:
 
 	void Log(void)
 	{
-		uint32_t result;
 		result = *Count - 2; //Поправка на вызов
 		SEGGER_RTT_printf(0, ">------- LOG --------<\n",result);
 		SEGGER_RTT_printf(0, "> %d ms\n>--------------------<\n",uwTick);
@@ -61,14 +55,12 @@ public:
 
 	void Log(char * str)
 	{
-		uint32_t result;
 		result = *Count - 2; //Поправка на вызов
 		SEGGER_RTT_printf(0, "%s> %s\n",RTT_CTRL_TEXT_BRIGHT_GREEN,  str);
 		SEGGER_RTT_printf(0, "%s%s> %d ms ",RTT_CTRL_TEXT_BLACK, RTT_CTRL_BG_BRIGHT_GREEN, uwTick);
 		SEGGER_RTT_printf(0, "> %d Tick ",result);
 		SEGGER_RTT_printf(0, "> %d ms %d us\n",result / (SystemCoreClock/1000) , (result - 100000 *(result / 100000))/(SystemCoreClock/1000000));
 		SEGGER_RTT_printf(0, "%s\n", RTT_CTRL_RESET);
-
 	}
 
 };

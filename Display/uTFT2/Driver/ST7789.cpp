@@ -123,7 +123,8 @@ void TFT::ST7789_Update(void)
 
 void TFT::ST7789_Update(List_Update_Particle U)
 {
-	ST7789_Update(U.x0, U.y0, U.x1, U.y1);
+
+	ST7789_Update( constrain(U.x0,0,LCD->TFT_WIDTH - 1) , constrain(U.y0,0,LCD->TFT_HEIGHT - 1), constrain(U.x1,0,LCD->TFT_WIDTH - 1) , constrain(U.y1,0,LCD->TFT_HEIGHT - 1));
 }
 
 
@@ -451,7 +452,7 @@ void TFT::ST7789_UpdateDMA4bit(void) {
 			index++;
 		}
 
-		HAL_SPI_Transmit_DMA(&hspi1, (uint8_t*)line_buffer0, LCD->TFT_WIDTH);
+		HAL_SPI_Transmit_DMA(LCD->hspi, (uint8_t*)line_buffer0, LCD->TFT_WIDTH);
 		while(DMA_TX_Complete == 0){__NOP();};
 		DMA_TX_Complete = 0;
 	}
@@ -518,7 +519,7 @@ void TFT::ST7789_UpdateDMA4bitV2(void) {
 		while(DMA_TX_Complete == 0){__NOP();};
 				DMA_TX_Complete = 0;
 
-		HAL_SPI_Transmit_DMA(&hspi1, (uint8_t*)line_buffer0, LCD->TFT_WIDTH);
+		HAL_SPI_Transmit_DMA(LCD->hspi, (uint8_t*)line_buffer0, LCD->TFT_WIDTH);
 	    //� ��� ����� �������� � ������ 1
 		index_line++;
 		for (int16_t row = 0; row < LCD->TFT_WIDTH; row++) {
@@ -536,7 +537,7 @@ void TFT::ST7789_UpdateDMA4bitV2(void) {
 		DMA_TX_Complete = 0;
 
 
-		HAL_SPI_Transmit_DMA(&hspi1, (uint8_t*)line_buffer1, LCD->TFT_WIDTH);
+		HAL_SPI_Transmit_DMA(LCD->hspi, (uint8_t*)line_buffer1, LCD->TFT_WIDTH);
 		index_line++;
 	}
 
@@ -601,7 +602,7 @@ void TFT::ST7789_UpdateDMA8bitV2(void) {
 		while(DMA_TX_Complete == 0){__NOP();};
 				DMA_TX_Complete = 0;
 
-		HAL_SPI_Transmit_DMA(&hspi1, (uint8_t*)line_buffer0, LCD->TFT_WIDTH);
+		HAL_SPI_Transmit_DMA(LCD->hspi, (uint8_t*)line_buffer0, LCD->TFT_WIDTH);
 	    //� ��� ����� �������� � ������ 1
 		index_line++;
 		for (int16_t row = 0; row < LCD->TFT_WIDTH; row++) {
@@ -613,7 +614,7 @@ void TFT::ST7789_UpdateDMA8bitV2(void) {
 		DMA_TX_Complete = 0;
 
 
-		HAL_SPI_Transmit_DMA(&hspi1, (uint8_t*)line_buffer1, LCD->TFT_WIDTH);
+		HAL_SPI_Transmit_DMA(LCD->hspi, (uint8_t*)line_buffer1, LCD->TFT_WIDTH);
 		index_line++;
 	}
 
@@ -679,7 +680,7 @@ void TFT::ST7789_UpdateDMA16bitV2(void) {
 			while(DMA_TX_Complete == 0){__NOP();};
 					DMA_TX_Complete = 0;
 
-			HAL_SPI_Transmit_DMA(&hspi1, (uint8_t*)line_buffer0, LCD->TFT_WIDTH);
+			HAL_SPI_Transmit_DMA(LCD->hspi, (uint8_t*)line_buffer0, LCD->TFT_WIDTH);
 		    //� ��� ����� �������� � ������ 1
 			index_line++;
 			for (int16_t row = 0; row < LCD->TFT_WIDTH; row++) {
@@ -691,7 +692,7 @@ void TFT::ST7789_UpdateDMA16bitV2(void) {
 			DMA_TX_Complete = 0;
 
 
-			HAL_SPI_Transmit_DMA(&hspi1, (uint8_t*)line_buffer1, LCD->TFT_WIDTH);
+			HAL_SPI_Transmit_DMA(LCD->hspi, (uint8_t*)line_buffer1, LCD->TFT_WIDTH);
 			index_line++;
 		}
 
@@ -741,7 +742,7 @@ void TFT::ST7789_UpdateDMA16bitV3(void) {
 
 		DMA_TX_Complete = 0;
 
-		HAL_SPI_Transmit_DMA(&hspi1, (uint8_t*)LCD_Buffer16, LCD->TFT_WIDTH * LCD->TFT_HEIGHT);
+		HAL_SPI_Transmit_DMA(LCD->hspi, (uint8_t*)LCD->buffer16, LCD->TFT_WIDTH * LCD->TFT_HEIGHT);
 
 		while(DMA_TX_Complete == 0){__NOP();};
 				DMA_TX_Complete = 0;

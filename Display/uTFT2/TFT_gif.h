@@ -1,3 +1,36 @@
+/*
+
+ //Все гиф находятся в папке /Gif/%s/%d.bmp
+ //Имя папки не более 8 символов
+ 
+
+ 
+ TFT_gif gif;
+ gif.init(&tft);
+ gif.setName("BT");
+ gif.setMaxIndex(44);
+ gif.setDelay(0);
+ gif.useAplpha(1);
+ gif.setSwap(0);
+
+ TFT_gif gif2;
+ gif2.init(&tft);
+ gif2.setName("Q1");
+ gif2.setMaxIndex(23);
+ gif2.setDelay(0);
+ gif2.useAplpha(1);
+ gif2.setSwap(0);
+ gif2.SetXY(120, 120);
+ gif2.setOffset(4*21);
+
+
+ gif.run(); Обработчик пеперисовки
+
+ tft.ST7789_Update(gif.info());
+
+ */
+
+
 #ifndef TFT_GIF_H_
 #define TFT_GIF_H_
 
@@ -43,7 +76,7 @@ public:
     void setMaxIndex(int i)    {index_max = i;}
     void setSwap(int i)        {swap = i;}
 
-    List_Update_Particle info(void) {return U;}
+    List_Update_Particle info(void) {return U;} //Информация используемая для того чтобы отрисовать кадр
 
 
   private:

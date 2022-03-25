@@ -15,6 +15,7 @@
 
 class TFT_SPI{
 public:
+
 	uTFT_LCD_t * LCD;
 
 	void init(uTFT_LCD_t * _LCD){LCD = _LCD;}
@@ -38,8 +39,6 @@ public:
 		CMD;
 		HAL_SPI_Transmit(LCD->hspi, &cmd, 1, 1);
 	}
-
-
 
 	// Только для порта настроенного на 16 бит
 	void SendCmd16(uint16_t cmd)
@@ -80,6 +79,7 @@ public:
 void LCD_Select   (void)   {
 	HAL_GPIO_WritePin(LCD->GPIO_CS, LCD->GPIO_Pin_CS, GPIO_PIN_RESET);
 } //CS -> 0
+
 void LCD_UnSelect (void)   {
 	HAL_GPIO_WritePin(LCD->GPIO_CS, LCD->GPIO_Pin_CS, GPIO_PIN_SET);
 } //CS -> 1

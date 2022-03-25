@@ -3,7 +3,7 @@
 #include "SEGGER.h"
 #include "SEGGER_RTT.h"
 #include "SEGGER_RTT_Conf.h"
-#include "SEGGER_SYSVIEW.h"
+//#include "SEGGER_SYSVIEW.h"
 
 //32 бит BMP с альфа каналом
 //void uTFT_BMP_From_File_Alpha(uTFT_LCD_t *LCD, int32_t x0, int32_t y0,
@@ -88,20 +88,8 @@ void TFT::Bitmap_From_Flash(int16_t X, int16_t Y, Bitmap *bmp) {
 
 }
 
+// 756us 216MHz
 void TFT::Bitmap_From_Flash_Background_16bit(Bitmap *bmp) {
-
-	/*
-	const uint16_t *p16;
-	p16 = bmp->steam16;
-
-    uint16_t *p;
-	p = &LCD->buffer16[0];
-
-    int max = LCD->TFT_HEIGHT * LCD->TFT_WIDTH;
-
-    for (int i = 0; i < max; i++)
-    	*p++ = *p16++;
-    */
 
 	const uint32_t *p16;
 	p16 = (uint32_t *)bmp->steam16;
@@ -109,9 +97,19 @@ void TFT::Bitmap_From_Flash_Background_16bit(Bitmap *bmp) {
     uint32_t *p;
 	p = (uint32_t *)&LCD->buffer16[0];
 
-	uint32_t count = LCD->TFT_HEIGHT * LCD->TFT_WIDTH / 2;
+	uint32_t count = LCD->TFT_HEIGHT * LCD->TFT_WIDTH / 2 / 4 / 4 / 2;
 
-	while(count--) *p++ = *p16++;
+	while(count--)
+	{
+		*p++ = *p16++; *p++ = *p16++; *p++ = *p16++; *p++ = *p16++;
+		*p++ = *p16++; *p++ = *p16++; *p++ = *p16++; *p++ = *p16++;
+		*p++ = *p16++; *p++ = *p16++; *p++ = *p16++; *p++ = *p16++;
+		*p++ = *p16++; *p++ = *p16++; *p++ = *p16++; *p++ = *p16++;
+		*p++ = *p16++; *p++ = *p16++; *p++ = *p16++; *p++ = *p16++;
+		*p++ = *p16++; *p++ = *p16++; *p++ = *p16++; *p++ = *p16++;
+		*p++ = *p16++; *p++ = *p16++; *p++ = *p16++; *p++ = *p16++;
+		*p++ = *p16++; *p++ = *p16++; *p++ = *p16++; *p++ = *p16++;
+	}
 
 }
 
@@ -162,7 +160,10 @@ void TFT::Bitmap_From_Flash_Tr(uint16_t X, uint16_t Y,	Bitmap bmp, uint16_t TrCo
 			for (uint16_t pX = X; pX < bmp.x; pX++) {
 				temp = *p16++;
 				if (TrColor != temp)
-					SetPixel(pX, pY, temp);
+				{
+						LCD->buffer16[pX + pY * LCD->TFT_WIDTH] = temp;
+				}
+
 			}
 
 		}
@@ -471,7 +472,7 @@ void TFT::BMP_From_File_Tr(int32_t x0, int32_t y0, char * Name, uint16_t tr_colo
 				if (x <= *bmp_header.biWidth)	
 				{	
 					color =  bmp_color_table[buf[index % 4096]];
-          if (color != tr_color )					
+                    if (color != tr_color )
 					  SetPixel(x,y, color);
 				}					
 		  }
@@ -559,6 +560,8 @@ List_Update_Particle TFT::BMP_From_File_Alpha(int32_t x0, int32_t y0, char * Nam
 		if (offset)
 			f_read (&SDFile, &BMP_From_File_buf, offset, &bytesread);
 		
+		index_max = result.H * result.W;
+
 		for(index = 0; index < index_max; index++)
 		{
 			if (index % 1024 == 0) 

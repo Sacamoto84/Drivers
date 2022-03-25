@@ -1,10 +1,3 @@
-/*
- * HiSpeedTimer.h
- *
- *  Created on: 29 дек. 2020 г.
- *      Author: Ivan
- */
-
 #ifndef HISPEEDTIMER_H_
 #define HISPEEDTIMER_H_
 
@@ -14,6 +7,8 @@
 #include "SEGGER_RTT_Conf.h"
 
 #include "global_define.h"
+
+#include <math.h>
 
 #define    DWT_CYCCNT    *(volatile uint32_t*)0xE0001004
 #define    DWT_CONTROL   *(volatile uint32_t*)0xE0001000
@@ -33,7 +28,6 @@ private:
 
     uint32_t StartCount;
     uint32_t EndCount;
-
 
     uint32_t tickToMs;
 
@@ -75,15 +69,16 @@ public:
 	void Loger(char * str)
 	{
 		result = *Count - 2; //Поправка на вызов
-		//char _str[64];
-		//sprintf(_str, "[ %s ] > %ld Tick > %ld ms %ld us\n", str, result, result / tickToMs , (result - (result / tickToMs)*(SystemCoreClock/1000))/tickToUs);
-		//LOG('I', (char4*)"DWT", &_str[0]);
+		char _str[64];
 		SEGGER_RTT_printf(0, "%s%sDWT>%s",RTT_CTRL_TEXT_BLACK, RTT_CTRL_BG_BRIGHT_YELLOW,RTT_CTRL_RESET);
-		SEGGER_RTT_printf(0, "%s%s [ %s ]%s>",RTT_CTRL_TEXT_BRIGHT_WHITE, RTT_CTRL_BG_GREEN,  str, RTT_CTRL_RESET);
-		//SEGGER_RTT_printf(0, "%s%sDWT>%s",RTT_CTRL_TEXT_BLACK, RTT_CTRL_BG_BRIGHT_YELLOW, RTT_CTRL_RESET);
-		SEGGER_RTT_printf(0, "%s%s %d Tick > %d ms %d us %s\n", RTT_CTRL_TEXT_BRIGHT_WHITE, RTT_CTRL_BG_GREEN, result, result / tickToMs , (result - (result / tickToMs)*(SystemCoreClock/1000))/tickToUs, RTT_CTRL_RESET);
+		SEGGER_RTT_printf(0, "%s%s [ %s ]%s>",RTT_CTRL_TEXT_BRIGHT_WHITE, RTT_CTRL_BG_BLACK,  str, RTT_CTRL_RESET);
+		uint32_t timeus =  result/ tickToUs;
+        sprintf(_str, "%s%s %ld Tick > %ld us %s\n", RTT_CTRL_TEXT_BRIGHT_GREEN, RTT_CTRL_BG_BLACK, result, timeus, RTT_CTRL_RESET);
+		SEGGER_RTT_printf(0, _str);
+
 	}
 
 };
 
 #endif /* HISPEEDTIMER_H_ */
+
