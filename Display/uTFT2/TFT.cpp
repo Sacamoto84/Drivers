@@ -406,3 +406,35 @@ void TFT::scroll(int16_t dx, int16_t dy)
 	    if (dy < 0) RectangleFilled(_sx, _sy + _sh + dy, _sw, -dy, _scolor);
 
 }
+
+
+
+
+
+uint16_t TFT::alphaBlend(uint8_t alpha, uint16_t fgc, uint16_t bgc)
+{
+	// For speed use fixed point maths and rounding to permit a power of 2 division
+	uint16_t fgR = ((fgc >> 10) & 0x3E) + 1;
+	uint16_t fgG = ((fgc >> 4) & 0x7E) + 1;
+	uint16_t fgB = ((fgc << 1) & 0x3E) + 1;
+
+	uint16_t bgR = ((bgc >> 10) & 0x3E) + 1;
+	uint16_t bgG = ((bgc >> 4) & 0x7E) + 1;
+	uint16_t bgB = ((bgc << 1) & 0x3E) + 1;
+
+	// Shift right 1 to drop rounding bit and shift right 8 to divide by 256
+	uint16_t r = (((fgR * alpha) + (bgR * (255 - alpha))) >> 9);
+	uint16_t g = (((fgG * alpha) + (bgG * (255 - alpha))) >> 9);
+	uint16_t b = (((fgB * alpha) + (bgB * (255 - alpha))) >> 9);
+
+	// Combine RGB565 colours into 16 bits
+	return (r << 11) | (g << 5) | (b << 0);
+}
+
+
+
+
+
+
+
+

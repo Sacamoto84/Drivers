@@ -1,3 +1,5 @@
+#ifdef USE_CLI
+
 #include "main.h"
 #include "stm32f4xx_hal.h"
 #include <stdlib.h>
@@ -188,3 +190,5 @@ void BLE_Port_99(int PosS, int len) {
 	BT_Send_ACK_to_Host(99);
 	return;
 }
+
+#endif

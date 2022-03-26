@@ -231,7 +231,7 @@ void TFT::RectangleFilled(uint16_t x, uint16_t y, uint16_t w, uint16_t h,
 	uint32_t i;
 
 	/* Check input parameters */
-	if (x >= LCD->TFT_WIDTH || y >= LCD->TFT_HEIGHT) {
+	if (x >= LCD->TFT_WIDTH || y >= LCD->TFT_HEIGHT || w==0 || h==0 ) {
 		/* Return error */
 		return;
 	}
@@ -255,7 +255,7 @@ void TFT::RectangleFilled(uint16_t x, uint16_t y, uint16_t w, uint16_t h,
 		return;
 	}
 
-	for (i = 0; i <= h; i++) {
+	for (i = 0; i < h; i++) {
 		LineH(y + i, x, x + w, c); //124us
 	}
 

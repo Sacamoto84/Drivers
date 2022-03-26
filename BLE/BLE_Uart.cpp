@@ -17,6 +17,8 @@
 
 #include "usart.h"
 
+#ifdef USE_CLI
+
 #include "BLE_Commands.h"
 
 extern DMA_HandleTypeDef hdma_usart3_tx;
@@ -82,34 +84,7 @@ char buffer30[30];
 volatile uint8_t i19 = 0;
 volatile uint32_t crc = 0xaa;
 
-void USART3_IRQHandler(void)
-{
-  SEGGER_SYSVIEW_RecordEnterISR();
-  static uint8_t USART_data;
 
-	
-  if (USART3->SR & USART_SR_ORE){}
-	
-  //При приеме помещаем в буффер данные
-  if ((USART3->SR & USART_SR_RXNE) && ((USART3->SR & USART_SR_ORE) == 0)){
-    
-		USART_data = USART3->DR;
-        PutChar(USART_data);//принятый байт
-		//SEGGER_RTT_printf(0,"RX:PutChar\n");
-		
-		if(USART_data == 0x24) //$
-		{  
-			 SEGGER_SYSVIEW_Print("RX:End Packet");
-			 //SEGGER_RTT_printf(0,"RX:End Packet$\n");
-			 //SEGGER_RTT_WriteString(0, "U3 RX End Packet '$'\n");
-			 countCommand++;
-			
-		}
-  }	
-	
-	HAL_UART_IRQHandler(&huart3);
-	SEGGER_SYSVIEW_RecordExitISR();
-}
 
 //Возвращает количество байт в буффере
 uint16_t BTserial_available(void){	return count; }
@@ -306,3 +281,39 @@ uint8_t CRC8(char *pcBlock, unsigned int len)
     }
     return _crc;
 }
+
+#endif
+
+void USART3_IRQHandler(void)
+{
+  SEGGER_SYSVIEW_RecordEnterISR();
+  static uint8_t USART_data;
+
+
+  if (USART3->SR & USART_SR_ORE){}
+
+  //При приеме помещаем в буффер данные
+  if ((USART3->SR & USART_SR_RXNE) && ((USART3->SR & USART_SR_ORE) == 0)){
+
+		USART_data = USART3->DR;
+#ifdef USE_CLI
+        PutChar(USART_data);//принятый байт
+		//SEGGER_RTT_printf(0,"RX:PutChar\n");
+
+		if(USART_data == 0x24) //$
+		{
+			 SEGGER_SYSVIEW_Print("RX:End Packet");
+			 //SEGGER_RTT_printf(0,"RX:End Packet$\n");
+			 //SEGGER_RTT_WriteString(0, "U3 RX End Packet '$'\n");
+			 countCommand++;
+
+		}
+#endif
+
+  }
+
+	HAL_UART_IRQHandler(&huart3);
+	SEGGER_SYSVIEW_RecordExitISR();
+}
+
+

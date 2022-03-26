@@ -24,7 +24,7 @@
 #define FALLING 2
 #define RISING 3
 
-#define Now  HAL_GetTick()
+#define Now  uwTick
 
 #define min(a,b) ((a)<(b)?(a):(b))
 #define max(a,b) ((a)>(b)?(a):(b))

@@ -124,7 +124,7 @@ void TFT::ST7789_Update(void)
 void TFT::ST7789_Update(List_Update_Particle U)
 {
 
-	ST7789_Update( constrain(U.x0,0,LCD->TFT_WIDTH - 1) , constrain(U.y0,0,LCD->TFT_HEIGHT - 1), constrain(U.x1,0,LCD->TFT_WIDTH - 1) , constrain(U.y1,0,LCD->TFT_HEIGHT - 1));
+	ST7789_Update( constrain(U.x0,0, LCD->TFT_WIDTH - 1) , constrain(U.y0,0,LCD->TFT_HEIGHT - 1), constrain(U.x1,0,LCD->TFT_WIDTH - 1) , constrain(U.y1,0,LCD->TFT_HEIGHT - 1));
 }
 
 

@@ -437,6 +437,8 @@ public:
 
 	uTFT_t uTFT; //Для установка положения и цвета для текста
 
+	uint16_t alphaBlend(uint8_t alpha, uint16_t fgc, uint16_t bgc);
+
 private:
 
 
