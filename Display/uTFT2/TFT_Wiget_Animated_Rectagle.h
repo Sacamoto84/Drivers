@@ -40,7 +40,7 @@ public:
     {
 
        float temp;
-       char str[32];
+       //char str[32];
 
        float elapsedTimeRate; //Состояние онимации от 0.0 до 1.0
 

@@ -43,12 +43,12 @@ uTFT_LCD_t name={x , y, SPRITE_RAM, 16, NULL , NULL, &name##_buffer16[0],};
 //////////////////////////////////////////////
 
 typedef struct {
-	int x0;
-	int y0;
-	int x1;
-	int y1;
-	int W;
-	int H;
+	int16_t x0;
+	int16_t y0;
+	int16_t x1;
+	int16_t y1;
+	int16_t W;
+	int16_t H;
 } List_Update_Particle;
 
 
