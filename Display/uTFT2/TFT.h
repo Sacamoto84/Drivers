@@ -67,7 +67,7 @@ public:
 
 
 
-
+////////////////////////////////////////////////////////////////////////////////////////////
     //Для ресурсов
     uint32_t resurce_count;
     uint32_t resurce_start_adress; //Начало ресурсов
@@ -88,6 +88,42 @@ public:
 		adress = (uint8_t *)(resurce_start_adress + *offset);
   	    return adress;
     }
+
+    //Получить дескриптов картинки из ресурсов 16 и 32 бит
+    Bitmap getResBitmapID(int8_t id) {
+
+    	Bitmap bmp;
+
+    	if (id == -1)
+    	{
+    	  bmp.H = 0;
+    	  bmp.W = 0;
+    	  bmp.bit = 0;
+    	  bmp.steam8 = 0;
+    	  bmp.steam16 = 0;
+    	  bmp.steam32 = 0;
+    	  return bmp;
+    	}
+
+
+
+    	uint32_t *p;
+    	p = (uint32_t *)(resurce_start_adress + 4 + (16*id));
+    	bmp.W = (uint16_t)*p++;
+    	bmp.H = (uint16_t)*p++;
+    	bmp.steam8 = NULL; bmp.steam16 = NULL; bmp.steam32 = NULL;
+    	bmp.bit =*p++;
+    	uint32_t * offset;
+    	offset = (uint32_t *)(resurce_start_adress + 4 + (16*id) + 12);
+    	if (bmp.bit == 16)
+    		bmp.steam16 = (uint16_t *)(resurce_start_adress + *offset);
+    	if (bmp.bit == 32)
+    		bmp.steam32 = (uint32_t *)(resurce_start_adress + *offset);
+  	    return bmp;
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 
 	void init(uTFT_LCD_t *_LCD) {
@@ -191,7 +227,7 @@ public:
 	__weak void SSD1306_UpdateScreen(void);
 	void SSD1306_Contrast(uint8_t c);
 
-
+    //Быстрее чем color565
 	uint16_t RGB565(uint8_t R, uint8_t G, uint8_t B) {
 		return ((R >> 3) << 11) | ((G >> 2) << 5) | (B >> 3);
 	}

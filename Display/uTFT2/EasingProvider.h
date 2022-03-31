@@ -1,14 +1,11 @@
-/*
- * EasingProvider.h
- *
- *  Created on: 25 мар. 2022 г.
- *      Author: Ivan
- */
+//https://github.com/MasayukiSuda/EasingInterpolator
 
 #ifndef EASINGPROVIDER_H_
 #define EASINGPROVIDER_H_
 
 #include "math.h"      /* pow */
+
+
 
 enum Ease {
     LINEAR,

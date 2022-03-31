@@ -28,13 +28,16 @@ public:
 	List_Update_Particle info(void)       { List_Update_Particle U;  U.H = H; U.W = W; U.x0 = x; U.y0 = y; U.x1 = x + W - 1; U.y1 = y + H - 1; return U; }
     void setEaseP(Ease e)                 { easeP = e; } //Выбор типа движения в анимации
     void setEaseN(Ease e)                 { easeN = e; } //Выбор типа движения в анимации
+
     uint8_t needUpdate(void)              {
     	if (_needUpdate)
     	{
-    		_needUpdate =0;
+    		_needUpdate = 0;
     		return 1;
     	}
     	return 0;};
+
+
 
     void run()
     {
@@ -61,13 +64,11 @@ public:
 
     	  if (typeAnimation == 2){
               uint16_t col = tft->GetPixel(x, y);
-              if (elapsedTimeRate >= 1.0F) elapsedTimeRate = 1.0F; if (elapsedTimeRate <= 0.0F) elapsedTimeRate = 0.0F;
+              if (elapsedTimeRate >= 1.0F) elapsedTimeRate = 1.0F;
+              if (elapsedTimeRate <= 0.0F) elapsedTimeRate = 0.0F;
               uint16_t newcolor = tft->alphaBlend( (uint8_t)(255.0F*elapsedTimeRate), palitra[18], col);
     		  tft->RectangleFilled(x, y, W, H, newcolor);  }
 
-
-           //sprintf(str, "id:%d (+) run P:%d N:%d eT:%d t:%d\n", id, P, N, (int)(elapsedTimeRate*1000), (int)(temp*1000));
-           //SEGGER_RTT_WriteString(0, str);
     	  _needUpdate = 1;
     	}
 
@@ -107,16 +108,18 @@ public:
     		  tft->RectangleFilled(x, y, W, H, newcolor);
     	  }
 
-          //sprintf(str, "id:%d (-) run P:%d N:%d eT:%f t:%f\n", id, P, N, elapsedTimeRate, temp);
-         // SEGGER_RTT_WriteString(0, str);
     	  _needUpdate = 1;
     	}
 
 
        if ((P == 0) && (_select == 1))
        {
-	     tft->RectangleFilled(x, y, W, H, palitra[18]);
-	     _needUpdate = 1;
+	     //tft->RectangleFilled(x, y, W, H, palitra[18]);
+
+	     //if (_needUpdate)
+	    //	 _needUpdate = 0;
+	     //else
+	     //   _needUpdate = 0;
        }
 
       // if ((N == 0) && (_select == 0))

@@ -50,9 +50,9 @@ void TFT::Bitmap_From_Flash(int16_t X, int16_t Y, Bitmap *bmp) {
 		p = bmp->steam8;
 
 		pY = Y;
-		while (pY < Y + bmp->y) {
+		while (pY < Y + bmp->H) {
 			pX = X;
-			while (pX < X + bmp->x) {
+			while (pX < X + bmp->W) {
 				bL = 0;
 				tmpCh = *p++;
 				if (tmpCh) {
@@ -80,8 +80,8 @@ void TFT::Bitmap_From_Flash(int16_t X, int16_t Y, Bitmap *bmp) {
 		const uint16_t *p16;
 		p16 = bmp->steam16;
 
-		for (int16_t pY = Y; pY < bmp->y + Y; pY++) {
-			for (int16_t pX = X; pX < bmp->x + X; pX++)
+		for (int16_t pY = Y; pY < bmp->H + Y; pY++) {
+			for (int16_t pX = X; pX < bmp->W + X; pX++)
 				SetPixel(pX, pY, *p16++);
 		}
 	}
@@ -125,9 +125,9 @@ void TFT::Bitmap_From_Flash_Tr(uint16_t X, uint16_t Y,	Bitmap bmp, uint16_t TrCo
 		uint8_t bL;
 
 		pY = Y;
-		while (pY < Y + bmp.y) {
+		while (pY < Y + bmp.H) {
 			pX = X;
-			while (pX < X + bmp.x) {
+			while (pX < X + bmp.W) {
 				bL = 0;
 				tmpCh = *p++;
 				if (tmpCh) {
@@ -156,8 +156,8 @@ void TFT::Bitmap_From_Flash_Tr(uint16_t X, uint16_t Y,	Bitmap bmp, uint16_t TrCo
 		p16 = bmp.steam16;
 
 		uint16_t temp;
-		for (uint16_t pY = Y; pY < bmp.y; pY++) {
-			for (uint16_t pX = X; pX < bmp.x; pX++) {
+		for (uint16_t pY = Y; pY < bmp.H; pY++) {
+			for (uint16_t pX = X; pX < bmp.W; pX++) {
 				temp = *p16++;
 				if (TrColor != temp)
 				{
@@ -183,14 +183,11 @@ void TFT::Bitmap_From_Flash_Alpha(int32_t x0, int32_t y0,
 	volatile uint8_t sR, sG, sB;
 	volatile uint8_t dR, dG, dB;
 
-	index_max = bmp->x * bmp->y;
+	index_max = bmp->W * bmp->H;
 
 	for (index = 0; index < index_max; index++) {
-	//for (index = index_max; index > 0; index--) {
-
-		x = (index % (bmp->x)) + x0;
-		y =  bmp->y - ((index_max-index) / (bmp->x)) - 1 + y0;
-
+		x = (index % (bmp->W)) + x0;
+		y =  bmp->H - ((index_max-index) / (bmp->W)) - 1 + y0;
 
 		sAlpha_Float = (float) ((bmp->steam32[index] >> 24) / 255.0F)* customAlpha;
 
@@ -211,10 +208,7 @@ void TFT::Bitmap_From_Flash_Alpha(int32_t x0, int32_t y0,
 		sB = ((sB * sAlpha_Float) + (oneminusalpha * dB));
 
 		sColor = RGB565(sR, sG, sB);
-		//SetPixel(x, y, sColor);
-
 		LCD->buffer16[x + y * LCD->TFT_WIDTH] = sColor;
-
 	}
 }
 
