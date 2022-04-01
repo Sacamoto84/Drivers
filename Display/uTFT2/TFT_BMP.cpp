@@ -341,7 +341,7 @@ void TFT::BMP_From_File(int32_t x0, int32_t y0, char * Name)
 	uint32_t index;
 	uint32_t index_max;
 	int32_t x, y;
-	uint32_t dobavka_x;
+	//uint32_t dobavka_x;
 	
 	uint8_t bmp_header_buffer[54]; //Буффер заголовка
 	UINT bytesread;
@@ -418,7 +418,7 @@ void TFT::BMP_From_File_Tr(int32_t x0, int32_t y0, char * Name, uint16_t tr_colo
 	uint32_t index;
 	uint32_t index_max;
 	int32_t x, y;
-	uint32_t dobavka_x;
+	//uint32_t dobavka_x;
 	uint16_t color;
 	
 	uint8_t bmp_header_buffer[54]; //Буффер заголовка
@@ -463,7 +463,7 @@ void TFT::BMP_From_File_Tr(int32_t x0, int32_t y0, char * Name, uint16_t tr_colo
 					f_read (&SDFile, &buf, 4096, &bytesread);
 			  x = (index % (*bmp_header.biWidth)) + x0;
 			  y = *bmp_header.biHeight - (index / (*bmp_header.biWidth)) - 1 + y0;		  
-				if (x <= *bmp_header.biWidth)	
+				if (x <= (int32_t)*bmp_header.biWidth)
 				{	
 					color =  bmp_color_table[buf[index % 4096]];
                     if (color != tr_color )
@@ -484,7 +484,7 @@ void TFT::BMP_From_File_Tr(int32_t x0, int32_t y0, char * Name, uint16_t tr_colo
 						f_read (&SDFile, &buf, 4095, &bytesread);
 					x = (index % (*bmp_header.biWidth)) + x0;
 					y = *bmp_header.biHeight - (index / (*bmp_header.biWidth)) - 1 + y0;	
-					if (x <= *bmp_header.biWidth) 
+					if (x <= (int32_t)*bmp_header.biWidth)
 					{
 						color = RGB565(buf[(index % 1365)*3+2], buf[(index % 1365)*3+1],buf[(index % 1365)*3]);
 						if (color != tr_color )

@@ -87,7 +87,7 @@ uint16_t TFT::Font_Micro_Find_Len_Str(char *str,
 	const uint8_t *peng = &uFont->dataEng[0]; //Начало массива символов
 	const uint8_t *p;
 
-	uint16_t lengs;
+	uint8_t lengs = 0;
 	uint16_t lenSum;
 
 	lenSum = 0;

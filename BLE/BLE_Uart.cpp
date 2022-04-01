@@ -287,16 +287,17 @@ uint8_t CRC8(char *pcBlock, unsigned int len)
 void USART3_IRQHandler(void)
 {
   SEGGER_SYSVIEW_RecordEnterISR();
-  static uint8_t USART_data;
+
 
 
   if (USART3->SR & USART_SR_ORE){}
 
   //При приеме помещаем в буффер данные
   if ((USART3->SR & USART_SR_RXNE) && ((USART3->SR & USART_SR_ORE) == 0)){
-
-		USART_data = USART3->DR;
 #ifdef USE_CLI
+	    static uint8_t USART_data;
+		USART_data = USART3->DR;
+
         PutChar(USART_data);//принятый байт
 		//SEGGER_RTT_printf(0,"RX:PutChar\n");
 

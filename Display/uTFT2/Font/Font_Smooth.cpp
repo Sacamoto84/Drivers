@@ -63,7 +63,7 @@ u64 total_utf8_symbols = BUFSIZE;
 u8* is_cyrillic(u8 code) {
 
 	u8 i;
-	u8 *pos;
+	u8 *pos = NULL;
 
 	if (code != 0xA8 && code != 0xB8 && (code < 0xC0 || code > 0xFF))
 		return pos = NULL;
@@ -72,7 +72,7 @@ u8* is_cyrillic(u8 code) {
 
 		if (code == cp1251_cyrillic_table[i])
 		{
-			//pos = &cp1251_cyrillic_table[i];
+			pos = (u8*)&cp1251_cyrillic_table[i];//?
 		}
 
 	return pos;
@@ -239,9 +239,9 @@ void Font_Smooth_loadMetrics(uint16_t gCount) {
 	uint16_t gNum = 0;
 
 	while (gNum < gCount) {
-		gUnicode[gNum] = (uint16_t) readInt32(); // Unicode code point value
-		gHeight[gNum] = (uint8_t) readInt32(); // Height of glyph
-		gWidth[gNum] = (uint8_t) readInt32(); // Width of glyph
+		gUnicode[gNum]  = (uint16_t) readInt32(); // Unicode code point value
+		gHeight[gNum]   = (uint8_t) readInt32(); // Height of glyph
+		gWidth[gNum]    = (uint8_t) readInt32(); // Width of glyph
 		gxAdvance[gNum] = (uint8_t) readInt32(); // xAdvance - to move x cursor
 		gdY[gNum] = (int16_t) readInt32(); // y delta from baseline
 		gdX[gNum] = (int8_t) readInt32(); // x delta from cursor

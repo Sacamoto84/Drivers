@@ -174,7 +174,7 @@ public:
 			ST7789_Update();
 			break; //1-ST7789
 		case ST7735:
-			ST7735_Update();
+			ST7735_Update(); //-V1037
 			break; //1-ST7789
 		case ST7735S:
 			ST7735_Update();

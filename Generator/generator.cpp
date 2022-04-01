@@ -191,7 +191,7 @@ void GENERATOR::read_save_ini_to_structure_ch(void)
 {
 	SEGGER_RTT_WriteString(0,"\x1B[1;30m>read_save_ini_to_structure_ch();\n");
 
-	char str[16];
+	//char str[16];
 
 	const size_t bufferLen = 80;
 	char buffer[bufferLen];

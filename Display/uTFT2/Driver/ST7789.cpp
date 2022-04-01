@@ -293,7 +293,7 @@ void TFT::ST77XX_Update_MADCTL(void) {
 	if (LCD->GPIO_CS != NULL)
 		CS_0;
 
-	data = 0;
+	//data = 0;
 	data = (LCD->MADCTL.MY << 7) | (LCD->MADCTL.MX << 6) | (LCD->MADCTL.MV << 5)
 			| (LCD->MADCTL.ML << 4) | (LCD->MADCTL.RGB << 3)
 			| (LCD->MADCTL.MH << 2);

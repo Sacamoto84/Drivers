@@ -73,7 +73,7 @@ public:
 		SEGGER_RTT_printf(0, "%s%sDWT>%s",RTT_CTRL_TEXT_BLACK, RTT_CTRL_BG_BRIGHT_YELLOW,RTT_CTRL_RESET);
 		SEGGER_RTT_printf(0, "%s%s [ %s ]%s>",RTT_CTRL_TEXT_BRIGHT_WHITE, RTT_CTRL_BG_BLACK,  str, RTT_CTRL_RESET);
 		uint32_t timeus =  result/ tickToUs;
-        sprintf(_str, "%s%s %ld Tick > %ld us %s\n", RTT_CTRL_TEXT_BRIGHT_GREEN, RTT_CTRL_BG_BLACK, result, timeus, RTT_CTRL_RESET);
+        sprintf(_str, "%s%s %lu Tick > %lu us %s\n", RTT_CTRL_TEXT_BRIGHT_GREEN, RTT_CTRL_BG_BLACK, result, timeus, RTT_CTRL_RESET);
 		SEGGER_RTT_printf(0, _str);
 
 	}
