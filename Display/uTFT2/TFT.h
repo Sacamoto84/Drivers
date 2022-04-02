@@ -92,33 +92,25 @@ public:
     //Получить дескриптов картинки из ресурсов 16 и 32 бит
     Bitmap getResBitmapID(int8_t id) {
 
-    	Bitmap bmp;
+    	Bitmap bmp = {0};
 
     	if (id == -1)
     	{
-    	  bmp.H = 0;
-    	  bmp.W = 0;
-    	  bmp.bit = 0;
-    	  bmp.steam8 = 0;
-    	  bmp.steam16 = 0;
-    	  bmp.steam32 = 0;
     	  return bmp;
     	}
-
-
 
     	uint32_t *p;
     	p = (uint32_t *)(resurce_start_adress + 4 + (16*id));
     	bmp.W = (uint16_t)*p++;
     	bmp.H = (uint16_t)*p++;
-    	bmp.steam8 = NULL; bmp.steam16 = NULL; bmp.steam32 = NULL;
     	bmp.bit =*p++;
+
     	uint32_t * offset;
+
     	offset = (uint32_t *)(resurce_start_adress + 4 + (16*id) + 12);
-    	if (bmp.bit == 16)
-    		bmp.steam16 = (uint16_t *)(resurce_start_adress + *offset);
-    	if (bmp.bit == 32)
-    		bmp.steam32 = (uint32_t *)(resurce_start_adress + *offset);
+
+    	bmp.data = (uint32_t *)(resurce_start_adress + *offset);
+
   	    return bmp;
     }
     ////////////////////////////////////////////////////////////////////////////////////////////

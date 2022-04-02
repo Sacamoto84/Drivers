@@ -57,6 +57,9 @@ enum ANIMATION_COMMAND_STATE {
 	END
 };
 
+#define BIT32 3
+#define BIT16 1
+
 class TFT_gif {
 public:
 
@@ -102,6 +105,10 @@ public:
 		int res = f_open(&SDFile, current_patch, FA_READ);
 		char BMP_From_File_buf[64];
 
+		int b = 0;
+
+		field.bit = 0;
+
 		if (res == FR_OK) {
 			f_gets(BMP_From_File_buf, 16, &SDFile);
 			H = atoi(BMP_From_File_buf);
@@ -110,17 +117,21 @@ public:
 
 			f_gets(BMP_From_File_buf, 16, &SDFile);
 
-			if (atoi(BMP_From_File_buf) == 32)
-				field.bit32 = 1;
-			else
-				field.bit32 = 0;
+		    b = atoi(BMP_From_File_buf);
+
+			if (b == 32)
+				field.bit = BIT32;
+
+			if (b == 24)
+				field.bit = 0;
+
+			if (b == 16)
+				field.bit = BIT16;
 
 			f_gets(BMP_From_File_buf, 16, &SDFile);
 			index_max = atoi(BMP_From_File_buf) - 1;
 
-			SEGGER_RTT_printf(0,
-					"(+) GIF name: %s  H: %d  W: %d  32bit: %d  frame: %d\n",
-					name_gif, H, W, field.bit32, index_max + 1);
+			SEGGER_RTT_printf(0, "(+) GIF name: %s  H: %d  W: %d  bit: %d  frame: %d\n", name_gif, H, W, field.bit, index_max + 1);
 		}
 		f_close(&SDFile);
 
@@ -145,22 +156,18 @@ public:
 	ANIMATION_COMMAND_STATE state_animation = STOP;
 
 	struct fieldbite {
-		unsigned vector :1; //uint8_t vector = 0; //направление анимации 0- прямое 1- обратное
-		unsigned enabled :1;
-		unsigned needUpdate :1;
-		unsigned bit32 :1;
+		unsigned int vector :1; //uint8_t vector = 0; //направление анимации 0- прямое 1- обратное
+		unsigned int needUpdate :1;
+		unsigned int bit :2; //1-16 3-32 0-error
 	} field;
 
 	uint8_t  delay = 100; //Задержка
-
-	Bitmap bmpStop = {0}; //Картинка отображаемая при отсуствии анимации
+	Bitmap   bmpStop = {0}; //Картинка отображаемая при отсуствии анимации
 
 private:
 
-
-
 	uint16_t   index_max = 0;            //Максимальный индекс
-	int16_t   index_current = 0;        //Текущий индекс
+	int16_t    index_current = 0;        //Текущий индекс
 
 	uint8_t H = 0;
 	uint8_t W = 0;
@@ -172,24 +179,20 @@ private:
 	uint32_t start_time = 0; //Записываем время начала проприсовки анимации
 	char name_gif[8] = { 0 };                //Название Gif папки
 
-
-
-
-
-    //Открыть картирку по индексу
+    //Открыть картирку по индексу 16 и 24 бит
 	void openBMPfromIndex(uint8_t i) {
-
-		//TimerT5.Start();
-
 		char current_patch[32]; //Полный путь к файлу
-
 		sprintf(current_patch, "/Gif/%s/res.bin", name_gif); //Собираем полный путь в файлу
 
-		//TimerDWT.Start();
 		int res = f_open(&SDFile, current_patch, FA_READ); //1667us -Of Gen off Fat32 2к  1360 Fat16 16к
-		//TimerDWT.Loger("f_open");
 
-		uint8_t BMP_From_File_buf[4100];
+		if(res != FR_OK)		{
+			SEGGER_RTT_printf(0, "Gif>ERROR open file>%s\n", current_patch);
+			f_close(&SDFile);  //7uS
+		    return;
+		}
+
+		uint8_t BMP_From_File_buf[4100] __attribute__((aligned (4)));
 
 		uint32_t index;
 		UINT bytesread;
@@ -197,72 +200,115 @@ private:
 		uint32_t max = H * W;
 		int32_t _x, _y;
 
-		uint16_t sColor;
-
 		float sAlpha_Float;
-		float oneminusalpha;
-		uint16_t dColor;
+		float oneminusalpha_Float;
+
+		//int32_t alpha;
+		//int32_t oneminusalpha;
+
+		uint32_t dColor;
+		uint32_t sColor;
 
 		uint32_t sR, sG, sB;
 		uint32_t dR, dG, dB;
+		uint32_t R, G, B;
 
-		if (field.bit32) {
+		if (field.bit == BIT32) {
 
-			//TimerT5.Start();
+			res = f_lseek(&SDFile, i * max * 4); //656us -Of Gen off
 
-			if (res == FR_OK) {
-
-				//TimerDWT.Start();
-				f_lseek(&SDFile, i * max * 4); //656us -Of Gen off
-				//TimerDWT.Loger("f_lseek");
-
-				for (index = 0; index < max; index++) {
-
-					if (index % 1024 == 0) {
-						//TimerDWT.Start();
-						f_read(&SDFile, &BMP_From_File_buf[0], 4096,
-								&bytesread); ////915us -Of Gen off
-						//TimerDWT.Loger("f_read");
-					}
-
-					_x = (index % W) + x;
-					_y = (index / W) + y;
-
-					sAlpha_Float = BMP_From_File_buf[(index % 1024) * 4] / 255.0;
-
-					sR = BMP_From_File_buf[(index % 1024) * 4 + 1];
-					sG = BMP_From_File_buf[(index % 1024) * 4 + 2];
-					sB = BMP_From_File_buf[(index % 1024) * 4 + 3];
-
-					dColor = tft->LCD->buffer16[_x + _y * tft->LCD->TFT_WIDTH];
-
-					dR = (dColor & 0xF800) >> 8;
-					dG = (dColor & 0x7E0)  >> 3;
-					dB = (dColor & 0x1F)   << 3;
-
-					oneminusalpha = 1.0F - sAlpha_Float;
-
-					sR = ((sR * sAlpha_Float) + (oneminusalpha * dR));
-					sG = ((sG * sAlpha_Float) + (oneminusalpha * dG));
-					sB = ((sB * sAlpha_Float) + (oneminusalpha * dB));
-
-					sColor = tft->RGB565(sR, sG, sB);
-					tft->LCD->buffer16[_x + _y * tft->LCD->TFT_WIDTH] = sColor;
-
-				}
+			if(res != FR_OK)
+			{
+				SEGGER_RTT_WriteString(0, "Gif>32>ERROR f_lseek\n");
+				f_close(&SDFile);  //7uS
+			    return;
 			}
 
-			//TimerT5.Loger("Rutine");
+			uint32_t *p;
+
+			for (index = 0; index < max; index++)
+			{
+				if (index % 1024 == 0) {
+					f_read(&SDFile, &BMP_From_File_buf[0], 4096,
+							&bytesread); ////915us -Of Gen off
+					p = (uint32_t *)&BMP_From_File_buf[0];
+				}
+
+				_x = (index % W) + x;
+				_y = (index / W) + y;
+
+				sAlpha_Float = BMP_From_File_buf[(index % 1024) * 4 ] / 255.0F;
+				sR           = BMP_From_File_buf[(index % 1024) * 4 + 1];
+				sG           = BMP_From_File_buf[(index % 1024) * 4 + 2];
+				sB           = BMP_From_File_buf[(index % 1024) * 4 + 3];
+
+				dColor = tft->LCD->buffer16[_x + _y * tft->LCD->TFT_WIDTH];
+
+				dR = (dColor & 0xF800) >> 8;
+				dG = (dColor & 0x7E0)  >> 3;
+				dB = (dColor & 0x1F)   << 3;
+
+				oneminusalpha_Float = 1.0F - sAlpha_Float;
+
+				R = ((sR * sAlpha_Float) + (oneminusalpha_Float * dR));
+				G = ((sG * sAlpha_Float) + (oneminusalpha_Float * dG));
+				B = ((sB * sAlpha_Float) + (oneminusalpha_Float * dB));
+
+				sColor = tft->RGB565(R, G, B);
+				tft->LCD->buffer16[_x + _y * tft->LCD->TFT_WIDTH] = sColor;
+
+				}
+
+			f_close(&SDFile);  //7uS
+			return;
 		}
-		//U = (tft->BMP_From_File_Alpha(x, y, current_patch, offset, field.swap));
-		else {
 
+		if (field.bit == BIT16) {
 
+			res = f_lseek(&SDFile, i * max * 2); //656us -Of Gen off
 
+			if(res != FR_OK)
+			{
+				SEGGER_RTT_WriteString(0, "Gif>16>ERROR f_lseek\n");
+				f_close(&SDFile);  //7uS
+			    return;
+			}
+
+			uint16_t *p;
+
+			for (index = 0; index < max; index++)
+			{
+				if (index % 2048 == 0) {
+					f_read(&SDFile, &BMP_From_File_buf[0], 4096,
+							&bytesread); ////915us -Of Gen off
+					p = (uint16_t *)&BMP_From_File_buf[0];
+				}
+				_x = (index % W) + x;
+				_y = (index / W) + y;
+				sColor = *p++;
+				tft->LCD->buffer16[_x + _y * tft->LCD->TFT_WIDTH] = sColor;
+			}
+
+			f_close(&SDFile);  //7uS
+			return;
 		}
-		//tft->BMP_From_File(x, y, current_patch);
 
-		f_close(&SDFile);  //7uS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	}
 
@@ -281,10 +327,10 @@ private:
 					if ((bmpStop.H) &&	(index_current == 0))
 					{
 
-						if(field.bit32)
+						if(field.bit)
 							tft->Bitmap_From_Flash_Alpha(x, y, &bmpStop, 1.0F);
 						else
-							Bitmap_From_Flash(x, y, &bmpStop);
+							Bitmap_From_Flash_16b(x, y, &bmpStop);
 					}
 					else
 					{
@@ -323,10 +369,10 @@ private:
 
 					if (bmpStop.H)
 					{
-						if(field.bit32)
-					      tft->Bitmap_From_Flash_Alpha(x, y, &bmpStop, 1.0F);
+						if(field.bit)
+					      Bitmap_From_Flash_32b(x, y, &bmpStop);
 						else
-						  Bitmap_From_Flash(x, y, &bmpStop);
+						  Bitmap_From_Flash_16b(x, y, &bmpStop);
 					}
 					else{
 					  openBMPfromIndex(0);
@@ -395,48 +441,28 @@ private:
 
 			//Один раз воспроизвести и остановиться на последнем кадре
 			if (trigger == HOVER) {
-
 				if (state_animation == STOP) {
+					//SEGGER_RTT_WriteString(0, "STOP\n");
 
-					SEGGER_RTT_WriteString(0, "STOP\n");
-
-					if (bmpStop.H)
-					{
-
-						if(field.bit32)
-						{
-							TimerDWT.Start();
-					        Bitmap_From_Flash_32b(x, y, &bmpStop);
-					        TimerDWT.Loger((char*)"Bitmap_From_Flash_Alpha 32b");
-						}
-						else
-						{
-							TimerDWT.Start();
-						    Bitmap_From_Flash(x, y, &bmpStop);
-						    TimerDWT.Loger((char*)"Bitmap_From_Flash 16b");
-						}
-
-
-					}
-					else{
-
-					  TimerDWT.Start();
-					  openBMPfromIndex(index_max);
-					  TimerDWT.Loger((char*)"openBMPfromIndex (index_max)");
+					switch (bmpStop.bit) {
+						case 32: Bitmap_From_Flash_32b(x, y, &bmpStop);	break;
+						case 24: Bitmap_From_Flash_24b(x, y, &bmpStop);	break;
+						case 16: Bitmap_From_Flash_16b(x, y, &bmpStop);	break;
+						default: openBMPfromIndex(index_max); break; //Когда нет картинки в ресурсах
 					}
 
 					start_time = uwTick; //Запомнили начало
-
-
-
 					return;
 				}
 
 				if (state_animation == PLAY) {
 
-					SEGGER_RTT_WriteString(0, "PLAY\n");
+					//SEGGER_RTT_WriteString(0, "PLAY\n");
 
+					TimerDWT.Start();
 					openBMPfromIndex(index_current);
+					TimerDWT.Loger((char*)"openBMPfromIndex");
+
 					index_current++;
 					if (index_current > index_max) {
 						index_current = index_max;
@@ -450,16 +476,14 @@ private:
 
 
 		}
-
 		start_time = uwTick; //Запомнили начало
-
 	}
 
 
-	void Bitmap_From_Flash(int16_t X, int16_t Y, Bitmap *bmp) {
+	void Bitmap_From_Flash_16b(int16_t X, int16_t Y, Bitmap *bmp) {
 
 			const uint16_t *p16;
-			p16 = bmp->steam16;
+			p16 = (uint16_t *)bmp->data;
 			int32_t pX;
 			int32_t pY;
 		    int _H = bmp->H + Y;
@@ -471,6 +495,36 @@ private:
 			}
 	}
 
+	void Bitmap_From_Flash_24b(int16_t X, int16_t Y, Bitmap *bmp) {
+
+		    SEGGER_RTT_WriteString(0, "Bitmap_From_Flash_24b\n");
+
+
+			const uint8_t *p8;
+			p8 = (uint8_t *)bmp->data;
+			int32_t pX;
+			int32_t pY;
+		    int _H = bmp->H + Y;
+		    int _W = bmp->W + X;
+
+		    uint8_t A, HI;
+			uint16_t Color;
+			uint16_t dColor;
+			uint32_t delta;
+
+			for ( pY = Y; pY < _H; pY++) {
+				for ( pX = X; pX < _W; pX++)
+				{
+					A = *p8++;
+				    HI = *p8++;
+				    Color = HI | ( *p8++ << 8 );
+				    delta = pX + pY * 240;
+				    dColor = tft->LCD->buffer16[delta];
+				    tft->LCD->buffer16[delta] = tft->alphaBlend(A, Color, dColor);
+				}
+			}
+
+	}
 	//32 бит BMP с альфа каналом Сохранять как инвертированая альфа и свап  , customAlpha = 1.0 полная альфа
 	void Bitmap_From_Flash_32b(int16_t x0, int16_t y0,	Bitmap *bmp) {
 
@@ -493,7 +547,7 @@ private:
 		uint32_t deltaX;
 
 		uint8_t *p8;
-		p8 = (uint8_t *)&bmp->steam32[0];
+		p8 = (uint8_t *)&bmp->data[0];
 
 		for ( pY = y0; pY < _H; pY++) {
 			for ( pX = x0; pX < _W; pX++)
@@ -527,8 +581,6 @@ private:
 
 
 	}
-
-
 
 };
 

@@ -47,7 +47,7 @@ void TFT::Bitmap_From_Flash(int16_t X, int16_t Y, Bitmap *bmp) {
 		uint8_t bL;
 		const uint8_t *p;
 
-		p = bmp->steam8;
+		p = (uint8_t *)bmp->data;
 
 		pY = Y;
 		while (pY < Y + bmp->H) {
@@ -117,7 +117,7 @@ void TFT::Bitmap_From_Flash_Tr(uint16_t X, uint16_t Y,	Bitmap bmp, uint16_t TrCo
 
 	if (bmp.bit == 1) {
 		const uint8_t *p;
-		p = bmp.steam8;
+		p = (uint8_t *)bmp.data;
 
 		uint8_t pX;
 		uint8_t pY;

@@ -93,13 +93,16 @@ typedef struct {
 
 // Bitmap
 typedef struct {
-	uint16_t W;
-	uint16_t H;
-	unsigned char  * steam8;
-	unsigned short * steam16;
-	unsigned int   * Palette;
-	unsigned int     bit;     //1,8,16,32
-	uint32_t       * steam32;
+	uint16_t  W;
+	uint16_t  H;
+	uint32_t  bit;     //1,8,16,24,32
+	uint32_t * data;
+	uint32_t * palette;
+
+	//unsigned char  * steam8;  //Убрать
+	unsigned short * steam16; //Убрать
+	uint32_t       * steam32; //Убрать
+
 } Bitmap;
 
 
