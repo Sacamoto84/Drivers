@@ -52,6 +52,7 @@ enum ANIMATION_TRIGGERS {
 enum ANIMATION_COMMAND_STATE {
 	STOP,    //Отобразить первый кадр
 	PLAY,    //Начать анимацию
+	PLAYMORPH,
 	REPLAY,
 	PAUSE,   //Остановить на текущем кадре
 	END
@@ -65,6 +66,11 @@ public:
 
 	void init(TFT *_TFT) {tft = _TFT;}
 
+	void setIndexMax(void)
+	{
+	  index_current = index_max;
+	}
+
 	void command(ANIMATION_COMMAND_STATE c) {
 
 		switch (c) {
@@ -74,6 +80,13 @@ public:
 				index_current = 0;
 				state_animation = PLAY;
 				field.vector = 0;
+			}
+			break;
+
+
+		case PLAYMORPH:
+			if (state_animation != PLAY) {
+				state_animation = PLAY;
 			}
 			break;
 
@@ -164,6 +177,8 @@ public:
 	uint8_t  delay = 100; //Задержка
 	Bitmap   bmpStop = {0}; //Картинка отображаемая при отсуствии анимации
 
+	Bitmap   bmpStart = {0}; //Картинка отображаемая при отсуствии анимации
+
 private:
 
 	uint16_t   index_max = 0;            //Максимальный индекс
@@ -179,8 +194,20 @@ private:
 	uint32_t start_time = 0; //Записываем время начала проприсовки анимации
 	char name_gif[8] = { 0 };                //Название Gif папки
 
+
+
+
+
+
+
+
+
+
+
+
     //Открыть картирку по индексу 16 и 24 бит
 	void openBMPfromIndex(uint8_t i) {
+
 		char current_patch[32]; //Полный путь к файлу
 		sprintf(current_patch, "/Gif/%s/res.bin", name_gif); //Собираем полный путь в файлу
 
@@ -203,9 +230,6 @@ private:
 		float sAlpha_Float;
 		float oneminusalpha_Float;
 
-		//int32_t alpha;
-		//int32_t oneminusalpha;
-
 		uint32_t dColor;
 		uint32_t sColor;
 
@@ -213,7 +237,13 @@ private:
 		uint32_t dR, dG, dB;
 		uint32_t R, G, B;
 
+		//uint32_t *p;
+
+		uint16_t *p16;
+
 		if (field.bit == BIT32) {
+
+
 
 			res = f_lseek(&SDFile, i * max * 4); //656us -Of Gen off
 
@@ -224,14 +254,14 @@ private:
 			    return;
 			}
 
-			uint32_t *p;
+
 
 			for (index = 0; index < max; index++)
 			{
 				if (index % 1024 == 0) {
 					f_read(&SDFile, &BMP_From_File_buf[0], 4096,
 							&bytesread); ////915us -Of Gen off
-					p = (uint32_t *)&BMP_From_File_buf[0];
+					//p = (uint32_t *)&BMP_From_File_buf[0];
 				}
 
 				_x = (index % W) + x;
@@ -263,7 +293,11 @@ private:
 			return;
 		}
 
+
+
 		if (field.bit == BIT16) {
+
+
 
 			res = f_lseek(&SDFile, i * max * 2); //656us -Of Gen off
 
@@ -274,18 +308,19 @@ private:
 			    return;
 			}
 
-			uint16_t *p;
+
+			p16 = (uint16_t *)&BMP_From_File_buf[0];
 
 			for (index = 0; index < max; index++)
 			{
 				if (index % 2048 == 0) {
 					f_read(&SDFile, &BMP_From_File_buf[0], 4096,
 							&bytesread); ////915us -Of Gen off
-					p = (uint16_t *)&BMP_From_File_buf[0];
+					p16 = (uint16_t *)&BMP_From_File_buf[0];
 				}
 				_x = (index % W) + x;
 				_y = (index / W) + y;
-				sColor = *p++;
+				sColor = *p16++;
 				tft->LCD->buffer16[_x + _y * tft->LCD->TFT_WIDTH] = sColor;
 			}
 
@@ -323,24 +358,21 @@ private:
 
 				if (state_animation == STOP) {
 
-
-					if ((bmpStop.H) &&	(index_current == 0))
-					{
-
-						if(field.bit)
-							tft->Bitmap_From_Flash_Alpha(x, y, &bmpStop, 1.0F);
-						else
-							Bitmap_From_Flash_16b(x, y, &bmpStop);
-					}
-					else
-					{
-						openBMPfromIndex(index_current--);
-					}
-
-					//openBMPfromIndex(index_current--);
+					index_current--;
 					if (index_current < 0)
+					{
 						index_current = 0;
 
+						switch (bmpStart.bit) {
+							case 32: Bitmap_From_Flash_32b(x, y, &bmpStart);	break;
+							case 24: Bitmap_From_Flash_24b(x, y, &bmpStart);	break;
+							case 16: Bitmap_From_Flash_16b(x, y, &bmpStart);	break;
+							default: openBMPfromIndex(0); break; //Когда нет картинки в ресурсах
+						}
+
+					}
+					else
+					  openBMPfromIndex(index_current--);
 
 					start_time = uwTick; //Запомнили начало
 					return;
@@ -348,12 +380,20 @@ private:
 
 				if (state_animation == PLAY) {
 
-					openBMPfromIndex(index_current++);
-
-					if (index_current > index_max) {
+					index_current++;
+					if (index_current >= index_max) {
 						index_current = index_max;
-					}
 
+						switch (bmpStop.bit) {
+							case 32: Bitmap_From_Flash_32b(x, y, &bmpStop);	break;
+							case 24: Bitmap_From_Flash_24b(x, y, &bmpStop);	break;
+							case 16: Bitmap_From_Flash_16b(x, y, &bmpStop);	break;
+							default: openBMPfromIndex(index_max); break; //Когда нет картинки в ресурсах
+						}
+
+					}
+					else
+					  openBMPfromIndex(index_current);
 
 					start_time = uwTick; //Запомнили начало
 					return;
@@ -367,16 +407,13 @@ private:
 
 				if (state_animation == STOP) {
 
-					if (bmpStop.H)
-					{
-						if(field.bit)
-					      Bitmap_From_Flash_32b(x, y, &bmpStop);
-						else
-						  Bitmap_From_Flash_16b(x, y, &bmpStop);
+					switch (bmpStart.bit) {
+						case 32: Bitmap_From_Flash_32b(x, y, &bmpStart);	break;
+						case 24: Bitmap_From_Flash_24b(x, y, &bmpStart);	break;
+						case 16: Bitmap_From_Flash_16b(x, y, &bmpStart);	break;
+						default: openBMPfromIndex(0); break; //Когда нет картинки в ресурсах
 					}
-					else{
-					  openBMPfromIndex(0);
-					}
+
 
 					start_time = uwTick; //Запомнили начало
 					return;
@@ -430,7 +467,13 @@ private:
 
 				if (state_animation == STOP) {
 
-					openBMPfromIndex(0);
+					switch (bmpStart.bit) {
+						case 32: Bitmap_From_Flash_32b(x, y, &bmpStart);	break;
+						case 24: Bitmap_From_Flash_24b(x, y, &bmpStart);	break;
+						case 16: Bitmap_From_Flash_16b(x, y, &bmpStart);	break;
+						default: openBMPfromIndex(0); break; //Когда нет картинки в ресурсах
+					}
+
 					start_time = uwTick; //Запомнили начало
 					return;
 				}

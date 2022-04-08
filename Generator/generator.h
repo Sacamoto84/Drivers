@@ -48,14 +48,14 @@ typedef struct {
 	char AM_mod[20];          //Имя файла
 
 	uint16_t FM_Base;
-	uint16_t FM_Dev;
+	float    FM_Dev;
 	char FM_mod[20];       //Имя файла
 	float FM_mod_fr;        //Часта модуляции
 
 	//Буфферы
 	uint16_t buffer_carrier[SAMPLES];
 	uint16_t buffer_am[AM_MODSAMPLES];
-	uint16_t buffer_fm[FM_MODSAMPLES];
+	float    buffer_fm[FM_MODSAMPLES];
 
 	uint32_t rC;		     //Частота несущей 1
 	uint32_t angle_cr;

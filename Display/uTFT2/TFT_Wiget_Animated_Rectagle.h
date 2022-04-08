@@ -114,10 +114,10 @@ public:
 
        if ((P == 0) && (_select == 1))
        {
-	     //tft->RectangleFilled(x, y, W, H, palitra[18]);
+	     tft->RectangleFilled(x, y, W, H, palitra[18]);
 
 	     //if (_needUpdate)
-	    //	 _needUpdate = 0;
+	    	 _needUpdate = 1;
 	     //else
 	     //   _needUpdate = 0;
        }

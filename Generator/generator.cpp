@@ -53,7 +53,7 @@ void GENERATOR::Create_AM_Modulation(_structure_ch *_CH) {
 
 //Прочесть файл FM модуляции и записать в буффер "/Mod/_CH->FM_mod"
 void GENERATOR::Create_FM_Modulation(_structure_ch *_CH) {
-	uint16_t x, y;
+	float x, y;
 	//UINT *p;
 	char str[40] = { 0 };
 
@@ -77,7 +77,7 @@ void GENERATOR::Create_FM_Modulation(_structure_ch *_CH) {
 	p = (uint16_t*)&buffer_temp[0];
 
 	for (i = 0; i < 512; i++) {
-		_CH->buffer_fm[i] = x + (y * *p / 4095.0F);
+		_CH->buffer_fm[i] = x + (y * (float)*p / 4095.0F);
 		p += 2;
 	}
 
