@@ -17,7 +17,7 @@ void BT_Send_String_to_Host(int index, char * outstr);
 void BT_Port_00(int PosS, int len);
 void BLE_Port_01(int PosS, int len);
 //CLI
-void BLE_Port_98(int PosS, int len);
+extern void BLE_Port_98(int PosS, int len);
 //Установка Яркости экрана OK
 void BLE_Port_99(int PosS, int len);
 

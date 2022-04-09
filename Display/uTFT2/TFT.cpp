@@ -109,7 +109,8 @@ void TFT::Fill(uint16_t color) {
 	}
 
 	if (LCD->Bit == 16) {
-		for (int32_t i = 0; i < (LCD->TFT_HEIGHT * LCD->TFT_WIDTH); i++)
+		int ii = LCD->TFT_HEIGHT * LCD->TFT_WIDTH;
+		for (int32_t i = 0; i < ii; i++)
 			LCD->buffer16[i] = color;
 
 		/*

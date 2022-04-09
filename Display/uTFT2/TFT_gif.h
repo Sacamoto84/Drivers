@@ -46,7 +46,8 @@ enum ANIMATION_TRIGGERS {
 	HOVER,      //Запуск без повторения застываем на последнем кадре
 	LOOP,       //Запуск с повторнением
 	MORPH,      //Запуск вперед пока есть поздействие и возврат
-	BOOMERANG   //Запуск приводит к движению в перед и назад
+	BOOMERANG,   //Запуск приводит к движению в перед и назад
+	ONCE        //Запуск Сначала невидимого обьекта с последующим исчезновением в конце
 };
 
 enum ANIMATION_COMMAND_STATE {
@@ -207,6 +208,8 @@ private:
 
     //Открыть картирку по индексу 16 и 24 бит
 	void openBMPfromIndex(uint8_t i) {
+
+		if (i>index_max) return;
 
 		char current_patch[32]; //Полный путь к файлу
 		sprintf(current_patch, "/Gif/%s/res.bin", name_gif); //Собираем полный путь в файлу
@@ -516,6 +519,29 @@ private:
 					return;
 				}
 			}
+
+
+			//Один раз воспроизвести и остановиться на последнем кадре
+			if (trigger == ONCE) {
+				if (state_animation == STOP) {
+					return;
+				}
+
+				if (state_animation == PLAY) {
+
+					openBMPfromIndex(index_current);
+
+					index_current++;
+					if (index_current > index_max) {
+						index_current = index_max;
+						state_animation = STOP;
+					}
+
+					return;
+				}
+			}
+
+
 
 
 		}

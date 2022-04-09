@@ -8,18 +8,16 @@
 #include "usart.h"
 #include "SEGGER_RTT.h"
 #include "SEGGER_SYSVIEW.h"
-
-//#include "BLE.h"
-
 #include "tim.h"
-
 #include "SEGGER_SYSVIEW.h" 
-
 #include "usart.h"
+#include "global_define.h"
 
 #ifdef USE_CLI
 
 #include "BLE_Commands.h"
+
+extern void BLE_Port_98(int PosS, int len);
 
 extern DMA_HandleTypeDef hdma_usart3_tx;
 
@@ -31,7 +29,7 @@ void StartTaskLCD(void);
 //Кольцевой буффер
 ////////////////////
 //https://chipenable.ru/index.php/programming-avr/44-uchebnyy-kurs-organizatsiya-obmena-po-usart-u-s-ispolzovaniem-koltsevogo-bufera.html
-#define SIZE_BUF 2048
+#define SIZE_BUF 2048*3
 
 volatile unsigned char cycleBuf[SIZE_BUF] CCMRAM; //Кольцевой приемный буффер 8K
 
@@ -284,12 +282,8 @@ uint8_t CRC8(char *pcBlock, unsigned int len)
 
 #endif
 
-void USART3_IRQHandler(void)
+extern "C" void USART3_IRQHandler(void)
 {
-  SEGGER_SYSVIEW_RecordEnterISR();
-
-
-
   if (USART3->SR & USART_SR_ORE){}
 
   //При приеме помещаем в буффер данные
@@ -314,7 +308,6 @@ void USART3_IRQHandler(void)
   }
 
 	HAL_UART_IRQHandler(&huart3);
-	SEGGER_SYSVIEW_RecordExitISR();
 }
 
 

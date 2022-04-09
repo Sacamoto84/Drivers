@@ -1,5 +1,3 @@
-#ifdef USE_CLI
-
 #include "main.h"
 #include "stm32f4xx_hal.h"
 #include <stdlib.h>
@@ -13,7 +11,9 @@
 
 #include "BLE_Commands.h"
 #include "LOG.h"
+#include "global_define.h"
 
+#ifdef USE_CLI
 extern void SendToCli(char *str, int len);
 
 extern volatile int U3_DMA_TX_Complete;
@@ -31,10 +31,6 @@ void BT_Send_RAW(char *str) {
 	int max = strlen(str);
 
 	if (max < 128) {
-		//SEGGER_RTT_printf(0, "%s%sTX>%s", RTT_CTRL_TEXT_BLACK,
-		//RTT_CTRL_BG_BRIGHT_YELLOW, RTT_CTRL_RESET);
-		//SEGGER_RTT_printf(0, "%s%s%s%s\n", RTT_CTRL_TEXT_BRIGHT_WHITE,
-		//RTT_CTRL_BG_GREEN, str, RTT_CTRL_RESET);
 		LOG((char *)"TX",'D', str);
 	} else {
 		SEGGER_RTT_printf(0, "%s%sTX>%s", RTT_CTRL_TEXT_BLACK,
@@ -42,8 +38,6 @@ void BT_Send_RAW(char *str) {
 		SEGGER_RTT_printf(0, "%s%s>len:%d%s\n", RTT_CTRL_TEXT_BRIGHT_WHITE,
 		RTT_CTRL_BG_GREEN, strlen(str), RTT_CTRL_RESET);
 	}
-	//HAL_UART_Transmit(&huart3, (uint8_t*)str, strlen(str), 1000);
-
 
 	int index = 0;
 	DMA1_Stream3->CR &= ~DMA_SxCR_EN; //Выключаем DMA
