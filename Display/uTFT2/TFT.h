@@ -183,6 +183,7 @@ public:
 	void Fill(uint16_t color);
 
 	void SetPixel(int32_t x, int32_t y, uint16_t color);
+	void SetPixel16(int32_t x, int32_t y, uint16_t color);
 	uint16_t GetPixel(int32_t x, int32_t y);
 	void SetColorToPallete(uint8_t index, uint16_t color);
 
@@ -283,7 +284,9 @@ public:
 	void Line(int32_t x0, int32_t y0, int32_t x1, int32_t y1, uint16_t c);
 	void LineV(int32_t X, int32_t Y1, int32_t Y2, uint16_t color);
 	void LineH(int32_t Y, int32_t X1, int32_t X2, uint16_t color);
+	void LineH16(int32_t Y, int32_t X1, int32_t X2, uint16_t color);
 	void LineHW(int32_t x, int32_t y, int32_t w, uint16_t color);
+	void LineHW16(int32_t x, int32_t y, int32_t w, uint16_t color);
 	void LineMoveTo(int32_t x, int32_t y, uint16_t c);
 
     int16_t LineMoveX;
@@ -342,6 +345,7 @@ public:
 	void Font_Smooth_drawStr(const char *str);
 	void Font_Smooth_drawStr(int x, int y, const char *str);
 	void Font_Smooth_drawStr(int x, int y, const char *str, uint16_t color);
+	//void Font_Smooth_drawStr(int x, int y, const char *str, uint16_t color, uint8_t getcolor);
 	// ----- Font u8g ----
 
 
@@ -446,6 +450,11 @@ public:
 
 	//32 ��� BMP � ����� �������
 	List_Update_Particle BMP_From_File_Alpha(int32_t x0, int32_t y0, char * Name, int offset, int swap);
+
+
+	void Bitmap_From_Flash_16b(int16_t X, int16_t Y, Bitmap *bmp);
+	void Bitmap_From_Flash_24b(int16_t X, int16_t Y, Bitmap *bmp);
+	void Bitmap_From_Flash_32b(int16_t X, int16_t Y, Bitmap *bmp);
 
 	/***************************************************************************************
 	** __weak

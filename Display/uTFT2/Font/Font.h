@@ -11,11 +11,12 @@ extern "C" {
 #include "string.h"
 
 typedef struct {
-	int32_t  CurrentX;
-	int32_t  CurrentY;
-	uint8_t  Inverted;
+	int16_t  CurrentX;
+	int16_t  CurrentY;
 	uint16_t Color;
 	uint16_t BColor;
+	uint8_t  Inverted;
+	uint8_t  GetColor; //1-Нужно читать цвет фона, 0-Использовать цвет BColor
 } uTFT_t;
 
 

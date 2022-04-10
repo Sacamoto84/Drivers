@@ -189,9 +189,25 @@ void TFT::LineH(int32_t Y, int32_t X1, int32_t X2, uint16_t color) {
 	}
 
 }
+void TFT::LineH16(int32_t Y, int32_t X1, int32_t X2, uint16_t color) {
 
+	int32_t i;
+
+	if (X2 >= LCD->TFT_WIDTH) X2 = LCD->TFT_WIDTH - 1;
+	if (Y >= LCD->TFT_HEIGHT) return;
+
+		for (i = X1; i <= X2; i++) //uTFT_SetPixel(X, i, color);
+		{
+			LCD->buffer16[i + Y * LCD->TFT_WIDTH] = color;
+		}
+
+}
 void TFT::LineHW(int32_t x, int32_t y, int32_t w, uint16_t color) {
 	LineH(y, x, x + w - 1, color);
+}
+
+void TFT::LineHW16(int32_t x, int32_t y, int32_t w, uint16_t color) {
+	LineH16(y, x, x + w - 1, color);
 }
 
 void TFT::LineMoveTo(int32_t x, int32_t y, uint16_t c) {

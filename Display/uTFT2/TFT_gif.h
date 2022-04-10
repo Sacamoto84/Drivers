@@ -646,11 +646,7 @@ private:
 			}
 
 		}
-
-
-
 	}
-
 };
 
 #endif /* TFT_GIF_H_ */

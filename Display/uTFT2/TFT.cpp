@@ -49,6 +49,15 @@ void TFT::SetPixel(int32_t x, int32_t y, uint16_t color) {
 	}
 }
 
+void TFT::SetPixel16(int32_t x, int32_t y, uint16_t color) {
+
+	if ((x < 0) || (y < 0) || (x >= LCD->TFT_WIDTH) || (y >= LCD->TFT_HEIGHT))
+		return;
+
+	LCD->buffer16[x + y * LCD->TFT_WIDTH] = color;
+}
+
+
 uint16_t TFT::GetPixel(int32_t x, int32_t y) {
 
 	if (LCD->Bit == 16) {

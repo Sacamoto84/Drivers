@@ -332,7 +332,7 @@ void TFT::Font_Smooth_drawGlyph(uint16_t code) {
 	const unsigned char *p_gBitmap; //Указатель на графические данные
 	uint8_t pixel;
 	uint8_t getColor;
-	getColor = 1;
+	getColor = uTFT.GetColor;
 
 	if (code < 0x21) {
 		if (code == 0x20) {
@@ -376,8 +376,6 @@ void TFT::Font_Smooth_drawGlyph(uint16_t code) {
 		int16_t cy = uTFT.CurrentY + gFont.maxAscent - gdY[gNum];
 		int16_t cx = uTFT.CurrentX + gdX[gNum];
 
-//    startWrite(); // Avoid slow ESP32 transaction overhead for every pixel
-
 		for (int y = 0; y < gHeight[gNum]; y++) {
 			for (int x = 0; x < gWidth[gNum]; x++) {
 				pixel = *p_gBitmap++; //pbuffer[x]; //<//
@@ -386,29 +384,51 @@ void TFT::Font_Smooth_drawGlyph(uint16_t code) {
 					if (pixel != 0xFF) {
 						if (dl) {
 							if (dl == 1)
+							{
+
+#ifdef USE_NOTSAVE_FONT
+								LCD->buffer16[xs + (y + cy) * LCD->TFT_WIDTH] = fg;
+#else
 								SetPixel(xs, y + cy, fg);
+#endif
+							}
 							else
-								LineHW(xs, y + cy, dl, fg);
+								LineHW16(xs, y + cy, dl, fg);
 
 							dl = 0;
 						}
+
 						if (getColor)
+						{
+#ifdef USE_NOTSAVE_FONT
+							bg = LCD->buffer16[x + cx + (y + cy) * LCD->TFT_WIDTH];
+#else
 							bg = GetPixel(x + cx, y + cy);
+#endif
+						}
+
+
+#ifdef USE_NOTSAVE_FONT
+						LCD->buffer16[x + cx + (y + cy) * LCD->TFT_WIDTH] = alphaBlend(pixel, fg, bg);
+#else
 						SetPixel(x + cx, y + cy, alphaBlend(pixel, fg, bg));
+#endif
+
 					} else {
 						if (dl == 0)
 							xs = x + cx;
 						dl++;
 					}
+
 				} else {
 					if (dl) {
-						LineHW(xs, y + cy, dl, fg);
+						LineHW16(xs, y + cy, dl, fg);
 						dl = 0;
 					}
 				}
 			}
 			if (dl) {
-				LineHW(xs, y + cy, dl, fg);
+				LineHW16(xs, y + cy, dl, fg);
 				dl = 0;
 			}
 		}
@@ -520,6 +540,7 @@ void TFT::Font_Smooth_drawStr(int x, int y, const char *str, uint16_t color) {
 	uTFT.CurrentX = x;
 	uTFT.CurrentY = y;
 	uTFT.Color = color;
+
 	while (*str != 0) {
 		uint16_t code = 0;
 
@@ -531,9 +552,10 @@ void TFT::Font_Smooth_drawStr(int x, int y, const char *str, uint16_t color) {
 
 		Font_Smooth_drawGlyph(code);
 		str++;
-		//uTFT.CurrentX +=  gFont.spaceWidth ;
-		//cursorX + gdX[i] + gWidth[i]
-		//cursorX + gdX[i] + gWidth[i]
 	}
-
 }
+
+
+
+
+
