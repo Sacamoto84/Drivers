@@ -326,7 +326,6 @@ bool Font_Smooth_getUnicodeIndex(uint16_t unicode, uint16_t *index) {
 }
 
 //TFT_HEIGHT
-
 void TFT::Font_Smooth_drawGlyph(uint16_t code) {
 
 	const unsigned char *p_gBitmap; //Указатель на графические данные

@@ -208,6 +208,10 @@ public:
 	void ST7789_UpdateDMA16bitV3(void);
 	void ST7789_Transmit_Array(char dc, uint8_t *data, int nbytes);
 
+
+
+
+
 	void ILI9225_init_table16(uint16_t *table, int16_t size);
 	void ILI9225_setWindow   ( uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
 
@@ -352,8 +356,13 @@ public:
 
 
 
+	//Video
 
 
+	void video_play(char * Name, uint8_t delay = 0);
+	void video_load(uint8_t delay);
+	uint32_t (*videoCallBackFunc)(uint32_t); //Некая функция, используется для остановки видео по событию во время проигрования
+	uint32_t video_stop;
 
 
 
