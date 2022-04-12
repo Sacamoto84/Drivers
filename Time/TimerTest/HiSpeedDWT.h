@@ -13,7 +13,7 @@
 #include "SEGGER_RTT.h"
 #include "SEGGER_RTT_Conf.h"
 
-#include "global_define.h"
+//#include "global_define.h"
 
 #include <math.h>
 

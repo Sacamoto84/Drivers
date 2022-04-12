@@ -208,8 +208,8 @@ public:
 	void ST7789_UpdateDMA16bitV3(void);
 	void ST7789_Transmit_Array(char dc, uint8_t *data, int nbytes);
 
-
-
+	void ST7789_Update_DMA_Cicle_On(void);
+	void ST7789_Update_DMA_Cicle_Off(void);
 
 
 	void ILI9225_init_table16(uint16_t *table, int16_t size);

@@ -5,12 +5,17 @@
 #include "SEGGER.h"
 #include "SEGGER_RTT.h"
 
+#include "HiSpeedDWT.h"
+
+extern HiSpeedDWT TimerDWT;
+extern HiSpeedDWT TimerT5;
+
 extern char str1[60];
 
 extern FIL SDFile;       /* File object for SD */
 
 uint16_t * pix;
-UINT * bytesread1;
+
 uint32_t time;
 
 //void load_video(FIL *fp)
@@ -81,58 +86,40 @@ uint32_t time;
 ////	CS_H;
 //}
 
+
+
 void TFT::video_load(uint8_t delay)
 {
-	 uint8_t buf[5100]; //Буффер данных
-
-	 uint32_t index_max  =  LCD->TFT_HEIGHT *  LCD->TFT_WIDTH; 
-	 uint32_t index_max2 =  LCD->TFT_HEIGHT *  LCD->TFT_WIDTH * 2;
-     uint32_t index;
-	 int32_t x, y;
-	
-	 uint32_t fsize = f_size(&SDFile);
-	 time = 0;
-	 uint32_t res;
-	
-	for(index = 0; index < fsize; index+=2)
+    uint32_t index;
+	uint32_t fsize = f_size(&SDFile);
+	ST7789_Update_DMA_Cicle_On();
+	UINT bytesread;
+	for(index = 0; index < fsize; index+=115200)
 	{
-		if (index % 4096 == 0) 
-		{
-			res = f_read (&SDFile, &buf, 4096, bytesread1);
+		f_read (&SDFile, (uint8_t*)(LCD->buffer16), 115200, &bytesread);
+		if (videoCallBackFunc) {
+	     	uint32_t (*fcnPtr)(uint32_t) = videoCallBackFunc;
+			if(fcnPtr(0)) break;
 		}
-		x = (index>>1) %  LCD->TFT_WIDTH;
-		y = (((index>>1)%(index_max))/  LCD->TFT_WIDTH) *  LCD->TFT_WIDTH;	
-				
-		LCD->buffer16[x + y]= *(uint16_t *)&buf[index % 4096];
-		
-		if ((index % index_max2) == 0) 
-  		{ 
-			ST7789_UpdateDMA16bitV3();
-
-
-			 if (videoCallBackFunc) {
-
-				 uint32_t (*fcnPtr)(uint32_t) = videoCallBackFunc;
-				 if(fcnPtr(0)) break;
-			}
-
-				if (delay)
-					HAL_Delay(delay);
- 		}
+		if (delay)
+			HAL_Delay(delay);
 	}
+	ST7789_Update_DMA_Cicle_Off();
 }
 
 
 void TFT::video_play(char * Name, uint8_t delay)
 {
-	SEGGER_RTT_WriteString(0, "Video Play\n");
+	SEGGER_RTT_WriteString(0, "video play\n");
 	int res;
 	res = f_open(&SDFile, Name, FA_READ);
 
     if (res == FR_OK)
 	{
+    	TimerDWT.Start();
     	video_load(delay);
         f_close(&SDFile);
+        TimerDWT.Loger((char*)"video_load");
 	}
 	else
 	  SEGGER_RTT_WriteString(0, "Video == FR_ERROR\n");

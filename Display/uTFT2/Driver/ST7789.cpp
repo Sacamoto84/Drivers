@@ -774,57 +774,67 @@ void TFT::ST7789_Transmit_Array(char dc, uint8_t *data, int nbytes)
 }
 
 
-//void ST7789_Update_DMA_Cicle_On(void)
-//{
-//	
-//	DMA2_Stream3->CR &= ~DMA_SxCR_EN;     //Отключаем DMA
-//  while( !(SPI1->SR & SPI_SR_TXE));	    //Ждем окончания передачи по SPI
-//	DMA2_Stream3->NDTR = 0;               //Сброс счетчика DMA
-//	SPI1->CR1 &= ~SPI_CR1_SPE;            //Спокойно отключаем SPI
-//	SPI1->CR2  &= ~SPI_CR2_TXDMAEN;       //Отвязываем от DMA
-//	SPI1->CR1 &= ~SPI_CR1_DFF;            //8bit mode
-//	SPI1->CR1 |= SPI_CR1_SPE;             //Включаем для работы в обычном режиме
-//	
-//	
-//	ST7789_SendCmd(0x2A); // Column addr set
-//  ST7789_SendData(0x00);     //??????? ??? XSTART
-//  ST7789_SendData(TFT_XSTART);     //??????? ??? XSTART
-//  ST7789_SendData(0x00);     //???????  ??? XEND
-//  ST7789_SendData(TFT_XSTART+TFT_WIDTH-1);    //??????? ??? XEND
+void TFT::ST7789_Update_DMA_Cicle_On(void)
+{
 
-//  ST7789_SendCmd(0x2B); // Row addr set
-//  ST7789_SendData(0x00);
-//  ST7789_SendData(TFT_YSTART);
-//  ST7789_SendData(0x00);
-//  ST7789_SendData(TFT_YSTART+TFT_HEIGHT-1);
-//        
-//  ST7789_SendCmd(0x2C); //Memory write
+	DMA2_Stream3->CR &= ~DMA_SxCR_EN;     //Отключаем DMA
+    while( !(SPI1->SR & SPI_SR_TXE));	  //Ждем окончания передачи по SPI
+	DMA2_Stream3->NDTR = 0;               //Сброс счетчика DMA
+	SPI1->CR1 &= ~SPI_CR1_SPE;            //Спокойно отключаем SPI
+	SPI1->CR2  &= ~SPI_CR2_TXDMAEN;       //Отвязываем от DMA
+	SPI1->CR1 &= ~SPI_CR1_DFF;            //8bit mode
+	SPI1->CR1 |= SPI_CR1_SPE;             //Включаем для работы в обычном режиме
+
+
+	//int32_t i = 0;
+	uint8_t HI;
+	uint8_t LO;
+
+	HI = (LCD->dx + LCD->TFT_WIDTH - 1) >> 8;
+	LO = (LCD->dx + LCD->TFT_WIDTH - 1) & 0xFF;
+	SPI.SendCmd(0x2A);
+	SPI.SendData(0x00);
+	SPI.SendData(LCD->dx);
+	SPI.SendData(HI);
+	SPI.SendData(LO);
+	SPI.SendCmd(0x2B);
+	SPI.SendData(0x00);
+	SPI.SendData(LCD->dy);
+	SPI.SendData(0x00);
+	SPI.SendData(LCD->dy + LCD->TFT_HEIGHT - 1);
+	SPI.SendCmd(0x2C); //Memory write
+
 //	
 //	while( !(SPI1->SR & SPI_SR_TXE));       //Ждем окончания передачи по SPI
 //	SPI1->CR1 &= ~SPI_CR1_SPE;              //Спокойно отключаем SPI
 //	SPI1->CR1 |= SPI_CR1_DFF;               //16bit mode
 //	
-//	DATA;
-//	
-//	DMA2_Stream3->CR &= ~DMA_SxCR_EN; // DMA 
-//	DMA2_Stream3->NDTR = TFT_HEIGHT*TFT_WIDTH;  
-//	DMA2_Stream3->PAR   = 0x4001300C;//SPI
-//	DMA2_Stream3->M0AR  = (uint32_t)&LCD_Buffer[0];		
-//	DMA2_Stream3->CR |=  DMA_SxCR_CIRC;      //Кольцевой режим
-//	DMA2_Stream3->CR |=  DMA_SxCR_EN;        //Включаем DMA
-//	SPI1->CR2 |= SPI_CR2_TXDMAEN;            //SPI на DMA 
-//	SPI1->CR1 |= SPI_CR1_SPE;                //Включаем SPI для работы в DMA
-//}
+	DATA;
 
-//void ST7789_Update_DMA_Cicle_Off(void)
-//{
-//	DMA2_Stream3->CR &= ~DMA_SxCR_EN;     //Отключаем DMA
-//  while( !(SPI1->SR & SPI_SR_TXE));	    //Ждем окончания передачи по SPI
-//	DMA2_Stream3->NDTR = 0;               //Сброс счетчика DMA
-//	DMA2_Stream3->CR &= ~DMA_SxCR_CIRC;   //Выкл Кольцевой режим
-//	SPI1->CR1 &= ~SPI_CR1_SPE;            //Спокойно отключаем SPI
-//	SPI1->CR2 &= ~SPI_CR2_TXDMAEN;        //Отвязываем от DMA
-//	SPI1->CR1 &= ~SPI_CR1_DFF;            //8bit mode
-//	SPI1->CR1 |= SPI_CR1_SPE;             //Включаем для работы в обычном режиме
-//}
+	SPI.Spi8to16();
+
+	DMA2_Stream3->CR   &= ~DMA_SxCR_EN; // DMA
+	DMA2_Stream3->NDTR  = 240*240;
+	DMA2_Stream3->PAR   = 0x4001300C;//SPI
+	DMA2_Stream3->M0AR  = (uint32_t)&LCD->buffer16[0];
+	DMA2_Stream3->CR   |=  DMA_SxCR_CIRC;      //Кольцевой режим
+	DMA2_Stream3->CR   |=  DMA_SxCR_EN;        //Включаем DMA
+
+	SPI1->CR2 |= SPI_CR2_TXDMAEN;              //SPI на DMA
+	SPI1->CR1 |= SPI_CR1_SPE;                  //Включаем SPI для работы в DMA
+}
+
+void TFT::ST7789_Update_DMA_Cicle_Off(void)
+{
+	DMA2_Stream3->CR &= ~DMA_SxCR_EN;     //Отключаем DMA
+    while( !(SPI1->SR & SPI_SR_TXE));	  //Ждем окончания передачи по SPI
+	DMA2_Stream3->NDTR = 0;               //Сброс счетчика DMA
+	DMA2_Stream3->CR &= ~DMA_SxCR_CIRC;   //Выкл Кольцевой режим
+
+
+	SPI1->CR1 &= ~SPI_CR1_SPE;            //Спокойно отключаем SPI
+	SPI1->CR2 &= ~SPI_CR2_TXDMAEN;        //Отвязываем от DMA
+	SPI1->CR1 &= ~SPI_CR1_DFF;            //8bit mode
+	SPI1->CR1 |= SPI_CR1_SPE;             //Включаем для работы в обычном режиме
+}
 
