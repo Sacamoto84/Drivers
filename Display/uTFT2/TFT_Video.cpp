@@ -94,6 +94,10 @@ void TFT::video_load(uint8_t delay)
 	uint32_t fsize = f_size(&SDFile);
 	ST7789_Update_DMA_Cicle_On();
 	UINT bytesread;
+	uint32_t start_time = uwTick;
+	int32_t delta;
+	video_stop = 0;
+    //11ms delay=0;
 	for(index = 0; index < fsize; index+=115200)
 	{
 		f_read (&SDFile, (uint8_t*)(LCD->buffer16), 115200, &bytesread);
@@ -101,9 +105,38 @@ void TFT::video_load(uint8_t delay)
 	     	uint32_t (*fcnPtr)(uint32_t) = videoCallBackFunc;
 			if(fcnPtr(0)) break;
 		}
-		if (delay)
-			HAL_Delay(delay);
+
+		delta =  delay - (uwTick - start_time) - 1; //Время кадра
+
+		if ((delay) && (delta > 0))
+		{
+			//HAL_Delay(delta);
+			  uint32_t tickstart = HAL_GetTick();
+			  uint32_t wait = delta;
+
+			  /* Add a freq to guarantee minimum wait */
+			  if (wait < HAL_MAX_DELAY)
+			  {
+			    wait += (uint32_t)(uwTickFreq);
+			  }
+
+			  while((HAL_GetTick() - tickstart) < wait)
+			  {
+				if (videoCallBackFunc)
+				{
+				    uint32_t (*fcnPtr)(uint32_t) = videoCallBackFunc;
+					if(fcnPtr(0))
+					{
+						ST7789_Update_DMA_Cicle_Off();
+						return;
+					}
+				}
+			  }
+		}
+		start_time = uwTick;
 	}
+
+
 	ST7789_Update_DMA_Cicle_Off();
 }
 
@@ -116,10 +149,10 @@ void TFT::video_play(char * Name, uint8_t delay)
 
     if (res == FR_OK)
 	{
-    	TimerDWT.Start();
+    	//TimerDWT.Start();
     	video_load(delay);
         f_close(&SDFile);
-        TimerDWT.Loger((char*)"video_load");
+        //TimerDWT.Loger((char*)"video_load");
 	}
 	else
 	  SEGGER_RTT_WriteString(0, "Video == FR_ERROR\n");
