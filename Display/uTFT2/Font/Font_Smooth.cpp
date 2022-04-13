@@ -554,6 +554,19 @@ void TFT::Font_Smooth_drawStr(int x, int y, const char *str, uint16_t color) {
 	}
 }
 
+void TFT::Font_Smooth_drawStr1251(int x, int y, const char *str, uint16_t color) {
+	uTFT.CurrentX = x;
+	uTFT.CurrentY = y;
+	uTFT.Color = color;
+
+	while (*str != 0) {
+		uint16_t code = 0;
+		code = *str;
+		Font_Smooth_drawGlyph(code);
+		str++;
+	}
+}
+
 
 
 

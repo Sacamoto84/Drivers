@@ -349,6 +349,7 @@ public:
 	void Font_Smooth_drawStr(const char *str);
 	void Font_Smooth_drawStr(int x, int y, const char *str);
 	void Font_Smooth_drawStr(int x, int y, const char *str, uint16_t color);
+	void Font_Smooth_drawStr1251(int x, int y, const char *str, uint16_t color);
 	//void Font_Smooth_drawStr(int x, int y, const char *str, uint16_t color, uint8_t getcolor);
 	// ----- Font u8g ----
 
