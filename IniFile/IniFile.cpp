@@ -6,7 +6,7 @@ const uint8_t IniFile::maxFilenameLen = INI_FILE_MAX_FILENAME_LEN;
 
 IniFile::IniFile(const char* filename, mode_t mode, bool caseSensitive)
 {
-	SEGGER_RTT_printf(0, "IniFile::IniFile>filename>%s\n", filename);
+	SEGGER_RTT_printf(0, "IniFile::IniFile>filename>%s\r\n", filename);
 
 	if (strlen(filename) <= maxFilenameLen)
 		strcpy(_filename, filename);
@@ -15,12 +15,12 @@ IniFile::IniFile(const char* filename, mode_t mode, bool caseSensitive)
 	_mode = mode;
 	_caseSensitive = caseSensitive;
 
-	SEGGER_RTT_WriteString(0, "IniFile::IniFile>end\n");
+	SEGGER_RTT_WriteString(0, "IniFile::IniFile>end\r\n");
 }
 
 void IniFile::setFilename(const char* filename)
 {
-	SEGGER_RTT_printf(0, "IniFile::setFilename>filename>%s\n", filename);
+	SEGGER_RTT_printf(0, "IniFile::setFilename>filename>%s\r\n", filename);
 
 	if (strlen(filename) <= maxFilenameLen)
 		strcpy(_filename, filename);
@@ -29,7 +29,7 @@ void IniFile::setFilename(const char* filename)
 
 
 
-	SEGGER_RTT_WriteString(0, "IniFile::IniFile>end\n");
+	SEGGER_RTT_WriteString(0, "IniFile::IniFile>end\r\n");
 }
 
 IniFile::~IniFile()
@@ -610,7 +610,7 @@ void IniFile::printErrorMessage(bool eol)
 	  }
 
 	  if (eol)
-		  SEGGER_RTT_WriteString(0, "\n");
+		  SEGGER_RTT_WriteString(0, "\r\n");
 
 
 }

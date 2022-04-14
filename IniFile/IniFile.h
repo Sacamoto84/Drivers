@@ -172,7 +172,7 @@ private:
 
 bool IniFile::open(void)
 {
-	SEGGER_RTT_WriteString(0, "IniFile::open\n");
+	SEGGER_RTT_WriteString(0, "IniFile::open\r\n");
 	//if (_file == true)
 	//	f_close(&_fatfsfile);
 
@@ -186,14 +186,14 @@ bool IniFile::open(void)
 	{
 		_file = true;
 		_error = errorNoError;
-		SEGGER_RTT_WriteString(0, "IniFile::open> errorNoError\n");
+		SEGGER_RTT_WriteString(0, "IniFile::open> errorNoError\r\n");
 		return true;
 	}
 	else
 	{
 		_file = false;
 		_error = errorFileNotFound;
-		SEGGER_RTT_WriteString(0, "IniFile::open> errorFileNotFound\n");
+		SEGGER_RTT_WriteString(0, "IniFile::open> errorFileNotFound\r\n");
 		return false;
 	}
 }

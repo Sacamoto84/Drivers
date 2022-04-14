@@ -145,7 +145,7 @@ public:
 			f_gets(BMP_From_File_buf, 16, &SDFile);
 			index_max = atoi(BMP_From_File_buf) - 1;
 
-			SEGGER_RTT_printf(0, "(+) GIF name: %s  H: %d  W: %d  bit: %d  frame: %d\n", name_gif, H, W, field.bit, index_max + 1);
+			SEGGER_RTT_printf(0, "(+) GIF name: %s  H: %d  W: %d  bit: %d  frame: %d\r\n", name_gif, H, W, field.bit, index_max + 1);
 		}
 		f_close(&SDFile);
 
@@ -217,7 +217,7 @@ private:
 		int res = f_open(&SDFile, current_patch, FA_READ); //1667us -Of Gen off Fat32 2к  1360 Fat16 16к
 
 		if(res != FR_OK)		{
-			SEGGER_RTT_printf(0, "Gif>ERROR open file>%s\n", current_patch);
+			SEGGER_RTT_printf(0, "Gif>ERROR open file>%s\r\n", current_patch);
 			f_close(&SDFile);  //7uS
 		    return;
 		}
@@ -252,7 +252,7 @@ private:
 
 			if(res != FR_OK)
 			{
-				SEGGER_RTT_WriteString(0, "Gif>32>ERROR f_lseek\n");
+				SEGGER_RTT_WriteString(0, "Gif>32>ERROR f_lseek\r\n");
 				f_close(&SDFile);  //7uS
 			    return;
 			}
@@ -306,7 +306,7 @@ private:
 
 			if(res != FR_OK)
 			{
-				SEGGER_RTT_WriteString(0, "Gif>16>ERROR f_lseek\n");
+				SEGGER_RTT_WriteString(0, "Gif>16>ERROR f_lseek\r\n");
 				f_close(&SDFile);  //7uS
 			    return;
 			}
@@ -566,7 +566,7 @@ private:
 
 	void Bitmap_From_Flash_24b(int16_t X, int16_t Y, Bitmap *bmp) {
 
-		    SEGGER_RTT_WriteString(0, "Bitmap_From_Flash_24b\n");
+		    SEGGER_RTT_WriteString(0, "Bitmap_From_Flash_24b\r\n");
 
 
 			const uint8_t *p8;

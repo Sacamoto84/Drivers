@@ -622,7 +622,7 @@ void TFT::Bitmap_From_Flash_16b(int16_t X, int16_t Y, Bitmap *bmp) {
 
 void TFT::Bitmap_From_Flash_24b(int16_t X, int16_t Y, Bitmap *bmp) {
 
-	    SEGGER_RTT_WriteString(0, "Bitmap_From_Flash_24b\n");
+	    SEGGER_RTT_WriteString(0, "Bitmap_From_Flash_24b\r\n");
 
 
 		const uint8_t *p8;

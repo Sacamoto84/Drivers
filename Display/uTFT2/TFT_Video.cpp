@@ -136,14 +136,16 @@ void TFT::video_load(uint8_t delay)
 		start_time = uwTick;
 	}
 
-
 	ST7789_Update_DMA_Cicle_Off();
 }
 
 
 void TFT::video_play(char * Name, uint8_t delay)
 {
-	SEGGER_RTT_WriteString(0, "video play\n");
+	SEGGER_RTT_WriteString(0, RTT_TEST);
+	SEGGER_RTT_WriteString(0, "Видео play");
+	SEGGER_RTT_WriteString(0, "\x1B[0m\r\n");
+
 	int res;
 	res = f_open(&SDFile, Name, FA_READ);
 
@@ -155,5 +157,5 @@ void TFT::video_play(char * Name, uint8_t delay)
         //TimerDWT.Loger((char*)"video_load");
 	}
 	else
-	  SEGGER_RTT_WriteString(0, "Video == FR_ERROR\n");
+	  SEGGER_RTT_WriteString(0, "Video == FR_ERROR\r\n");
 }

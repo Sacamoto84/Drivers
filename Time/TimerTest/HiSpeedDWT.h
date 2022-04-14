@@ -52,7 +52,7 @@ public:
 	void init(void)
 	{
 		SEGGER_RTT_printf(0, "%s%sDWT>%s",RTT_CTRL_TEXT_BLACK, RTT_CTRL_BG_BRIGHT_YELLOW,RTT_CTRL_RESET);
-		SEGGER_RTT_printf(0, "%s%s Init SystemCoreClock %d %s\n",RTT_CTRL_TEXT_BRIGHT_WHITE, RTT_CTRL_BG_GREEN, SystemCoreClock, RTT_CTRL_RESET);
+		SEGGER_RTT_printf(0, "%s%s Init SystemCoreClock %d %s\r\n",RTT_CTRL_TEXT_BRIGHT_WHITE, RTT_CTRL_BG_GREEN, SystemCoreClock, RTT_CTRL_RESET);
 		tickToUs = SystemCoreClock / 1000000; //получаем кол-во тактов за 1 мкс
 		tickToMs = tickToUs * 1000;
 		SCB_DEMCR |= CoreDebug_DEMCR_TRCENA_Msk; // разрешаем использовать счётчик
@@ -65,7 +65,7 @@ public:
 	void init(TIM_HandleTypeDef * htimer, bool timer16 = false)
 	{
 		SEGGER_RTT_printf(0, "%s%sDWT>%s",RTT_CTRL_TEXT_BLACK, RTT_CTRL_BG_BRIGHT_YELLOW,RTT_CTRL_RESET);
-		SEGGER_RTT_printf(0, "%s%s Init Timer SystemCoreClock %d %s\n",RTT_CTRL_TEXT_BRIGHT_WHITE, RTT_CTRL_BG_GREEN, SystemCoreClock, RTT_CTRL_RESET);
+		SEGGER_RTT_printf(0, "%s%s Init Timer SystemCoreClock %d %s\r\n",RTT_CTRL_TEXT_BRIGHT_WHITE, RTT_CTRL_BG_GREEN, SystemCoreClock, RTT_CTRL_RESET);
 
 		bit16 = timer16;
 
@@ -95,7 +95,7 @@ public:
 		SEGGER_RTT_printf(0, "%s%s [ %s ]%s>",RTT_CTRL_TEXT_BRIGHT_WHITE, RTT_CTRL_BG_BLACK,  str, RTT_CTRL_RESET);
 		if (bit16) result = *Count + 2; //Вернем поправку на место
 		uint32_t timeus =  result/ tickToUs;
-        sprintf(_str, "%s%s %lu Tick > %lu us %s\n", RTT_CTRL_TEXT_BRIGHT_GREEN, RTT_CTRL_BG_BLACK, result, timeus, RTT_CTRL_RESET);
+        sprintf(_str, "%s%s %lu Tick > %lu us %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN, RTT_CTRL_BG_BLACK, result, timeus, RTT_CTRL_RESET);
 		SEGGER_RTT_WriteString(0, _str);
 	}
 
