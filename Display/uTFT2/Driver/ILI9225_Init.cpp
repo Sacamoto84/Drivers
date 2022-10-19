@@ -1,7 +1,7 @@
 #include "ILI9225.h"
 
 #define TFTLCD_DELAY 0xFFFF
-uint16_t ILI9225_regValues[] = {
+const uint16_t ILI9225_regValues[] = {
 	/* Start Initial Sequence */
 	/* Set SS bit and direction output from S528 to S1 */
 	ILI9225_POWER_CTRL1, 0x0000,//0x0000, // Set SAP,DSTB,STB
@@ -64,9 +64,9 @@ uint16_t ILI9225_regValues[] = {
 	ILI9225_DISP_CTRL1, 0x1017,
 };
 
-void TFT::ILI9225_init_table16(uint16_t *table, int16_t size)
+void TFT::ILI9225_init_table16(const uint16_t *table, int16_t size)
 {
-    uint16_t  *p = table;
+      const uint16_t  *p = table;
 	  static uint16_t  cmd;
 	  static uint16_t  d;
 	

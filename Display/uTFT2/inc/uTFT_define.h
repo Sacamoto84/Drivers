@@ -19,8 +19,8 @@
 #define convert24to16(x) (((x & 0x00f80000) >> 19) | ((x & 0x0000fc00) >> 5) |((x & 0x000000f8) << 8))
 #define defineRGB565(R,G,B)  (((R >> 3) << 11) | ((G >> 2) << 5) | (B >> 3))
 
-#define CMD  HAL_GPIO_WritePin(LCD->GPIO_DC, LCD->GPIO_Pin_DC, GPIO_PIN_RESET);
-#define DATA HAL_GPIO_WritePin(LCD->GPIO_DC, LCD->GPIO_Pin_DC, GPIO_PIN_SET);
+//#define CMD  HAL_GPIO_WritePin(LCD->GPIO_DC, LCD->GPIO_Pin_DC, GPIO_PIN_RESET);
+//#define DATA HAL_GPIO_WritePin(LCD->GPIO_DC, LCD->GPIO_Pin_DC, GPIO_PIN_SET);
 
 extern uint16_t LCD_Palette;
 

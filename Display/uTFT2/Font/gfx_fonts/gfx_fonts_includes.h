@@ -9,6 +9,13 @@
 #define FONT_GFX_FONTS_GFX_FONTS_INCLUDES_H_
 
 // Original Adafruit_GFX "Free Fonts"
+
+#include <JetBrainsMono10.h>
+#include <JetBrainsMono12.h>
+#include <JetBrainsMono14.h>
+#include <JetBrainsMono16.h>
+#include <JetBrainsMono18.h>
+
 #include <TomThumb.h>  // TT1
 #include <Org_01.h>  // TT1
 #include <Picopixel.h>  // TT1
@@ -155,6 +162,7 @@
 #include <FreeMonoBold16.h>
 #include <FreeMonoBold18.h>
 
+#include <FreeSerif12.h>
 
 
 
@@ -163,9 +171,12 @@
 
 #include <TimesNRCyr14.h>
 
+#include "DejaVu_12.h"
 
+#include "DejaVu_24.h"
 
-
-
+#include "RoboMono_20.h"
+#include "RoboMono_22.h"
+#include "RoboMono_24.h"
 
 #endif /* FONT_GFX_FONTS_GFX_FONTS_INCLUDES_H_ */

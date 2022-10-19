@@ -21,8 +21,6 @@ public:
         lastValue =  ~(*value);
     }
 
-
-
   void SetValue(T in)  { *value = in; }
   T    GetValue(void)  { return * value; }
 

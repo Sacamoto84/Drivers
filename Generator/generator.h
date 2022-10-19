@@ -2,12 +2,7 @@
 #define GENERATOR_H
 
 #include "main.h"
-
 #include "tim.h"
-
-#include "SEGGER_SYSVIEW.h"
-#include "SEGGER_SYSVIEW_Int.h"
-#include "SEGGER_RTT.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -15,8 +10,6 @@
 #include <stdio.h>
 
 #include "dac.h"
-
-#include "IniFile.h"
 
 extern DMA_HandleTypeDef hdma_dac1;
 
@@ -32,6 +25,8 @@ extern FRESULT fr;
 
 extern uint32_t OUTPUT[OUTPUTSAMPLES] RAM_16;
 
+extern FIL SDFile1 CCMRAM;
+
 #pragma pack(push,1)
 typedef struct {
 
@@ -42,14 +37,14 @@ typedef struct {
 	uint8_t FM_EN;
 
 	uint16_t Carrier_fr;       //Частота нечущей
-	char Carrier_mod[20];     //Имя файла
+	char Carrier_mod[28];      //Имя файла
 
 	float AM_fr;              //Часта модуляции
-	char AM_mod[20];          //Имя файла
+	char AM_mod[28];          //Имя файла
 
 	uint16_t FM_Base;
 	float    FM_Dev;
-	char FM_mod[20];       //Имя файла
+	char  FM_mod[28];       //Имя файла
 	float FM_mod_fr;        //Часта модуляции
 
 	//Буфферы
@@ -98,6 +93,46 @@ public:
 	void Create_Carrier(_structure_ch *_CH);
 	void Create_AM_Modulation(_structure_ch *_CH);
 	void Create_FM_Modulation(_structure_ch *_CH);
+
+	void Create_Carrier1(void)
+	{
+	    Create_Carrier(&CH1);
+	}
+
+	void Create_Carrier2(void)
+	{
+	    Create_Carrier(&CH2);
+	}
+
+	void Create_AM_Modulation1(void)
+	{
+		Create_AM_Modulation(&CH1);
+	}
+	void Create_AM_Modulation2(void)
+	{
+		Create_AM_Modulation(&CH2);
+	}
+
+	void Create_FM_Modulation1(void)
+	{
+		Create_FM_Modulation(&CH1);
+	}
+	void Create_FM_Modulation2(void)
+	{
+		Create_FM_Modulation(&CH2);
+	}
+
+	void Refresh_FM_Modulation(_structure_ch *_CH); //Для Base Dev без чтения с диска
+	void Refresh_FM_Modulation1(void)
+	{
+		Refresh_FM_Modulation(&CH1);
+	}
+	void Refresh_FM_Modulation2(void)
+	{
+		Refresh_FM_Modulation(&CH2);
+	}
+
+
 	void RAW_to_Structure(_structure_ch *_CH);
 	void Structure_to_RAW(_structure_ch *_CH);
 	void read_save_file_to_structure_ch(void); //Чтение файла сохранения и запись его в структуру
@@ -126,13 +161,12 @@ public:
 		CH2.phase_accumulator_fm = 0;
 	}
 
-
-
-
-
 	_structure_ch CH1, CH2; //Используются для чтения настроек из файла save.dat
 
 	UINT buffer_temp[1024+16]; //Сохраняются данные файлов
+
+	uint16_t cacheFM1 [1024]; //Кеш для перенастройки Base Dev без чтения из диска
+	uint16_t cacheFM2 [1024];
 
 	int32_t DMA_Buffer_Current;
 

@@ -438,9 +438,15 @@ void TFT::TriangleFilled(int16_t x1, int16_t y1, int16_t x2, int16_t y2,
 	}
 }
 
+
+//tft.Gradient_Vertical(0, 0, 239, 239, 0x26, 0x4d, 0x59, 0x43, 0x97, 0x8d);
+//tft.Gradient_Vertical(0, 0, 239, 239, 0x68, 0x82, 0xa0, 0x2c, 0x69, 0x75);
+//tft.Gradient_Vertical(0, 0, 239, 239, 0x26, 0x4d, 0x59, 0x2c, 0x69, 0x75);
 //Вертикальный градиент
-void TFT::Gradient_Vertical(uint32_t x0, uint32_t y0, uint32_t w, uint32_t h, uint8_t otR, uint8_t otG ,uint8_t otB, uint8_t doR, uint8_t doG, uint8_t doB)
-{
+void TFT::Gradient_Vertical(uint32_t x0, uint32_t y0, uint32_t w, uint32_t h,
+  uint8_t otR, uint8_t otG ,uint8_t otB,
+  uint8_t doR, uint8_t doG, uint8_t doB){
+
 	uint8_t b[2][3];
     uint8_t a[3];
 

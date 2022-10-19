@@ -1,9 +1,7 @@
 #include "TFT.h"
 
-#include "SEGGER.h"
-#include "SEGGER_RTT.h"
-#include "SEGGER_RTT_Conf.h"
-//#include "SEGGER_SYSVIEW.h"
+#include "logUART.h"
+extern classLog rtt;
 
 //32 бит BMP с альфа каналом
 //void uTFT_BMP_From_File_Alpha(uTFT_LCD_t *LCD, int32_t x0, int32_t y0,
@@ -622,8 +620,7 @@ void TFT::Bitmap_From_Flash_16b(int16_t X, int16_t Y, Bitmap *bmp) {
 
 void TFT::Bitmap_From_Flash_24b(int16_t X, int16_t Y, Bitmap *bmp) {
 
-	    SEGGER_RTT_WriteString(0, "Bitmap_From_Flash_24b\r\n");
-
+	    rtt.println("Bitmap_From_Flash_24b");
 
 		const uint8_t *p8;
 		p8 = (uint8_t *)bmp->data;

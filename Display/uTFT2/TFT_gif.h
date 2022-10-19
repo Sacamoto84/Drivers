@@ -38,6 +38,9 @@
 
 #include "fatfs.h"
 
+#include "logUART.h"
+extern classLog rtt;
+
 extern HiSpeedDWT TimerT5;
 extern HiSpeedDWT TimerDWT;
 //https://lordicon.com/
@@ -46,7 +49,7 @@ enum ANIMATION_TRIGGERS {
 	HOVER,      //Запуск без повторения застываем на последнем кадре
 	LOOP,       //Запуск с повторнением
 	MORPH,      //Запуск вперед пока есть поздействие и возврат
-	BOOMERANG,   //Запуск приводит к движению в перед и назад
+	BOOMERANG,  //Запуск приводит к движению в перед и назад
 	ONCE        //Запуск Сначала невидимого обьекта с последующим исчезновением в конце
 };
 
@@ -65,12 +68,18 @@ enum ANIMATION_COMMAND_STATE {
 class TFT_gif {
 public:
 
-	void init(TFT *_TFT) {tft = _TFT;}
+	//┌──────────────────────────────────┐
+	//│ Инициализация                    │
+	//└──────────────────────────────────┤
+	void init(TFT *_TFT) {tft = _TFT;} //│
+	//───────────────────────────────────┘
 
+	//─────────────────────────────────────┐
 	void setIndexMax(void)
 	{
 	  index_current = index_max;
 	}
+	//─────────────────────────────────────┘
 
 	void command(ANIMATION_COMMAND_STATE c) {
 
@@ -106,8 +115,8 @@ public:
 			break;
 		}
 
-	}
-;
+	};
+
 	void run(void) {calculate();}
 
 	void setName(char *name) {
@@ -145,7 +154,7 @@ public:
 			f_gets(BMP_From_File_buf, 16, &SDFile);
 			index_max = atoi(BMP_From_File_buf) - 1;
 
-			SEGGER_RTT_printf(0, "(+) GIF name: %s  H: %d  W: %d  bit: %d  frame: %d\r\n", name_gif, H, W, field.bit, index_max + 1);
+			rtt.print("(+) GIF name: %s  H: %d  W: %d  bit: %d  frame: %d\n", name_gif, H, W, field.bit, index_max + 1);
 		}
 		f_close(&SDFile);
 
@@ -165,7 +174,6 @@ public:
 		return U;
 	} //Информация используемая для того чтобы отрисовать кадр
 
-
 	ANIMATION_TRIGGERS      trigger = HOVER; //Выбор типа анимации
 	ANIMATION_COMMAND_STATE state_animation = STOP;
 
@@ -175,38 +183,30 @@ public:
 		unsigned int bit :2; //1-16 3-32 0-error
 	} field;
 
-	uint8_t  delay = 100; //Задержка
-	Bitmap   bmpStop = {0}; //Картинка отображаемая при отсуствии анимации
-
+	uint8_t  delay    = 100; //Задержка
+	Bitmap   bmpStop  = {0}; //Картинка отображаемая при отсуствии анимации
 	Bitmap   bmpStart = {0}; //Картинка отображаемая при отсуствии анимации
 
+
 private:
+	//──────────────────────────────┬───────────────────────────────────┬──────────┐
+	uint16_t   index_max     = 0; //│ Максимальный индекс               │ private: │
+	int16_t    index_current = 0; //│ Текущий индекс                    └──────────┤
+	                              //│                                              │
+	uint8_t H = 0;                //│                                              │
+	uint8_t W = 0;                //│                                              │
+	                              //│                                              │
+	int16_t x = 0;                //│                                              │
+	int16_t y = 0;                //│                                              │
+	                              //│                                              │
+	TFT *tft;                     //│                                              │
+	uint32_t start_time = 0;      //│ Записываем время начала проприсовки анимации │
+	char name_gif[8] = { 0 };     //│ Название Gif папки                           │
+	//──────────────────────────────┴──────────────────────────────────────────────┘
 
-	uint16_t   index_max = 0;            //Максимальный индекс
-	int16_t    index_current = 0;        //Текущий индекс
-
-	uint8_t H = 0;
-	uint8_t W = 0;
-
-	int16_t x = 0;
-	int16_t y = 0;
-
-	TFT *tft;
-	uint32_t start_time = 0; //Записываем время начала проприсовки анимации
-	char name_gif[8] = { 0 };                //Название Gif папки
-
-
-
-
-
-
-
-
-
-
-
-
-    //Открыть картирку по индексу 16 и 24 бит
+	//┌─────────────────────────────────────────────────────────────────┬──────────┐
+    //│ Открыть картирку по индексу 16 и 24 бит                         │ private: │
+	//└─────────────────────────────────────────────────────────────────┴──────────┤
 	void openBMPfromIndex(uint8_t i) {
 
 		if (i>index_max) return;
@@ -216,8 +216,9 @@ private:
 
 		int res = f_open(&SDFile, current_patch, FA_READ); //1667us -Of Gen off Fat32 2к  1360 Fat16 16к
 
+		//Ошибка открытия картинки с microSD
 		if(res != FR_OK)		{
-			SEGGER_RTT_printf(0, "Gif>ERROR open file>%s\r\n", current_patch);
+			rtt.print("\033[01;38;05;51mGif>\033[01;38;05;196mERROR open>\033[01;38;05;46m%s\n", current_patch);
 			f_close(&SDFile);  //7uS
 		    return;
 		}
@@ -240,24 +241,17 @@ private:
 		uint32_t dR, dG, dB;
 		uint32_t R, G, B;
 
-		//uint32_t *p;
-
 		uint16_t *p16;
 
 		if (field.bit == BIT32) {
 
-
-
 			res = f_lseek(&SDFile, i * max * 4); //656us -Of Gen off
-
 			if(res != FR_OK)
 			{
-				SEGGER_RTT_WriteString(0, "Gif>32>ERROR f_lseek\r\n");
+				rtt.print("Gif>32>ERROR f_lseek\r\n");
 				f_close(&SDFile);  //7uS
 			    return;
 			}
-
-
 
 			for (index = 0; index < max; index++)
 			{
@@ -289,9 +283,7 @@ private:
 
 				sColor = tft->RGB565(R, G, B);
 				tft->LCD->buffer16[_x + _y * tft->LCD->TFT_WIDTH] = sColor;
-
 				}
-
 			f_close(&SDFile);  //7uS
 			return;
 		}
@@ -299,18 +291,13 @@ private:
 
 
 		if (field.bit == BIT16) {
-
-
-
 			res = f_lseek(&SDFile, i * max * 2); //656us -Of Gen off
-
 			if(res != FR_OK)
 			{
-				SEGGER_RTT_WriteString(0, "Gif>16>ERROR f_lseek\r\n");
+				rtt.print("Gif>16>ERROR f_lseek\n");
 				f_close(&SDFile);  //7uS
 			    return;
 			}
-
 
 			p16 = (uint16_t *)&BMP_From_File_buf[0];
 
@@ -331,26 +318,12 @@ private:
 			return;
 		}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	}
+	//─────────────────────────────────────────────────────────────────────────────┘
 
-	//Открыть картирку по индексу
+	//┌─────────────────────────────────────────────────────────────────┬──────────┐
+    //│ Логика отрисовки                                                │ private: │
+	//└─────────────────────────────────────────────────────────────────┴──────────┤
 	void calculate(void) {
 
 		//Расчет следующего интекса с учетом времени кадра
@@ -548,7 +521,9 @@ private:
 		start_time = uwTick; //Запомнили начало
 	}
 
-
+	//┌─────────────────────────────────────────────────────────────────┬──────────┐
+    //│ Открыть картирку из флеш                                        │ private: │
+	//└─────────────────────────────────────────────────────────────────┴──────────┤
 	void Bitmap_From_Flash_16b(int16_t X, int16_t Y, Bitmap *bmp) {
 
 			const uint16_t *p16;
@@ -566,8 +541,7 @@ private:
 
 	void Bitmap_From_Flash_24b(int16_t X, int16_t Y, Bitmap *bmp) {
 
-		    SEGGER_RTT_WriteString(0, "Bitmap_From_Flash_24b\r\n");
-
+		    rtt.print("Bitmap_From_Flash_24b\n");
 
 			const uint8_t *p8;
 			p8 = (uint8_t *)bmp->data;
@@ -594,7 +568,8 @@ private:
 			}
 
 	}
-	//32 бит BMP с альфа каналом Сохранять как инвертированая альфа и свап  , customAlpha = 1.0 полная альфа
+
+	//32 бит BMP с альфа каналом Сохранять как инвертированая альфа и свап, customAlpha = 1.0 полная альфа
 	void Bitmap_From_Flash_32b(int16_t x0, int16_t y0,	Bitmap *bmp) {
 
 		uint32_t sColor;
@@ -647,6 +622,7 @@ private:
 
 		}
 	}
+	//─────────────────────────────────────────────────────────────────────────────┘
 };
 
 #endif /* TFT_GIF_H_ */

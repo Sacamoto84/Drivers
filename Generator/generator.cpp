@@ -1,7 +1,15 @@
 #include "Generator.h"
 #include "tim.h"
 
+#include "HiSpeedDWT.h"
+extern HiSpeedDWT TimerT5;
+
+#include "logUART.h"
+extern classLog rtt;
+
 uint32_t OUTPUT[OUTPUTSAMPLES] RAM_16;
+
+FIL SDFile1 CCMRAM;
 
 //Функция рендерит carrier из файла "/Carrier/_CH->Carrier_mod"
 void GENERATOR::Create_Carrier(_structure_ch *_CH) {
@@ -11,12 +19,12 @@ void GENERATOR::Create_Carrier(_structure_ch *_CH) {
 	sprintf(str, "/Carrier/%s", _CH->Carrier_mod);
 
 	if (f_open(&SDFile, str, FA_OPEN_EXISTING | FA_READ) == FR_OK) {
-		SEGGER_RTT_printf(0, ">Open OK %s\r\n", str);
+		rtt.print(">Open OK %s\n", str);
 		UINT testByte;
 		f_read(&SDFile, &buffer_temp, 2048, &testByte);
 		f_close(&SDFile);
 	} else
-		SEGGER_RTT_printf(0, ">Open Error %s\r\n", str);
+	    rtt.print(">Open Error %s\n", str);
 
 	uint16_t *p;
     p = (uint16_t*)&buffer_temp[0];
@@ -28,6 +36,9 @@ void GENERATOR::Create_Carrier(_structure_ch *_CH) {
 
 //Прочечть файл и заполнить массив AM модуляции "/Mod/_CH->AM_mod"
 void GENERATOR::Create_AM_Modulation(_structure_ch *_CH) {
+
+	//SEGGER_RTT_printf(0, "┌─ Create_AM_Modulation\n");
+
 	char str[40] = { 0 };
 
 	//По индексу определяем имя файла, его открываем и записываем во временный буффер
@@ -36,23 +47,26 @@ void GENERATOR::Create_AM_Modulation(_structure_ch *_CH) {
 	uint16_t i;
 
 	if (f_open(&SDFile, str, FA_OPEN_EXISTING | FA_READ) == FR_OK) {
-		SEGGER_RTT_printf(0, ">Open OK %s\r\n", str);
+		//SEGGER_RTT_printf(0, "└> OK %s\n", str);
 		UINT testByte;
 		f_read(&SDFile, &buffer_temp, 2048, &testByte);
 		f_close(&SDFile);
 	} else
-		SEGGER_RTT_printf(0, ">Open Error %s\r\n", str);
+	    rtt.print("└> Ошибка %s\n", str);
 
 	uint16_t *p;
     p = (uint16_t*)&buffer_temp[0];
 
-	for (i = 0; i < 1024; i++)
-		_CH->buffer_am[i] = *p++;
-
+    //14us
+	for (i = 0; i < 1024; i++){
+		_CH->buffer_am[i] = *p++;}
 }
 
 //Прочесть файл FM модуляции и записать в буффер "/Mod/_CH->FM_mod"
 void GENERATOR::Create_FM_Modulation(_structure_ch *_CH) {
+
+    rtt.print("\033[01;38;05;232;48;05;201mGEN\x1B[0m>Create_FM_Modulation CH%d\n", _CH->CH + 1);
+
 	float x, y;
 	//UINT *p;
 	char str[40] = { 0 };
@@ -65,37 +79,133 @@ void GENERATOR::Create_FM_Modulation(_structure_ch *_CH) {
 	uint16_t i;
 
 	if (f_open(&SDFile, str, FA_OPEN_EXISTING | FA_READ) == FR_OK) {
-		SEGGER_RTT_printf(0, ">Open OK %s\r\n", str);
+		rtt.print(">Open OK %s\n", str);
 		UINT testByte;
-		f_read(&SDFile, &buffer_temp, 2048, &testByte);
+
+		if (_CH->CH == 0)
+		  f_read(&SDFile, &cacheFM1, 2048, &testByte);
+		else
+		  f_read(&SDFile, &cacheFM2, 2048, &testByte);
+
 		f_close(&SDFile);
 	} else
-		SEGGER_RTT_printf(0, ">Open Error %s\r\n", str);
-
-	//p = &buffer_temp[0];
+        rtt.print(">Open Error %s\n", str);
+	///////////////////
 	uint16_t *p;
-	p = (uint16_t*)&buffer_temp[0];
+	if (_CH->CH == 0)
+	  p = (uint16_t*)&cacheFM1[0];
+	else
+	  p = (uint16_t*)&cacheFM2[0];
 
+	float buffer[FM_MODSAMPLES];
+
+	 //40us
 	for (i = 0; i < 512; i++) {
-		_CH->buffer_fm[i] = x + (y * (float)*p / 4095.0F);
+		//_CH->buffer_fm[i] = x + (y * (float)*p / 4095.0F);
+		buffer[i] = x + (y * (float)*p / 4095.0F);
 		p += 2;
 	}
 
+	//7 us
+	uint32_t *f1 = (uint32_t*)&_CH->buffer_fm[0];
+	uint32_t *f2 = (uint32_t*)&buffer[0];
+	for (i = 0; i < 512/4/2/2; i++) {
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+	}
+
+	//TimerT5.Loger((char *)"FM1rr");
+
 }
+
+//Прочесть файл FM модуляции и записать в буффер "/Mod/_CH->FM_mod"
+void GENERATOR::Refresh_FM_Modulation(_structure_ch *_CH) {
+
+    rtt.print("\033[01;38;05;232;48;05;68mGEN\x1B[0m>Refresh_FM_Modulation CH%d\n", _CH->CH + 1);
+
+	float x, y;
+
+	x = _CH->FM_Base - _CH->FM_Dev;
+	y = _CH->FM_Dev * 2;
+
+	uint16_t i;
+
+	uint16_t *p;
+	if (_CH->CH == 0)
+	  p = (uint16_t*)&cacheFM1[0];
+
+	else
+	  p = (uint16_t*)&cacheFM2[0];
+
+	float buffer[FM_MODSAMPLES];
+
+	 //40us
+	for (i = 0; i < 512; i++) {
+		//_CH->buffer_fm[i] = x + (y * (float)*p / 4095.0F);
+		buffer[i] = x + (y * (float)*p / 4095.0F);
+		p += 2;
+	}
+
+	//7 us
+	uint32_t *f1 = (uint32_t*)&_CH->buffer_fm[0];
+	uint32_t *f2 = (uint32_t*)&buffer[0];
+	for (i = 0; i < 512/4/2/2; i++) {
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+		*f1++ = *f2++;
+	}
+}
+
+
 
 void GENERATOR::Init(void) {
 
+	//CH1.CH = 0;
+	//CH2.CH = 1;
+
 	//Читаем настройки из файла save.ini и заполняем структуру CH1 и CH2
-	read_save_ini_to_structure_ch();
+	//read_save_ini_to_structure_ch();
 
-	Create_Carrier(&CH1);
-	Create_Carrier(&CH2);
+	//Create_Carrier(&CH1);
+	//Create_Carrier(&CH2);
 
-	Create_AM_Modulation(&CH1);
-	Create_AM_Modulation(&CH2);
+	//Create_AM_Modulation(&CH1);
+	//Create_AM_Modulation(&CH2);
 
-	Create_FM_Modulation(&CH1);
-	Create_FM_Modulation(&CH2);
+	//Create_FM_Modulation(&CH1);
+	//Create_FM_Modulation(&CH2);
+
+
+
+
+
 
 	/**************************
 	 *  DMA DAC
@@ -115,9 +225,6 @@ void GENERATOR::Init(void) {
 
 	HAL_TIM_Base_Start(&htim6);  //Запуск таймера6 для DAC
 }
-
-
-
 
 void GENERATOR::syg_update(int Buffer_Current) {
 	volatile static uint16_t O1;
@@ -145,8 +252,6 @@ void GENERATOR::syg_update(int Buffer_Current) {
 	CH2.Volume = 0.65F;
 
 	for (i; i < i_max; i++) {
-
-
 		if  (CH1.CH_EN)
 		{
 		if (CH1.FM_EN) {
@@ -189,7 +294,9 @@ void GENERATOR::syg_update(int Buffer_Current) {
 
 void GENERATOR::read_save_ini_to_structure_ch(void)
 {
-	SEGGER_RTT_WriteString(0,"\x1B[1;30m>read_save_ini_to_structure_ch();\r\n");
+	/*
+
+	 rtt.print("\x1B[38;05;10m>read_save_ini_to_structure_ch()\n");
 
 	//char str[16];
 
@@ -201,105 +308,106 @@ void GENERATOR::read_save_ini_to_structure_ch(void)
 	IniFile ini(filename);
 
 	if (!ini.open()) {
-	    SEGGER_RTT_WriteString(0, "Ini файл /Config/save.ini does не найден\r\n");
+		 rtt.print("Ini файл /Config/save.ini does не найден\r\n");
 	    // Cannot do anything else
 	    while (1)
 	      ;
 	  }
-	SEGGER_RTT_WriteString(0, "Ini /Config/save.ini файл найден\r\n");
+	 rtt.print("Ini /Config/save.ini файл найден\n");
 
     if (ini.getValue("CH1", "CR En", buffer, bufferLen, CH1.CH_EN))
-      SEGGER_RTT_printf(0,"%sCH1.CR EN   =  %s \r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
-    else { SEGGER_RTT_printf(0,"%sError [CH1] key 'CR En'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
+    	 rtt.print("%sCH1.CR EN   =  %s\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
+    else {  rtt.print("%sError [CH1] key 'CR En'\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
 
     if (ini.getValue("CH1", "CR Fr", buffer, bufferLen, CH1.Carrier_fr))
-      SEGGER_RTT_printf(0,"%sCH1.CR Fr   =  %s \r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
-    else { SEGGER_RTT_printf(0,"%sError [CH1] key 'CR Fr'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
+    	 rtt.print("%sCH1.CR Fr   =  %s\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
+    else { rtt.print("%sError [CH1] key 'CR Fr'\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
 
     if (ini.getValue("CH1", "CR Mod", buffer, bufferLen, &CH1.Carrier_mod[0], 20))
-    	SEGGER_RTT_printf(0,"%sCH1.CR Mod  =  %s \r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
-    else { SEGGER_RTT_printf(0,"%sError [CH1] key 'CR Mod'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
+    	 rtt.print("%sCH1.CR Mod  =  %s \r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
+    else {  rtt.print("%sError [CH1] key 'CR Mod'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
 
     if (ini.getValue("CH1", "AM En", buffer, bufferLen, CH1.AM_EN))
-    	SEGGER_RTT_printf(0,"%sCH1.CR EN   =  %s \r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
-    else { SEGGER_RTT_printf(0,"%sError [CH1] key 'AM En'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
+    	 rtt.print("%sCH1.CR EN   =  %s \r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
+    else {  rtt.print("%sError [CH1] key 'AM En'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
 
     if (ini.getValue("CH1", "AM Fr", buffer, bufferLen, CH1.AM_fr))
-    	SEGGER_RTT_printf(0,"%sCH1.AM Fr   =  %s\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
-    else { SEGGER_RTT_printf(0,"%sError [CH1] key 'AM Fr'\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
+    	 rtt.print("%sCH1.AM Fr   =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
+    else {  rtt.print("%sError [CH1] key 'AM Fr'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
 
     if (ini.getValue("CH1", "AM Mod", buffer, bufferLen, &CH1.AM_mod[0],20))
-    	SEGGER_RTT_printf(0,"%sCH1.AM Mod  =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
-    else { SEGGER_RTT_printf(0,"%sError [CH1] key 'AM Mod'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
+    	 rtt.print("%sCH1.AM Mod  =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
+    else {  rtt.print("%sError [CH1] key 'AM Mod'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
 
     if (ini.getValue("CH1", "FM En", buffer, bufferLen, CH1.FM_EN))
-      SEGGER_RTT_printf(0,"%sCH1.FM En   =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
-    else { SEGGER_RTT_printf(0,"%sError [CH1] key 'FM En'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
+    	 rtt.print("%sCH1.FM En   =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
+    else {  rtt.print("%sError [CH1] key 'FM En'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
 
     if (ini.getValue("CH1", "FM Base", buffer, bufferLen, CH1.FM_Base))
-    	SEGGER_RTT_printf(0,"%sCH1.FM Base =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
-    else { SEGGER_RTT_printf(0,"%sError [CH1] key 'FM Base'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
+    	 rtt.print("%sCH1.FM Base =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
+    else {  rtt.print("%sError [CH1] key 'FM Base'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
 
     if (ini.getValue("CH1", "FM Div", buffer, bufferLen, CH1.FM_Dev))
-    	SEGGER_RTT_printf(0,"%sCH1.FM Div  =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
-    else { SEGGER_RTT_printf(0,"%sError [CH1] key 'FM Div'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
+    	 rtt.print("%sCH1.FM Div  =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
+    else {  rtt.print("%sError [CH1] key 'FM Div'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
 
     if (ini.getValue("CH1", "FM Fr", buffer, bufferLen, CH1.FM_mod_fr))
-    	SEGGER_RTT_printf(0,"%sCH1.FM Fr   =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
-    else { SEGGER_RTT_printf(0,"%sError [CH1] key 'FM Fr'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
+    	 rtt.print("%sCH1.FM Fr   =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
+    else {  rtt.print("%sError [CH1] key 'FM Fr'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
 
     if (ini.getValue("CH1", "FM Mod", buffer, bufferLen, &CH1.FM_mod[0], 20))
-    	SEGGER_RTT_printf(0,"%sCH1.FM Mod  =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer );
-    else { SEGGER_RTT_printf(0,"%sError [CH1] key 'FM Mod'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
+        rtt.print("%sCH1.FM Mod  =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
+    else {  rtt.print("%sError [CH1] key 'FM Mod'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
 
 ////////////////
-    SEGGER_RTT_printf(0,"%s-----------------------------'\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN);
+    rtt.print("%s-----------------------------'\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN);
 
     if (ini.getValue("CH2", "CR En", buffer, bufferLen, CH2.CH_EN))
-      SEGGER_RTT_printf(0,"%sCH2.CR EN   =  %s \r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
-    else { SEGGER_RTT_printf(0,"%sError [CH2] key 'CR En'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
+    	 rtt.print("%sCH2.CR EN   =  %s \r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
+    else {  rtt.print("%sError [CH2] key 'CR En'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
 
     if (ini.getValue("CH2", "CR Fr", buffer, bufferLen, CH2.Carrier_fr))
-      SEGGER_RTT_printf(0,"%sCH2.CR Fr   =  %s \r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
-    else { SEGGER_RTT_printf(0,"%sError [CH2] key 'CR Fr'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
+    	 rtt.print("%sCH2.CR Fr   =  %s \r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
+    else {  rtt.print("%sError [CH2] key 'CR Fr'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
 
     if (ini.getValue("CH2", "CR Mod", buffer, bufferLen, &CH2.Carrier_mod[0], 20))
-    	SEGGER_RTT_printf(0,"%sCH2.CR Mod  =  %s \r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
-    else { SEGGER_RTT_printf(0,"%sError [CH2] key 'CR Mod'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
+    	 rtt.print("%sCH2.CR Mod  =  %s \r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
+    else {  rtt.print("%sError [CH2] key 'CR Mod'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
 
     if (ini.getValue("CH2", "AM En", buffer, bufferLen, CH2.AM_EN))
-    	SEGGER_RTT_printf(0,"%sCH2.CR EN   =  %s \r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
-    else { SEGGER_RTT_printf(0,"%sError [CH2] key 'AM En'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
+    	 rtt.print("%sCH2.CR EN   =  %s \r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
+    else {  rtt.print("%sError [CH2] key 'AM En'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
 
     if (ini.getValue("CH2", "AM Fr", buffer, bufferLen, CH2.AM_fr))
-    	SEGGER_RTT_printf(0,"%sCH2.AM Fr   =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
-    else { SEGGER_RTT_printf(0,"%sError [CH2] key 'AM Fr'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
+    	 rtt.print("%sCH2.AM Fr   =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
+    else {  rtt.print("%sError [CH2] key 'AM Fr'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
 
     if (ini.getValue("CH2", "AM Mod", buffer, bufferLen, &CH2.AM_mod[0],20))
-    	SEGGER_RTT_printf(0,"%sCH2.AM Mod  =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
-    else { SEGGER_RTT_printf(0,"%sError [CH2] key 'AM Mod'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
+    	 rtt.print("%sCH2.AM Mod  =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
+    else { rtt.print("%sError [CH2] key 'AM Mod'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
 
     if (ini.getValue("CH2", "FM En", buffer, bufferLen, CH2.FM_EN))
-      SEGGER_RTT_printf(0,"%sCH2.FM En   =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
-    else { SEGGER_RTT_printf(0,"%sError [CH2] key 'FM En'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
+    	 rtt.print("%sCH2.FM En   =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
+    else {  rtt.print("%sError [CH2] key 'FM En'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
 
     if (ini.getValue("CH2", "FM Base", buffer, bufferLen, CH2.FM_Base))
-    	SEGGER_RTT_printf(0,"%sCH2.FM Base =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
-    else { SEGGER_RTT_printf(0,"%sError [CH2] key 'FM Base'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
+    	 rtt.print("%sCH2.FM Base =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
+    else {  rtt.print("%sError [CH2] key 'FM Base'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
 
     if (ini.getValue("CH2", "FM Div", buffer, bufferLen, CH2.FM_Dev))
-    	SEGGER_RTT_printf(0,"%sCH2.FM Div  =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
-    else { SEGGER_RTT_printf(0,"%sError [CH2] key 'FM Div'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
+    	 rtt.print("%sCH2.FM Div  =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
+    else {  rtt.print("%sError [CH2] key 'FM Div'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
 
     if (ini.getValue("CH2", "FM Fr", buffer, bufferLen, CH2.FM_mod_fr))
-    	SEGGER_RTT_printf(0,"%sCH2.FM Fr   =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
-    else { SEGGER_RTT_printf(0,"%sError [CH2] key 'FM Fr'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
+    	 rtt.print("%sCH2.FM Fr   =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer);
+    else {  rtt.print("%sError [CH2] key 'FM Fr'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
 
     if (ini.getValue("CH2", "FM Mod", buffer, bufferLen, &CH2.FM_mod[0], 20))
-    	SEGGER_RTT_printf(0,"%sCH2.FM Mod  =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer );
-    else { SEGGER_RTT_printf(0,"%sError [CH2] key 'FM Mod'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
+    	 rtt.print("%sCH2.FM Mod  =  %s\r\n", RTT_CTRL_TEXT_BRIGHT_GREEN , buffer );
+    else {  rtt.print("%sError [CH2] key 'FM Mod'\r\n", RTT_CTRL_TEXT_BRIGHT_RED); ini.printErrorMessage(); }
 
     ini.close();
 
+ */
 
 }

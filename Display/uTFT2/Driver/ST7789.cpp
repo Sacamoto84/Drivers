@@ -707,6 +707,7 @@ void TFT::ST7789_UpdateDMA16bitV2(void) {
 
 }
 
+//DMA с блокировкой
 void TFT::ST7789_UpdateDMA16bitV3(void) {
 
 	if (blockUpdate) return;
@@ -830,7 +831,6 @@ void TFT::ST7789_Update_DMA_Cicle_Off(void)
     while( !(SPI1->SR & SPI_SR_TXE));	  //Ждем окончания передачи по SPI
 	DMA2_Stream3->NDTR = 0;               //Сброс счетчика DMA
 	DMA2_Stream3->CR &= ~DMA_SxCR_CIRC;   //Выкл Кольцевой режим
-
 
 	SPI1->CR1 &= ~SPI_CR1_SPE;            //Спокойно отключаем SPI
 	SPI1->CR2 &= ~SPI_CR2_TXDMAEN;        //Отвязываем от DMA

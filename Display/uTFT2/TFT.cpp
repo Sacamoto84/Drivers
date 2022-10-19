@@ -74,6 +74,29 @@ void TFT::SetColorToPallete(uint8_t index, uint16_t color) {
 	//LCD->LCD_Buffer_Palette[index] = color;
 }
 
+
+
+void TFT::Fill16(uint16_t color) {
+	    //uint32_t t = (uint32_t)color;
+		uint32_t Color = color * 65536  + color;
+		uint32_t *p;
+		p = (uint32_t *)&LCD->buffer16[0];
+
+		uint32_t max = LCD->TFT_HEIGHT * LCD->TFT_WIDTH / 2  / 4 / 2 / 2;
+
+		while(max--)
+		{
+			*p++ = Color; *p++ = Color; *p++ = Color; *p++ = Color;
+			*p++ = Color; *p++ = Color; *p++ = Color; *p++ = Color;
+
+			*p++ = Color; *p++ = Color; *p++ = Color; *p++ = Color;
+			*p++ = Color; *p++ = Color; *p++ = Color; *p++ = Color;
+		}
+		return;
+}
+
+
+
 void TFT::Fill(uint16_t color) {
 
 	if (LCD->Bit == 1) {
@@ -118,9 +141,10 @@ void TFT::Fill(uint16_t color) {
 	}
 
 	if (LCD->Bit == 16) {
-		int ii = LCD->TFT_HEIGHT * LCD->TFT_WIDTH;
-		for (int32_t i = 0; i < ii; i++)
-			LCD->buffer16[i] = color;
+		//int ii = LCD->TFT_HEIGHT * LCD->TFT_WIDTH;
+
+		//for (int32_t i = 0; i < ii; i++)
+		//	LCD->buffer16[i] = color;
 
 		/*
 		uint32_t Color = color <<16 & color;

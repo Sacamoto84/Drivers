@@ -65,9 +65,7 @@ public:
 
     uint32_t blockUpdate;
 
-
-
-////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////
     //Для ресурсов
     uint32_t resurce_count;
     uint32_t resurce_start_adress; //Начало ресурсов
@@ -114,9 +112,6 @@ public:
   	    return bmp;
     }
     ////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
 
 	void init(uTFT_LCD_t *_LCD) {
 		LCD = _LCD;
@@ -180,7 +175,13 @@ public:
 	}
 	;
 
-	void Fill(uint16_t color);
+
+
+//┌────────────────────────────────┬────────────────────┐
+	void Fill  (uint16_t color); //│                    │
+	void Fill16(uint16_t color); //│ Только Для 16 бит  │
+//└────────────────────────────────┴────────────────────┘
+
 
 	void SetPixel(int32_t x, int32_t y, uint16_t color);
 	void SetPixel16(int32_t x, int32_t y, uint16_t color);
@@ -212,7 +213,7 @@ public:
 	void ST7789_Update_DMA_Cicle_Off(void);
 
 
-	void ILI9225_init_table16(uint16_t *table, int16_t size);
+	void ILI9225_init_table16(const uint16_t *table, int16_t size);
 	void ILI9225_setWindow   ( uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
 
 
@@ -246,6 +247,14 @@ public:
 		  //TIM9->CCR2 = i;
 		#endif
 	}
+
+	//Установить цвет в ячейку палитры
+	void setColorToPalete(int index, uint16_t c)
+	{
+		if (index > 255) return;
+		LCD->palete[index] =  c;
+	}
+
 
 	void Struct_to_Pallete_4b(uTFT_LCD_t *LCD, uTFT_LCD_Pallete *in) {
 		LCD->palete[0] = in->C0;
@@ -342,6 +351,12 @@ public:
 
 
 	// ----- Font Smooth ----
+
+	void ConvertStringDosTo1251 ( char *str ); // Конвертирование строки из DOS(866) в Win1251
+	void ConvertString1251ToDos ( char *str ); // Конвертирование строки из Win1251 в DOS(866)
+	void ConvertString1251ToUTF8 ( char *in_str, char *out_str );// Конвертирование строки из Win1251 в UTF8
+	int  ConvertStringUTF8to1251 (const char* utf8, char* windows1251, size_t n);
+
 	//Тест вывод на экран всего алфавита
 	void Font_Smooth_showFont(uint32_t td);
 	void Font_Smooth_drawGlyph(uint16_t code);
@@ -357,14 +372,13 @@ public:
 
 
 
-	//Video
 
-
+	//Video только для 240x240 ST7789
 	void video_play(char * Name, uint8_t delay = 0);
 	void video_load(uint8_t delay);
-	uint32_t (*videoCallBackFunc)(uint32_t); //Некая функция, используется для остановки видео по событию во время проигрования
-	uint32_t video_stop;
-
+	uint32_t (*videoCallBackFunc)(uint32_t);          //Некая функция, используется для остановки видео по событию во время проигрования
+	uint32_t video_stop;                              //Для user как некая временная переменная (прекратить повторный запуск)
+	//─────────────────────────────────────────────────┘
 
 
 

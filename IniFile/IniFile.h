@@ -1,6 +1,8 @@
 #ifndef _INIFILE_H
 #define _INIFILE_H
 
+#include "logUART.h"
+extern classLog rtt;
 
 //#include <stdio.h>
 //#include <stdlib.h>
@@ -13,11 +15,6 @@
 #include <string.h>
 
 #include "fatfs.h"
-
-#include "SEGGER.h"
-#include "SEGGER_RTT.h"
-#include "SEGGER_RTT_Conf.h"
-#include "SEGGER_SYSVIEW.h"
 
 typedef bool boolean;
 
@@ -172,13 +169,12 @@ private:
 
 bool IniFile::open(void)
 {
-	SEGGER_RTT_WriteString(0, "IniFile::open\r\n");
+	rtt.print("IniFile::open\n");
 	//if (_file == true)
 	//	f_close(&_fatfsfile);
 
 	FRESULT res;
 	res = f_open(&_fatfsfile, _filename, FA_OPEN_EXISTING | FA_READ); // == FR_OK
-
 
 	//_file = SD.open(_filename, _mode);
 
@@ -186,14 +182,14 @@ bool IniFile::open(void)
 	{
 		_file = true;
 		_error = errorNoError;
-		SEGGER_RTT_WriteString(0, "IniFile::open> errorNoError\r\n");
+		rtt.print("IniFile::open> errorNoError\n");
 		return true;
 	}
 	else
 	{
 		_file = false;
 		_error = errorFileNotFound;
-		SEGGER_RTT_WriteString(0, "IniFile::open> errorFileNotFound\r\n");
+		rtt.print("IniFile::open> errorFileNotFound\n");
 		return false;
 	}
 }

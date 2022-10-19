@@ -11,9 +11,8 @@
 #include "main.h"
 #include "TFT.h"
 #include "EasingProvider.h"
-#include "SEGGER.h"
 
-extern uint16_t palitra[256];
+extern uint16_t palitra[];
 
 class TFT_Wiget_Animated_Rectagle {
 public:
