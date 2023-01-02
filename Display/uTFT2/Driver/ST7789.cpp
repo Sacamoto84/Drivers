@@ -1,6 +1,9 @@
-#include "../TFT.h"
+//#include "../TFT.h"
+#include "../TFT_Driver.h"
+#include "../TFT_SPI.h"
+#include "ST7789.h"
 
-void TFT::ST7789_Init(void) {
+void TFT_Driver::ST7789_Init(void) {
 	if (LCD->GPIO_CS != NULL) {
 		CS_0;
 	}
@@ -113,22 +116,18 @@ void TFT::ST7789_Init(void) {
 	}
 }
 
-
-
-void TFT::ST7789_Update(void)
+void TFT_Driver::ST7789_Update(void)
 {
 	ST7789_Update(0, 0, LCD->TFT_WIDTH - 1, LCD->TFT_HEIGHT - 1);
 }
 
-
-void TFT::ST7789_Update(List_Update_Particle U)
+void TFT_Driver::ST7789_Update(List_Update_Particle U)
 {
 
 	ST7789_Update( constrain(U.x0,0, LCD->TFT_WIDTH - 1) , constrain(U.y0,0,LCD->TFT_HEIGHT - 1), constrain(U.x1,0,LCD->TFT_WIDTH - 1) , constrain(U.y1,0,LCD->TFT_HEIGHT - 1));
 }
 
-
-void TFT::ST7789_Update(int x0, int y0, int x1, int y1) {
+void TFT_Driver::ST7789_Update(int x0, int y0, int x1, int y1) {
 
 	if (blockUpdate) return;
 
@@ -231,7 +230,7 @@ void TFT::ST7789_Update(int x0, int y0, int x1, int y1) {
 
 }
 
-void TFT::ST7789_AddrSet(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
+void TFT_Driver::ST7789_AddrSet(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
 	SPI.SendCmd(0x2A);
 	SPI.SendData(0x00);
 	SPI.SendData(x0 + LCD->dx);
@@ -246,7 +245,7 @@ void TFT::ST7789_AddrSet(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
 }
 
 // Поворот экрана
-void TFT::ST77XX_Rotate(uint16_t depth) {
+void TFT_Driver::ST77XX_Rotate(uint16_t depth) {
 	if (depth == 0) {
 		LCD->MADCTL.MV = 0;
 		LCD->MADCTL.MX = 0;
@@ -287,7 +286,7 @@ void TFT::ST77XX_Rotate(uint16_t depth) {
 }
 
 //Обновление регистра MADCTL
-void TFT::ST77XX_Update_MADCTL(void) {
+void TFT_Driver::ST77XX_Update_MADCTL(void) {
 	uint8_t data;
 
 	if (LCD->GPIO_CS != NULL)
@@ -304,7 +303,7 @@ void TFT::ST77XX_Update_MADCTL(void) {
 		CS_1;
 }
 
-void TFT::ST7789_Update_Window(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
+void TFT_Driver::ST7789_Update_Window(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
 
 	if (blockUpdate) return;
 
@@ -401,7 +400,7 @@ void TFT::ST7789_Update_Window(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
 	}
 }
 
-void TFT::ST7789_UpdateDMA4bit(void) {
+void TFT_Driver::ST7789_UpdateDMA4bit(void) {
 
 	if (blockUpdate) return;
 
@@ -464,7 +463,7 @@ void TFT::ST7789_UpdateDMA4bit(void) {
 
 }
 
-void TFT::ST7789_UpdateDMA4bitV2(void) {
+void TFT_Driver::ST7789_UpdateDMA4bitV2(void) {
 
 	if (blockUpdate) return;
 
@@ -552,7 +551,7 @@ void TFT::ST7789_UpdateDMA4bitV2(void) {
 
 }
 
-void TFT::ST7789_UpdateDMA8bitV2(void) {
+void TFT_Driver::ST7789_UpdateDMA8bitV2(void) {
 
 	if (blockUpdate) return;
 
@@ -630,7 +629,7 @@ void TFT::ST7789_UpdateDMA8bitV2(void) {
 }
 
 extern uint16_t LCD_Buffer16[240 * 240];
-void TFT::ST7789_UpdateDMA16bitV2(void) {
+void TFT_Driver::ST7789_UpdateDMA16bitV2(void) {
 
 	if (blockUpdate) return;
 
@@ -708,7 +707,7 @@ void TFT::ST7789_UpdateDMA16bitV2(void) {
 }
 
 //DMA с блокировкой
-void TFT::ST7789_UpdateDMA16bitV3(void) {
+void TFT_Driver::ST7789_UpdateDMA16bitV3(void) {
 
 	if (blockUpdate) return;
 
@@ -755,7 +754,7 @@ void TFT::ST7789_UpdateDMA16bitV3(void) {
 
 }
 
-void TFT::ST7789_Transmit_Array(char dc, uint8_t *data, int nbytes)
+void TFT_Driver::ST7789_Transmit_Array(char dc, uint8_t *data, int nbytes)
 {
 	if (dc)
 		DATA;
@@ -775,7 +774,7 @@ void TFT::ST7789_Transmit_Array(char dc, uint8_t *data, int nbytes)
 }
 
 
-void TFT::ST7789_Update_DMA_Cicle_On(void)
+void TFT_Driver::ST7789_Update_DMA_Cicle_On(void)
 {
 
 	DMA2_Stream3->CR &= ~DMA_SxCR_EN;     //Отключаем DMA
@@ -825,7 +824,7 @@ void TFT::ST7789_Update_DMA_Cicle_On(void)
 	SPI1->CR1 |= SPI_CR1_SPE;                  //Включаем SPI для работы в DMA
 }
 
-void TFT::ST7789_Update_DMA_Cicle_Off(void)
+void TFT_Driver::ST7789_Update_DMA_Cicle_Off(void)
 {
 	DMA2_Stream3->CR &= ~DMA_SxCR_EN;     //Отключаем DMA
     while( !(SPI1->SR & SPI_SR_TXE));	  //Ждем окончания передачи по SPI
