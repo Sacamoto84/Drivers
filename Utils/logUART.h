@@ -60,13 +60,11 @@ public:
 		}
 	}
 
-
 	//Вывести строку с нужным цветом
 	void colorString(int color, char const *const format);
 	void colorString(int color, int bgcolor, char const *const format);
 	void colorStringln(int color, char const *const format);
 	void colorStringln(int color, int bgcolor, char const *const format);
-
 
 	template<typename ... Args>
 	void warning(char const *const format, Args const &... args) noexcept {
@@ -96,19 +94,19 @@ public:
 		colorStringln(10, str);
 	}
 
-
-
 	//Ждать окончание передачи, для DMA
 	inline void waitComplete(void) {
 		int t = HAL_GetTick();
-		while (*dma_completed == 0) { if ((HAL_GetTick() - t) > 100) break; }
+		while (*dma_completed == false) { if ((HAL_GetTick() - t) > 100) break; }
 		*dma_completed = 0;
 	}
 
 	inline void DMASend(void) {
 		int size = strlen(str);
-		if (size)
-		  HAL_UART_Transmit_DMA(huart, (const uint8_t*) str, size);
+		if (size){
+		  //HAL_UART_Transmit_DMA(huart, (const uint8_t*) str, size);
+			HAL_UART_Transmit_IT(huart, (const uint8_t*) str, size);
+		}
 		else
 		  *dma_completed = 1;
 	}
