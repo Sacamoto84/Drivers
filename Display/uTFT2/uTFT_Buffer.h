@@ -7,6 +7,8 @@ extern "C" {
 
 #include "main.h"	
 
+#include "TFT_config.h"
+
 //_MADCTL
 typedef struct {
 	uint8_t MY;
@@ -44,7 +46,9 @@ typedef enum {
 	ILI9225, /* (2) */
 	SSD1306, /* (3) */
 	PCD8544, /* (4) */
-	ST7735S, LCD_USB, SPRITE_RAM
+	ST7735S,
+	LCD_USB,
+	SPRITE_RAM
 } LCD_DRIVER;
 
 //uTFT_LCD_t
@@ -53,22 +57,40 @@ typedef struct {
 	int32_t TFT_HEIGHT;      // ������ ������
 	LCD_DRIVER LCD_Driver; // 0-ST7735, 1-ST7789, 2-ILI9225 3-SSD1306 4-PCD8544
 	uint8_t Bit;             // �������� 16 8 4 2 1
-	SPI_HandleTypeDef *hspi;
-	I2C_HandleTypeDef *hi2c;
+
+
+	#ifdef TFT_USE_SPI
+	  SPI_HandleTypeDef *hspi;
+    #else
+	  uint32_t * notUse;
+    #endif
+
+
+
+    #ifdef TFT_USE_I2С
+	  I2C_HandleTypeDef *hi2c;
+    #else
+	  uint32_t * notUse;
+    #endif
+
+	uint8_t I2C_Adress;
+
 	uint16_t *buffer16;        // ��������� �� 16 ��� ������
-	uint8_t *buffer8;         // ��������� �� 8 ��� ������
+	uint8_t  *buffer8;         // ��������� �� 8 ��� ������
 	uint16_t *palete;          // ��������� �� �� �������
-	uint16_t dx;              // ��������� �� �� �������
-	uint16_t dy;              // ��������� �� �� �������
+
+
+	uint16_t dx;               // ��������� �� �� �������
+	uint16_t dy;               // ��������� �� �� �������
 	GPIO_TypeDef *GPIO_CS;
 	uint16_t GPIO_Pin_CS;
 	GPIO_TypeDef *GPIO_DC;
 	uint16_t GPIO_Pin_DC;
 	GPIO_TypeDef *GPIO_RESET;
 	uint16_t GPIO_Pin_RESET;
-	uint8_t I2C_Adress;   //
 	_MADCTL MADCTL;
 	_ROTATE_DELTA ROTATE_DELTA; //
+
 } uTFT_LCD_t;
 
 //uTFT_LCD_Pallete

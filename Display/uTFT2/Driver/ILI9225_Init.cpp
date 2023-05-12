@@ -1,4 +1,8 @@
+#include "TFT_config.h"
+
 #include "ILI9225.h"
+
+#ifdef TFT_Driver_ILI9225
 
 #define TFTLCD_DELAY 0xFFFF
 const uint16_t ILI9225_regValues[] = {
@@ -109,3 +113,4 @@ void TFT::ILI9225_init(void)
   	}
 }
 
+#endif /* TFT_Driver_ILI9225 */

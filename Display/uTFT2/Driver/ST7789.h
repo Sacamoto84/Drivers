@@ -1,5 +1,9 @@
+#include "TFT_config.h"
+
 #ifndef ST7789_H
 #define ST7789_H
+
+#ifdef TFT_Driver_ST7789
 
 #include <stdbool.h>
 #include "main.h"
@@ -105,5 +109,7 @@
 #define ST77XX_MADCTL_MV      0x20
 #define ST77XX_MADCTL_ML      0x10
 #define ST77XX_MADCTL_RGB     0x00
+
+#endif /* TFT_Driver_ST7789 */
 
 #endif /* _U8G_H */

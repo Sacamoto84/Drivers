@@ -1,6 +1,6 @@
 #include "bitmap.h"
 
-void BitmapFromFlash(TFT * tft, int16_t X, int16_t Y, Bitmap *bmp)
+void BitmapFromFlash1b(TFT * tft, int16_t X, int16_t Y, Bitmap *bmp)
 {
 	if (bmp->bit == 1) {
 
@@ -38,14 +38,5 @@ void BitmapFromFlash(TFT * tft, int16_t X, int16_t Y, Bitmap *bmp)
 			}
 		}
 
-		if (bmp->bit == 16) {
-			const uint16_t *p16;
-			p16 = bmp->steam16;
-
-			for (int16_t pY = Y; pY < bmp->H + Y; pY++) {
-				for (int16_t pX = X; pX < bmp->W + X; pX++)
-					tft->SetPixel(pX, pY, *p16++);
-			}
-		}
 }
 

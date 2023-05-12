@@ -1,3 +1,7 @@
+#include "TFT_config.h"
+
+#ifdef TFT_Driver_ST7789
+
 //#include "../TFT.h"
 #include "../TFT_Driver.h"
 #include "../TFT_SPI.h"
@@ -837,3 +841,4 @@ void TFT_Driver::ST7789_Update_DMA_Cicle_Off(void)
 	SPI1->CR1 |= SPI_CR1_SPE;             //Включаем для работы в обычном режиме
 }
 
+#endif /* TFT_Driver_ST7789 */

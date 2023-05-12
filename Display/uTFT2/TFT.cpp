@@ -57,7 +57,6 @@ void TFT::SetPixel16(int32_t x, int32_t y, uint16_t color) {
 	LCD->buffer16[x + y * LCD->TFT_WIDTH] = color;
 }
 
-
 uint16_t TFT::GetPixel(int32_t x, int32_t y) {
 
 	if (LCD->Bit == 16) {
@@ -73,8 +72,6 @@ void TFT::SetColorToPallete(uint8_t index, uint16_t color) {
 	//if (index>255) return;
 	//LCD->LCD_Buffer_Palette[index] = color;
 }
-
-
 
 void TFT::Fill16(uint16_t color) {
 	    //uint32_t t = (uint32_t)color;
@@ -94,8 +91,6 @@ void TFT::Fill16(uint16_t color) {
 		}
 		return;
 }
-
-
 
 void TFT::Fill(uint16_t color) {
 
@@ -140,52 +135,7 @@ void TFT::Fill(uint16_t color) {
 
 	}
 
-	if (LCD->Bit == 16) {
-		//int ii = LCD->TFT_HEIGHT * LCD->TFT_WIDTH;
-
-		//for (int32_t i = 0; i < ii; i++)
-		//	LCD->buffer16[i] = color;
-
-		/*
-		uint32_t Color = color <<16 & color;
-		uint32_t *p;
-		p = (uint32_t *)&LCD->buffer16[0];
-
-		uint32_t max = LCD->TFT_HEIGHT * LCD->TFT_WIDTH / 2  / 4 / 2 / 2;
-
-		while(max--)
-		{
-			*p++ = Color; *p++ = Color; *p++ = Color; *p++ = Color; //370
-			*p++ = Color; *p++ = Color; *p++ = Color; *p++ = Color; //287
-
-			*p++ = Color; *p++ = Color; *p++ = Color; *p++ = Color; //
-			*p++ = Color; *p++ = Color; *p++ = Color; *p++ = Color; //245
-		}
-		*/
-
-		return;
-	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 uint16_t TFT::alphaBlend(uint8_t alpha, uint16_t fgc, uint16_t bgc)
 {
@@ -206,11 +156,3 @@ uint16_t TFT::alphaBlend(uint8_t alpha, uint16_t fgc, uint16_t bgc)
 	// Combine RGB565 colours into 16 bits
 	return (r << 11) | (g << 5) | (b << 0);
 }
-
-
-
-
-
-
-
-

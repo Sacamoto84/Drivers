@@ -8,7 +8,7 @@
 #ifndef FONTCLASSIC_FONTCLASSIC_H_
 #define FONTCLASSIC_FONTCLASSIC_H_
 
-#include "TFT.h"
+#include "../TFT.h"
 
 #include "main.h"
 
@@ -31,8 +31,8 @@ typedef struct {
 //extern FontDef_t Font_11x18;
 //extern FontDef_t Font_16x26;
 
-extern char FontClassicPutc(TFT * tft, char ch, FontDef_t* Font, uint8_t NoBack );
-extern char FontClassicPuts(TFT * tft, char * str, FontDef_t* Font, uint8_t NoBack);
+extern char   FontClassicPutc(TFT * tft, char ch, FontDef_t* Font, uint8_t NoBack );
+extern char   FontClassicPuts(TFT * tft, char * str, FontDef_t* Font, uint8_t NoBack);
 extern char * FontClassicGetStringSize(char * str, FONTS_SIZE_t* SizeStruct, FontDef_t* Font);
 
 

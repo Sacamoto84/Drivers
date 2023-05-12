@@ -1,7 +1,7 @@
 #ifndef RESOURCE_RESOURCE_H_
 #define RESOURCE_RESOURCE_H_
 
-#include "bitmap.h"
+#include "../Bitmap/bitmap.h"
 
 extern void setResStartAdress(uint32_t i);
 

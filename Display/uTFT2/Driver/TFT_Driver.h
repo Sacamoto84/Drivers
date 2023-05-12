@@ -1,16 +1,25 @@
 #ifndef TFT_DRIVER_H_
 #define TFT_DRIVER_H_
 
+#include "TFT_config.h"
+
 #include "uTFT_Buffer.h"
 
 #include "TFT_define.h"
-#include "TFT_SPI.h"
+
+#ifdef TFT_USE_SPI
+  #include "TFT_SPI.h"
+#endif
+
 
 class TFT_Driver {
 public:
 
 	uTFT_LCD_t *LCD;
-	TFT_SPI SPI;
+
+    #ifdef TFT_USE_SPI
+	  TFT_SPI SPI;
+    #endif
 
 	uint32_t DMA_TX_Complete; //����� ������ ��������� DMA �������� ������ ��� �����
 	uint32_t blockUpdate;
@@ -21,22 +30,38 @@ public:
 
 		switch (LCD->LCD_Driver) {
 		case SSD1306:
-			SSD1306_Init();
+            #ifdef TFT_Driver_SSD1306
+			  SSD1306_Init();
+            #endif
 			break;
-		case ST7789:
-			SPI.init(_LCD);
-			ST7789_Init();
-			break;   // 1 - ST7789
-		case ILI9225:
-			SPI.init(_LCD);
-			ILI9225_init();
-			break;	 // 2 - ILI9225
-		case ST7735:
-			ST7735_init();
-			break;
-		case ST7735S:
-			ST7735S_init();
-			break;
+
+            #ifdef TFT_Driver_ST7789
+		    case ST7789:
+			  SPI.init(_LCD);
+			  ST7789_Init();
+			  break;   // 1 - ST7789
+            #endif
+
+            #ifdef TFT_Driver_ILI9225
+		    case ILI9225:
+			  SPI.init(_LCD);
+			  ILI9225_init();
+			  break;	 // 2 - ILI9225
+            #endif
+
+
+            #ifdef TFT_Driver_ST7735
+		    case ST7735:
+			  ST7735_init();
+			  break;
+            #endif
+
+            #ifdef TFT_Driver_ST7735S
+			case ST7735S:
+			  ST7735S_init();
+			  break;
+            #endif
+
 		default:
 			break;
 		}
@@ -48,10 +73,10 @@ public:
 			SSD1306_UpdateScreen();
 			break;
 		case ILI9225:
-			ILI9225_UpdateScreen();
+			//ILI9225_UpdateScreen();
 			break; // 2 - ILI9225
 		case ST7789:
-			ST7789_Update();
+			//ST7789_Update();
 			break; //1-ST7789
 		case ST7735:
 			//ST7735_Update(); //-V1037

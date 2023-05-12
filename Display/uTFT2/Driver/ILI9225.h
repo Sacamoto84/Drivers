@@ -1,5 +1,9 @@
+#include "TFT_config.h"
+
 #ifndef ILI9225_H
 #define ILI9225_H
+
+#ifdef TFT_Driver_ILI9225
 
 #ifdef __cplusplus
 extern "C" {
@@ -7,7 +11,7 @@ extern "C" {
 	
 #include "../TFT.h"
 
-#include "../inc/uTFT_define.h"
+#include "../uTFT_define.h"
 #include "main.h"
 
 #define MADCTLGRAPHICS 0x6
@@ -79,5 +83,7 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* TFT_Driver_ILI9225 */
 
 #endif /* _U8G_H */

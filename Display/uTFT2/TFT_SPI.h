@@ -1,6 +1,8 @@
 #ifndef TFT_SPI_H_
 #define TFT_SPI_H_
 
+#ifdef TFT_USE_SPI
+
 #include "main.h"
 #include "spi.h"
 
@@ -86,5 +88,7 @@
 	 } //CS -> 1
 
  } TFT_SPI;
+
+#endif /* TFT_USE_SPI */
 
 #endif /* TFT_SPI_H_ */

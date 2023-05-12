@@ -4,17 +4,20 @@
 #include "TFT_define.h"
 #include "uTFT_Buffer.h"
 
+#include "TFT_config.h"
+
 //#include "uTFT_weak.h"
 
-#include "spi.h"
-#include "TFT_SPI.h"
+#ifdef TFT_USE_SPI
+  #include "spi.h"
+  #include "TFT_SPI.h"
+#endif
 
-#include "TFT_Driver.h"
+
+#include "Driver/TFT_Driver.h"
 
 //#include "./Driver/ST7789.h"
 //#include "uTFT_Color.h"
-
-
 
 #define FontId0 (uint8_t *)(tft.getResAdressFontID(0))
 #define FontId1 (uint8_t *)(tft.getResAdressFontID(1))
@@ -43,10 +46,6 @@ public:
 
 	TFT_Driver driver;
 
-
-
-
-
 	int16_t _xPivot;   // TFT x pivot point coordinate for rotated Sprites
 	int16_t _yPivot;   // TFT x pivot point coordinate for rotated Sprites
 
@@ -69,14 +68,14 @@ public:
 
 	void Invert(void) //Не работает
 			{
-#if defined(uSSD1306)
+        #if defined(uSSD1306)
 		  //SSD1306_Invert();
 		#endif
 	}
 
 	//Подсветка 0..255
 	void BackLight(uint8_t i) {
-#if defined(LCD_USE_BL)
+        #ifdef LCD_USE_BL
 		  //TIM9->CCR2 = i;
 		#endif
 	}
