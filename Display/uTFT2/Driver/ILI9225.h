@@ -1,9 +1,9 @@
-#include "TFT_config.h"
-
 #ifndef ILI9225_H
 #define ILI9225_H
 
-#ifdef TFT_Driver_ILI9225
+#include "TFT_config.h"
+
+#if defined (TFT_DRIVER_ILI9225)
 
 #ifdef __cplusplus
 extern "C" {
@@ -86,4 +86,4 @@ extern "C" {
 
 #endif /* TFT_Driver_ILI9225 */
 
-#endif /* _U8G_H */
+#endif /* ILI9225_H */

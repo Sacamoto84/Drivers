@@ -18,9 +18,9 @@
  typedef struct                                                                   //│
  {
 
-	    uTFT_LCD_t * LCD;
+	    TFT_LCD_t * LCD;
 
-	 	void init (uTFT_LCD_t * _LCD)
+	 	void init (TFT_LCD_t * _LCD)
 	 	{LCD = _LCD;}
 
 	 	//Сброс экрана

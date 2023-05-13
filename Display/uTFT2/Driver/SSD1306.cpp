@@ -1,6 +1,6 @@
 #include "TFT_config.h"
 
-#ifdef TFT_Driver_SSD1306
+#if defined (TFT_DRIVER_SSD1306)
 
 #include "../TFT.h"
 
@@ -16,7 +16,7 @@ void TFT_Driver::SSD1306_WRITECOMMAND(uint8_t data) {
 		HAL_I2C_Master_Transmit(LCD->hi2c, LCD->I2C_Adress, dt, 2, 1000);
 	} else                          //SPI
 	{
-#ifdef TFT_USE_SPI
+#if defined(TFT_USE_SPI)
 		SPI.SendCmd(data);
 #endif
 	}
@@ -34,9 +34,9 @@ void TFT_Driver::SSD1306_WRITEDATA(uint8_t data) {
 #endif
 	} else //SPI
 	{
-#ifdef TFT_USE_SPI
+#if defined( TFT_USE_SPI)
 		SPI.SendData(data);
-      #endif
+#endif
 	}
 
 }
@@ -44,14 +44,14 @@ void TFT_Driver::SSD1306_WRITEDATA(uint8_t data) {
 //Инициализация первого экрана
 void TFT_Driver::SSD1306_Init(void) {
 
-#ifdef TFT_USE_SPI
+#if defined(TFT_USE_SPI)
 	//Только для SPI
 	if (LCD->GPIO_RESET != NULL)	
 		SPI.LCD_Reset();
 	
 	if (LCD->GPIO_CS != NULL)	
 		CS_0;
-    #endif
+#endif
 
 	/* Init LCD */
 	SSD1306_WRITECOMMAND(0xAE); //display off
@@ -93,7 +93,7 @@ void TFT_Driver::SSD1306_Init(void) {
 	SSD1306_WRITECOMMAND(0x14); //
 	SSD1306_WRITECOMMAND(0xAF); //--turn on SSD1306 panel
 
-#ifdef TFT_USE_SPI
+#if defined(TFT_USE_SPI)
 	if (LCD->GPIO_CS != NULL)	
 		CS_1;
     #endif
@@ -130,7 +130,7 @@ void TFT_Driver::SSD1306_UpdateScreen(void) {
 
 	} else { //SPI
 
-#ifdef TFT_USE_SPI
+#if defined(TFT_USE_SPI)
     if (LCD->GPIO_CS != NULL)	
     	CS_0;
 		
@@ -162,4 +162,4 @@ void TFT_Driver::SSD1306_Contrast(uint8_t c) {
 	SSD1306_WRITECOMMAND(c);
 }
 
-#endif /* TFT_Driver_SSD1306 */
+#endif /* TFT_DRIVER_SSD1306 */

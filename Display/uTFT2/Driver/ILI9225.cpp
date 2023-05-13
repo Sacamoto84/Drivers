@@ -1,3 +1,7 @@
+#include "TFT_config.h"
+
+#if defined(TFT_DRIVER_ILI9225)
+
 #include "ILI9225.h"
 
 void TFT::ILI9225_setWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
@@ -71,3 +75,5 @@ void TFT::ILI9225_UpdateScreen(void)
 	
 
 }
+
+#endif

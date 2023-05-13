@@ -1,6 +1,6 @@
 #include "TFT_config.h"
 
-#ifdef TFT_Driver_ST7789
+#if defined(TFT_DRIVER_ST7789)
 
 //#include "../TFT.h"
 #include "../TFT_Driver.h"

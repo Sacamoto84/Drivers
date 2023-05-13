@@ -1,8 +1,10 @@
 #include "TFT_config.h"
 
-#include "ILI9225.h"
 
-#ifdef TFT_Driver_ILI9225
+
+#if defined(TFT_DRIVER_ILI9225)
+
+#include "ILI9225.h"
 
 #define TFTLCD_DELAY 0xFFFF
 const uint16_t ILI9225_regValues[] = {

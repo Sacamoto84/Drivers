@@ -1,9 +1,11 @@
-#include "TFT_config.h"
+
 
 #ifndef ST7789_H
 #define ST7789_H
 
-#ifdef TFT_Driver_ST7789
+#include "TFT_config.h"
+
+#if defined(TFT_DRIVER_ST7789)
 
 #include <stdbool.h>
 #include "main.h"

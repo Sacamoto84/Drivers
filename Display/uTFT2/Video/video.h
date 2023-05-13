@@ -8,6 +8,9 @@
 #ifndef VIDEO_VIDEO_H_
 #define VIDEO_VIDEO_H_
 
+#include "TFT_config.h"
+#if define(TFT_UNIT_VIDEO)
+
 #include "main.h"
 
 #include "../TFT.h"
@@ -22,4 +25,8 @@ extern uint32_t video_stop;                              //Для user как н
 
 extern void video_play(TFT * tft, char * Name, uint8_t delay);
 
+#endif / * TFT_unit_video */
+
 #endif /* VIDEO_VIDEO_H_ */
+
+

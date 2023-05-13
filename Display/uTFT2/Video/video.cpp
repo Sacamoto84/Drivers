@@ -1,3 +1,6 @@
+#include "TFT_config.h"
+
+#ifdef define(TFT_UNIT_VIDEO)
 
 #include "video.h"
 
@@ -77,3 +80,5 @@ void video_play(TFT * tft, char * Name, uint8_t delay){
 	else
       rtt.print("video_play == Ошибка открытия файла\n");
 }
+
+#endif

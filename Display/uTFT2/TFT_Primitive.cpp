@@ -191,6 +191,7 @@ void TFT::LineH(int32_t Y, int32_t X1, int32_t X2, uint16_t color) {
 	}
 
 }
+
 void TFT::LineH16(int32_t Y, int32_t X1, int32_t X2, uint16_t color) {
 
 	int32_t i;
@@ -204,6 +205,7 @@ void TFT::LineH16(int32_t Y, int32_t X1, int32_t X2, uint16_t color) {
 		}
 
 }
+
 void TFT::LineHW(int32_t x, int32_t y, int32_t w, uint16_t color) {
 	LineH(y, x, x + w - 1, color);
 }
@@ -439,7 +441,6 @@ void TFT::TriangleFilled(int16_t x1, int16_t y1, int16_t x2, int16_t y2,
 		y += yinc2;
 	}
 }
-
 
 //tft.Gradient_Vertical(0, 0, 239, 239, 0x26, 0x4d, 0x59, 0x43, 0x97, 0x8d);
 //tft.Gradient_Vertical(0, 0, 239, 239, 0x68, 0x82, 0xa0, 0x2c, 0x69, 0x75);

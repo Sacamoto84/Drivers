@@ -4,7 +4,7 @@
 extern classLog rtt;
 
 //32 бит BMP с альфа каналом
-//void uTFT_BMP_From_File_Alpha(uTFT_LCD_t *LCD, int32_t x0, int32_t y0,
+//void uTFT_BMP_From_File_Alpha(TFT_LCD_t *LCD, int32_t x0, int32_t y0,
 //		char *Name, int offset);
 
 ////16x16
@@ -36,7 +36,7 @@ extern classLog rtt;
 //};
 
 #if (LCD_COLOR)
-void uTFT_Bitmap_From_Flash_Direct(uTFT_LCD_t* LCD, uint16_t X, uint16_t Y, BMP * bmp)
+void uTFT_Bitmap_From_Flash_Direct(TFT_LCD_t* LCD, uint16_t X, uint16_t Y, BMP * bmp)
 {	
 	int16_t xmin, xmax;
 	int16_t ymin, ymax;
