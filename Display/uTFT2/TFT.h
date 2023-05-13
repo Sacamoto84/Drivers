@@ -26,16 +26,10 @@ class TFT {
 public:
 
 	TFT_LCD_t *LCD;
-
 	TFT_Driver driver;
 
 	int16_t _xPivot;   // TFT x pivot point coordinate for rotated Sprites
 	int16_t _yPivot;   // TFT x pivot point coordinate for rotated Sprites
-
-
-
-
-
 
 	////////////////////////////////////////////////////////////////////////////////////////////
 	void init(TFT_LCD_t *_LCD) {
@@ -98,8 +92,7 @@ public:
 	void LineHW16(i32 x, i32 y, i32 w, u16 color);
 	void LineMoveTo(i32 x, i32 y, u16 c);
 
-	int16_t LineMoveX;
-	int16_t LineMoveY;
+
 
 	void LineMoveXY(i32 x, i32 y);
 
@@ -115,10 +108,8 @@ public:
 	void Circle(int16_t x0, int16_t y0, int16_t r, u16 c);
 	void CircleFilled(int16_t x0, int16_t y0, int16_t r, u16 c);
 
-	void Triangle(u16 x1, u16 y1, u16 x2, u16 y2,
-			u16 x3, u16 y3, u16 color);
-	void TriangleFilled(int16_t x1, int16_t y1, int16_t x2, int16_t y2,
-			int16_t x3, int16_t y3, u16 color);
+	void Triangle(u16 x1, u16 y1, u16 x2, u16 y2, u16 x3, u16 y3, u16 color);
+	void TriangleFilled(i16 x1, i16 y1, i16 x2, i16 y2, i16 x3, i16 y3, u16 color);
 
 	void Gradient_Vertical(u32 x0, u32 y0, u32 w, u32 h,
 			u8 otR, u8 otG, u8 otB, u8 doR, u8 doG,	u8 doB);
@@ -134,10 +125,12 @@ public:
 	void SetBColor(u16 BColor) {
 		uTFT.BColor = BColor;
 	}
-	void GotoXY(int16_t x, int16_t y) {
+	void GotoXY(i16 x, i16 y) {
 		uTFT.CurrentX = x;
 		uTFT.CurrentY = y;
 	}
+
+	u16 alphaBlend(u8 alpha, u16 fgc, u16 bgc);
 
 //	//Альфа и транспарент
 //	//Впихнуть изображение с другого спрайта
@@ -172,9 +165,12 @@ public:
 //		}
 //	}
 
+
+private:
 	uTFT_t uTFT; //Для установка положения и цвета для текста
 
-	u16 alphaBlend(u8 alpha, u16 fgc, u16 bgc);
+	int16_t LineMoveX; //Для LineTo
+	int16_t LineMoveY;
 
 private:
 

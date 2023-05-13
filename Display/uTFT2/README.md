@@ -1,5 +1,17 @@
+### `top`
+* [init](#init)
+* [tft](#tft)
 
 
+
+
+
+
+
+
+
+
+### `init`
 
 
 # Инициализация 
@@ -89,4 +101,17 @@ TFT_LCD_t LCD_0 = { 135,                  // Ширина экрана
 
 
 
+
+
+
+### `tft`
+
+```
+Fill   (u16 color)
+Fill1  (u16 color)
+Fill4  (u16 color)
+Fill8  (u16 color)
+Fill16 (u16 color)
+```
+* [Top](#top)
 

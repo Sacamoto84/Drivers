@@ -28,12 +28,12 @@ extern "C" {
 
 
 typedef struct {
-	int16_t CurrentX;
-	int16_t CurrentY;
+	int16_t  CurrentX;
+	int16_t  CurrentY;
 	uint16_t Color;
 	uint16_t BColor;
-	uint8_t Inverted;
-	uint8_t GetColor; //1-Нужно читать цвет фона, 0-Использовать цвет BColor
+	uint8_t  Inverted;
+	uint8_t  GetColor; //1-Нужно читать цвет фона, 0-Использовать цвет BColor
 } uTFT_t;
 
 typedef struct {
