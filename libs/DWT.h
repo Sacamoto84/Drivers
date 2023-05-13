@@ -25,7 +25,7 @@ static inline void DWT_Init(void)
     DWT_CONTROL |= DWT_CTRL_CYCCNTENA_Msk;   // запускаем счётчик
 }
 
-static inline void delay_micros(uint32_t us)
+static inline void delay_us(uint32_t us)
 {
     uint32_t us_count_tic =  us * (SystemCoreClock / 1000000); // получаем кол-во тактов за 1 мкс и умножаем на наше значение
     DWT->CYCCNT = 0U; // обнуляем счётчик
