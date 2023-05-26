@@ -230,13 +230,13 @@ void TFT::Rectangle(int32_t x, int32_t y, uint16_t w, uint16_t h, uint16_t c) {
 	/* Check input parameters */
 	if (x >= LCD->TFT_WIDTH || y >= LCD->TFT_HEIGHT) return;
 
-	/* Check width and height */
-	if ((x + w) >= LCD->TFT_WIDTH) {
-		w = LCD->TFT_WIDTH - x;
-	}
-	if ((y + h) >= LCD->TFT_HEIGHT) {
-		h = LCD->TFT_HEIGHT - y;
-	}
+//	/* Check width and height */
+//	if ((x + w) >= LCD->TFT_WIDTH) {
+//		w = LCD->TFT_WIDTH - x;
+//	}
+//	if ((y + h) >= LCD->TFT_HEIGHT) {
+//		h = LCD->TFT_HEIGHT - y;
+//	}
 
 	/* Draw 4 lines */
 	LineH(y, x, x + w, c);

@@ -6,6 +6,10 @@
 
 #include "Driver/TFT_Driver.h"
 
+
+
+
+
 #define FontId0 (u8 *)(tft.getResAdressFontID(0))
 #define FontId1 (u8 *)(tft.getResAdressFontID(1))
 #define FontId2 (u8 *)(tft.getResAdressFontID(2))
@@ -13,7 +17,7 @@
 
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 #define CREATE_SPRITE16(name, x , y) u16 name##_buffer16[x * y + 4];\
-TFT_LCD_t name={x , y, SPRITE_RAM, 16, NULL , NULL, &name##_buffer16[0],};
+TFT_LCD_t name={x , y, SPRITE_RAM, 16, NULL , NULL, 0, &name##_buffer16[0],};
 
 //Выделение памяти
 //CREATE_SPRITE16(S1, 32 , 32);
@@ -27,6 +31,8 @@ public:
 
 	TFT_LCD_t *LCD;
 	TFT_Driver driver;
+
+	uTFT_t uTFT; //Для установка положения и цвета для текста
 
 	int16_t _xPivot;   // TFT x pivot point coordinate for rotated Sprites
 	int16_t _yPivot;   // TFT x pivot point coordinate for rotated Sprites
@@ -51,7 +57,9 @@ public:
 	void SetPixel8  (i32 x, i32 y, u16 color); //│                  │
 	void SetPixel16 (i32 x, i32 y, u16 color); //│                  │
 //└──────────────────────────────────────────────────────────┴──────────────────┘
-	u16 GetPixel(i32 x, i32 y);
+	u16 GetPixel   (i32 x, i32 y);
+	u16 GetPixel1  (i32 x, i32 y);
+	u16 GetPixel16 (i32 x, i32 y);
 
 	void SetColorToPallete(u8 index, u16 color);
 
@@ -133,41 +141,40 @@ public:
 	u16 alphaBlend(u8 alpha, u16 fgc, u16 bgc);
 
 //	//Альфа и транспарент
-//	//Впихнуть изображение с другого спрайта
-//	void pushSpriteIn(TFT *_tft, int16_t x, int16_t y) {
-//		i32 x1, x2, y1, y2;
-//		x1 = constrain(x, 0, LCD->TFT_WIDTH);
-//		x2 = constrain(x + _tft->LCD->TFT_WIDTH, 0, LCD->TFT_WIDTH);
-//		y1 = constrain(y, 0, LCD->TFT_HEIGHT);
-//		y2 = constrain(y + _tft->LCD->TFT_HEIGHT, 0, LCD->TFT_HEIGHT);
-//
-//		for (i32 i = x1; i < x2; i++) {
-//			for (int16_t ii = y1; ii < y2; ii++) {
-//				SetPixel(i, ii, _tft->GetPixel(i - x, ii - y));
-//			}
-//		}
-//	}
-//
-//	void pushSpriteInTr(TFT *_tft, int16_t x, int16_t y, u16 tr_color) {
-//		int16_t x1, x2, y1, y2;
-//		u16 color;
-//		x1 = constrain(x, 0, LCD->TFT_WIDTH);
-//		x2 = constrain(x + _tft->LCD->TFT_WIDTH, 0, LCD->TFT_WIDTH);
-//		y1 = constrain(y, 0, LCD->TFT_HEIGHT);
-//		y2 = constrain(y + _tft->LCD->TFT_HEIGHT, 0, LCD->TFT_HEIGHT);
-//
-//		for (int16_t i = x1; i < x2; i++) {
-//			for (int16_t ii = y1; ii < y2; ii++) {
-//				color = _tft->GetPixel(i - x, ii - y);
-//				if ( color != tr_color)
-//				  SetPixel(i, ii, color);
-//			}
-//		}
-//	}
+//Скопировать изображение с другого экрана
+	void copy(TFT *_tft, int16_t x, int16_t y) {
+		i32 x1, x2, y1, y2;
+		x1 = constrain(x, 0, LCD->TFT_WIDTH);
+		x2 = constrain(x + _tft->LCD->TFT_WIDTH, 0, LCD->TFT_WIDTH);
+		y1 = constrain(y, 0, LCD->TFT_HEIGHT);
+		y2 = constrain(y + _tft->LCD->TFT_HEIGHT, 0, LCD->TFT_HEIGHT);
+
+		for (i32 i = x1; i < x2; i++) {
+			for (int16_t ii = y1; ii < y2; ii++) {
+				SetPixel(i, ii, _tft->GetPixel(i - x, ii - y));
+			}
+		}
+	}
+
+	void copyTr(TFT *_tft, int16_t x, int16_t y, u16 tr_color) {
+		int16_t x1, x2, y1, y2;
+		u16 color;
+		x1 = constrain(x, 0, LCD->TFT_WIDTH);
+		x2 = constrain(x + _tft->LCD->TFT_WIDTH, 0, LCD->TFT_WIDTH);
+		y1 = constrain(y, 0, LCD->TFT_HEIGHT);
+		y2 = constrain(y + _tft->LCD->TFT_HEIGHT, 0, LCD->TFT_HEIGHT);
+
+		for (int16_t i = x1; i < x2; i++) {
+			for (int16_t ii = y1; ii < y2; ii++) {
+				color = _tft->GetPixel(i - x, ii - y);
+				if ( color != tr_color)
+				  SetPixel(i, ii, color);
+			}
+		}
+	}
 
 
 private:
-	uTFT_t uTFT; //Для установка положения и цвета для текста
 
 	int16_t LineMoveX; //Для LineTo
 	int16_t LineMoveY;

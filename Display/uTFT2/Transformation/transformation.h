@@ -9,7 +9,6 @@
 #define TRANSFORMATION_TRANSFORMATION_H_
 
 #include "TFT.h"
-#include "uTFT_Color.h"
 
 class transformation {
 public:
@@ -25,7 +24,7 @@ public:
 		_sw = _iwidth;
 		_sh = _iheight;
 
-		_scolor = BLACK;
+		_scolor = 0;
 	}
 
 	bool pushRotated(TFT * tft ,TFT * tft_src, int16_t angle, int32_t transp);

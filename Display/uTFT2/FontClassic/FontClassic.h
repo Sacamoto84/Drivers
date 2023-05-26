@@ -1,16 +1,9 @@
-/*
- * FontClassic.h
- *
- *  Created on: 1 янв. 2023 г.
- *      Author: Ivan
- */
-
 #ifndef FONTCLASSIC_FONTCLASSIC_H_
 #define FONTCLASSIC_FONTCLASSIC_H_
 
-#include "../TFT.h"
-
 #include "main.h"
+
+#include "../TFT.h"
 
 #include "stdlib.h"
 #include "string.h"
@@ -27,13 +20,96 @@ typedef struct {
 	uint16_t Height;
 } FONTS_SIZE_t;
 
-//extern FontDef_t Font_7x10;
-//extern FontDef_t Font_11x18;
-//extern FontDef_t Font_16x26;
+extern FontDef_t Font_7x10;
+extern FontDef_t Font_11x18;
+extern FontDef_t Font_16x26;
 
-extern char   FontClassicPutc(TFT * tft, char ch, FontDef_t* Font, uint8_t NoBack );
-extern char   FontClassicPuts(TFT * tft, char * str, FontDef_t* Font, uint8_t NoBack);
-extern char * FontClassicGetStringSize(char * str, FONTS_SIZE_t* SizeStruct, FontDef_t* Font);
+//extern char   FontClassicPutc(TFT * tft, char ch, FontDef_t* Font, uint8_t NoBack );
+//extern char   FontClassicPuts(TFT * tft, char * str, FontDef_t* Font, uint8_t NoBack);
+//extern char * FontClassicGetStringSize(char * str, FONTS_SIZE_t* SizeStruct, FontDef_t* Font);
+
+/**
+  * @brief  Вывод символа
+  * @param  ch символ.
+  * @param  Font указатель на структуру
+  * @param  NoBack true если не нужен задний фон за символом, по умолчанию 0
+  * @retval ch status
+  */
+static inline char FontClassicPutc(TFT * tft, char ch, FontDef_t* Font, uint8_t NoBack ) {
+	uint32_t i, b, j;
+
+	if (NoBack)
+	for (i = 0; i < Font->FontHeight; i++) {
+		b = Font->data[(ch - 32) * Font->FontHeight + i];
+		for (j = 0; j < Font->FontWidth; j++) {
+			if ((b << j) & 0x8000) {
+				tft->SetPixel(tft->uTFT.CurrentX + j, (tft->uTFT.CurrentY + i), tft->uTFT.Color);}
+		}
+	}
+	else
+	for (i = 0; i < Font->FontHeight; i++) {
+		b = Font->data[(ch - 32) * Font->FontHeight + i];
+		for (j = 0; j < Font->FontWidth; j++) {
+			if ((b << j) & 0x8000) {
+				tft->SetPixel(tft->uTFT.CurrentX + j, (tft->uTFT.CurrentY + i), tft->uTFT.Color);}
+			else {
+				tft->SetPixel(tft->uTFT.CurrentX + j, (tft->uTFT.CurrentY + i), tft->uTFT.BColor);}
+		}
+	}
+
+	/* Increase pointer */
+	tft->uTFT.CurrentX += Font->FontWidth-1;
+
+	/* Return character written */
+	return ch;
+}
+
+/**
+  * @brief  Вывод строки
+  * @param  htim TIM handle.
+  * @param  sMasterConfig pointer to a TIM_MasterConfigTypeDef structure that
+  *         contains the selected trigger output (TRGO) and the Master/Slave
+  *         mode.
+  * @retval HAL status
+  */
+static inline char FontClassicPuts(TFT * tft, char* str, FontDef_t* Font, uint8_t NoBack) {
+	while (*str) {
+		if (FontClassicPutc(tft, *str, Font, NoBack) != *str) {
+			return *str;
+		}
+		str++;
+	}
+	/* Everything OK, zero should be returned */
+	return *str;
+}
+
+// Длина строки
+static inline char* FontClassicGetStringSize(char* str, FONTS_SIZE_t* SizeStruct, FontDef_t* Font) {
+	/* Fill settings */
+	SizeStruct->Height = Font->FontHeight;
+	SizeStruct->Length = Font->FontWidth * strlen(str);
+
+	/* Return pointer */
+	return str;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #endif /* FONTCLASSIC_FONTCLASSIC_H_ */

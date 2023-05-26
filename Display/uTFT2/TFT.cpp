@@ -7,6 +7,8 @@
 
 #include "TFT.h"
 
+#include "TFT_config.h"
+
 #include <math.h>
 #include <stdio.h>
 
@@ -15,16 +17,25 @@ void TFT::SetPixel(int32_t x, int32_t y, uint16_t color) {
 	if ((x < 0) || (y < 0) || (x >= LCD->TFT_WIDTH) || (y >= LCD->TFT_HEIGHT))
 		return;
 
-	if ((LCD->Bit) == 1) {
+#if defined(TFT_USE_1BIT)
+#if !defined (TFT_USE_ONLY_ONE_BIT_COLOR)
+  if (LCD->Bit == 1)
+#endif
+	{
 		if (color != 0)
 			LCD->buffer8[x + (y / 8) * LCD->TFT_WIDTH] |= 1 << (y % 8);
 		else
 			LCD->buffer8[x + (y / 8) * LCD->TFT_WIDTH] &= ~(1 << (y % 8));
 		return;
 	}
+#endif
 
+#if defined(TFT_USE_4BIT)
 	// 16 цветов
-	if ((LCD->Bit) == 4) {
+#if !defined (TFT_USE_ONLY_ONE_BIT_COLOR)
+  if (LCD->Bit == 4)
+#endif
+	{
 		if (x % 2 == 0) {
 			LCD->buffer8[x / 2 + y * ((LCD->TFT_WIDTH) / 2)] = (LCD->buffer8[x
 					/ 2 + y * ((LCD->TFT_WIDTH) / 2)] & (0x0F)) | (color << 4);
@@ -35,18 +46,30 @@ void TFT::SetPixel(int32_t x, int32_t y, uint16_t color) {
 
 		return;
 	}
+#endif
 
+#if defined(TFT_USE_8BIT)
 	//OK
-	if ((LCD->Bit) == 8) {
+#if !defined (TFT_USE_ONLY_ONE_BIT_COLOR)
+  if (LCD->Bit == 8)
+#endif
+	{
 		LCD->buffer8[x + y * LCD->TFT_WIDTH] = color;
 		return;
 	}
+#endif
 
+#if defined(TFT_USE_16BIT)
 	//OK
- 	if ((LCD->Bit) == 16) {
+#if !defined (TFT_USE_ONLY_ONE_BIT_COLOR)
+  if (LCD->Bit == 16)
+#endif
+	{
 		LCD->buffer16[x + y * LCD->TFT_WIDTH] = color;
 		return;
 	}
+#endif
+
 }
 
 void TFT::SetPixel1(int32_t x, int32_t y, uint16_t color) {
@@ -92,15 +115,48 @@ void TFT::SetPixel16(int32_t x, int32_t y, uint16_t color) {
 }
 
 uint16_t TFT::GetPixel(int32_t x, int32_t y) {
+	if ((x < 0) || (y < 0) || (x >= LCD->TFT_WIDTH) || (y >= LCD->TFT_HEIGHT))
+		return 0;
 
-	if (LCD->Bit == 16) {
-		if ((x < 0) || (y < 0) || (x >= LCD->TFT_WIDTH)
-				|| (y >= LCD->TFT_HEIGHT))
-			return 0;
-		return LCD->buffer16[x + y * LCD->TFT_WIDTH];
+#if defined(TFT_USE_1BIT)
+#if !defined (TFT_USE_ONLY_ONE_BIT_COLOR)
+  if (LCD->Bit == 1)
+#endif
+	{
+		return (LCD->buffer8[x + (y / 8) * LCD->TFT_WIDTH] >> (y % 8)) & 0x01;
 	}
+#endif
+
+#if defined(TFT_USE_16BIT)
+#if !defined (TFT_USE_ONLY_ONE_BIT_COLOR)
+  if (LCD->Bit == 16)
+#endif
+  {
+    return LCD->buffer16[x + y * LCD->TFT_WIDTH];
+  }
+#endif
 
 	return 0; //Не реализовано
+}
+
+uint16_t TFT::GetPixel1(int32_t x, int32_t y) {
+
+	if ((x < 0) || (y < 0) || (x >= LCD->TFT_WIDTH) || (y >= LCD->TFT_HEIGHT))
+		return 0;
+
+//		if (color != 0)
+//				LCD->buffer8[x + (y / 8) * LCD->TFT_WIDTH] |= 1 << (y % 8);
+//			else
+//				LCD->buffer8[x + (y / 8) * LCD->TFT_WIDTH] &= ~(1 << (y % 8));
+
+	return (LCD->buffer8[x + (y / 8) * LCD->TFT_WIDTH] >> (y % 8)) & 0x01;
+
+}
+
+uint16_t TFT::GetPixel16(int32_t x, int32_t y) {
+	if ((x < 0) || (y < 0) || (x >= LCD->TFT_WIDTH) || (y >= LCD->TFT_HEIGHT))
+		return 0;
+	return LCD->buffer16[x + y * LCD->TFT_WIDTH];
 }
 
 //Установка цвета в палитре
@@ -108,7 +164,6 @@ void TFT::SetColorToPallete(uint8_t index, uint16_t color) {
 	//if (index>255) return;
 	//LCD->LCD_Buffer_Palette[index] = color;
 }
-
 
 void TFT::Fill(uint16_t color) {
 
@@ -158,15 +213,15 @@ void TFT::Fill(uint16_t color) {
 
 void TFT::Fill1(uint16_t color) {
 
-		uint8_t c;
-		if (color)
-			c = 0xFF;
-		else
-			c = 0;
+	uint8_t c;
+	if (color)
+		c = 0xFF;
+	else
+		c = 0;
 
-		for (int32_t i = 0; i < (LCD->TFT_HEIGHT * LCD->TFT_WIDTH / 8); i++)
-			LCD->buffer8[i] = c;
-		return;
+	for (int32_t i = 0; i < (LCD->TFT_HEIGHT * LCD->TFT_WIDTH / 8); i++)
+		LCD->buffer8[i] = c;
+	return;
 }
 
 void TFT::Fill4(uint16_t color) {
@@ -178,8 +233,7 @@ void TFT::Fill4(uint16_t color) {
 	uint32_t *buf = (uint32_t*) LCD->buffer8;
 	uint32_t count = LCD->TFT_HEIGHT * LCD->TFT_WIDTH / 8;
 	uint32_t c = color | (color << 4) | ((color | (color << 4)) << 8)
-			| ((color | (color << 4)) << 16)
-			| ((color | (color << 4)) << 24);
+			| ((color | (color << 4)) << 16) | ((color | (color << 4)) << 24);
 	while (count--)
 		*buf++ = c;
 }
@@ -226,7 +280,6 @@ void TFT::Fill16(uint16_t color) {
 	}
 	return;
 }
-
 
 uint16_t TFT::alphaBlend(uint8_t alpha, uint16_t fgc, uint16_t bgc) {
 	// For speed use fixed point maths and rounding to permit a power of 2 division

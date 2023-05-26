@@ -78,26 +78,8 @@ void classLog::colorStringln(int color, int bgcolor, char const *const format)
 	print("\33[0m\n");
 }
 
-void classLog::warning(char const *const format) {colorStringln(11, format);}
-void classLog::error(char const *const format) {colorStringln(9, format);}
-void classLog::info(char const *const format) {colorStringln(45, format);}
-void classLog::successful(char const *const format) {colorStringln(10, format);}
 
-void classLog::print(char const *format) {
 
-	if (useDMA == false)
-		HAL_UART_Transmit(huart, (const uint8_t*) format, strlen(format),
-				1000);
-	else {
-		waitComplete();
-		int size = strlen(format);
-		if (size)
-			HAL_UART_Transmit_DMA(huart, (const uint8_t*) format, size);
-		else
-			*dma_completed = 1;
-	}
-
-}
 
 
 

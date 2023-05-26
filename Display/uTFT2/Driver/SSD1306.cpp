@@ -7,6 +7,12 @@
 #define SSD1306_I2C_ADDR         0x78 //0x78
 #define SSD1306_I2C_ADDR2        0x7A //0x7A
 
+
+//* Write command */
+//#define SSD1306_WRITECOMMAND(command)      ssd1306_I2C_Write(SSD1306_I2C, SSD1306_I2C_ADDR, 0x00, (command))
+///* Write data */
+//#define SSD1306_WRITEDATA(data)            ssd1306_I2C_Write(SSD1306_I2C, SSD1306_I2C_ADDR, 0x40, (data))
+
 void TFT_Driver::SSD1306_WRITECOMMAND(uint8_t data) {
 	if (LCD->hi2c)  //I2C
 	{
@@ -56,7 +62,7 @@ void TFT_Driver::SSD1306_Init(void) {
 	/* Init LCD */
 	SSD1306_WRITECOMMAND(0xAE); //display off
 	SSD1306_WRITECOMMAND(0x20); //Set Memory Addressing Mode
-	SSD1306_WRITECOMMAND(0x00); //00,Horizontal Addressing Mode;01,Vertical Addressing Mode;10,Page Addressing Mode (RESET);11,Invalid
+	SSD1306_WRITECOMMAND(0x10); //00,Horizontal Addressing Mode;01,Vertical Addressing Mode;10,Page Addressing Mode (RESET);11,Invalid
 	SSD1306_WRITECOMMAND(0xB0); //Set Page Start Address for Page Addressing Mode,0-7
 	SSD1306_WRITECOMMAND(0xC8); //Set COM Output Scan Direction
 	SSD1306_WRITECOMMAND(0x00); //---set low column address
@@ -102,6 +108,8 @@ void TFT_Driver::SSD1306_Init(void) {
 	//uTFT.CurrentY = 0;
 }
 
+volatile HAL_StatusTypeDef res;
+
 //490uS-72MHz
 void TFT_Driver::SSD1306_UpdateScreen(void) {
 	uint8_t *p;
@@ -110,6 +118,23 @@ void TFT_Driver::SSD1306_UpdateScreen(void) {
 	{
 
 #ifdef	TFT_USE_I2С
+
+
+//		for(uint8_t i = 0; i < 7; i++) {
+//		        //SSD1306_WRITECOMMAND(0xB0+i);
+//		        //SSD1306_WRITECOMMAND(0x00);
+//		       // SSD1306_WRITECOMMAND(0x10);
+//                HAL_Delay(5);
+//		        HAL_I2C_Master_Transmit(LCD->hi2c, LCD->I2C_Adress, &LCD->buffer8[128*i],
+//		       				128, 1000);
+//
+//		    }
+
+
+
+
+
+
 
 //		SSD1306_WRITECOMMAND(0xB0);
 //		SSD1306_WRITECOMMAND(0x00);
@@ -122,9 +147,13 @@ void TFT_Driver::SSD1306_UpdateScreen(void) {
 #endif
 
 		p = &LCD->buffer8[0];
-		//p--;
-		HAL_I2C_Master_Transmit(LCD->hi2c, LCD->I2C_Adress, p,
-				(LCD->TFT_HEIGHT * LCD->TFT_WIDTH) / 8, 1000);
+		p--;
+		*p = 0x40;
+
+		res = HAL_I2C_Master_Transmit(LCD->hi2c, LCD->I2C_Adress, p,
+				(LCD->TFT_HEIGHT * LCD->TFT_WIDTH) / 8 + 1, 1000);
+
+
 		return;
 #endif
 
