@@ -231,7 +231,12 @@ void BLE::BLE_UART_Decode(void) {
 }
 
 void BLE::Task(void) {
-	log();
+
+	if (fPacketEnd) {
+		fPacketEnd = 0;
+		Log.w("Принят символ конец пакета %d", countCommand);
+	}
+
 	while (countCommand) {
 		countCommand--;
 		BLE_UART_Decode();
@@ -260,4 +265,16 @@ uint8_t BLE::CRC8(char *pcBlock, unsigned int len) {
 	}
 	return _crc;
 }
+
+
+//Процедура формирования строки пересылки(короткий) 64
+void BLE::Send(char *outstr) {
+	char str[64 * 2];
+	char crc;
+	crc = CRC8(&outstr[0], strlen(outstr));
+	sprintf(str, "!%s;%d$", outstr, crc);
+	Log.s(str);
+	HAL_UART_Transmit(_huart, (uint8_t*) &str[0], strlen(str), 1000);
+}
+
 

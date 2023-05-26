@@ -6,8 +6,6 @@
 #include <stdio.h> /* for printf */
 #include <string.h> /* for printf */
 
-
-
 #include "main.h"
 
 #include "logUART.h"
@@ -21,7 +19,7 @@ extern classLog Log;
 class BLE {
 public:
 
-	typedef void (*Callback)(char *);
+	typedef void (*Callback)(char*);
 	Callback MyCallback;
 
 	void init(UART_HandleTypeDef *rx);
@@ -33,7 +31,6 @@ public:
 	uint8_t read(void);      //Прочитать один байт с буффера
 	void Task(void);
 //-------------------------------------- protected ----------------------------------//
-
 
 	void BLE_UART_Decode_Level_1(int PosS, int PosCRC);
 	void BLE_UART_Decode(void);
@@ -61,23 +58,15 @@ public:
 	//Флаги состояния
 	uint32_t fPacketEnd = 0; //Признак того что получили символ конца пакета
 
-
-
-	void log(void) {
-		if (fPacketEnd) {
-			fPacketEnd = 0;
-			Log.w("Принят символ конец пакета %d", countCommand);
-		}
-
+	void setCallback(Callback callback) {
+		MyCallback = callback;
 	}
 
-	void setCallback(Callback callback)
-	{
-			MyCallback = callback;
-	}
 
-	//Переменная, хранящая указатель на функцию
-	//void (*MyCallback)(char *argument);
+	void Send(char *outstr);
+
+
+
 
 
 
