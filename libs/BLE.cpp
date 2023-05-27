@@ -269,7 +269,7 @@ uint8_t BLE::CRC8(char *pcBlock, unsigned int len) {
 
 //Процедура формирования строки пересылки(короткий) 64
 void BLE::Send(char *outstr) {
-	char str[64 * 2];
+	char str[1024]={0};
 	char crc;
 	crc = CRC8(&outstr[0], strlen(outstr));
 	sprintf(str, "!%s;%d$", outstr, crc);

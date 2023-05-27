@@ -1,6 +1,8 @@
 #ifndef Arduino_h
 #define Arduino_h
 
+#define DEC 10
+
 #define HIGH 0x1
 #define LOW  0x0
 
@@ -21,10 +23,8 @@
 #define FALLING 2
 #define RISING 3
 
-#define Now  uwTick
+#define NOW  uwTick
 
-#define min(a,b) ((a)<(b)?(a):(b))
-#define max(a,b) ((a)>(b)?(a):(b))
 #define abs(x) ((x)>0?(x):-(x))
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
 #define round(x)     ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
@@ -51,14 +51,21 @@
 #define _NOP() do { __asm__ volatile ("nop"); } while (0)
 #endif
 
-
 #define bit(b) (1UL << (b))
+//macro added for compatibility
+#ifndef _BV
+  #define _BV(bit) (1 << (bit))
+#endif
+#ifndef cbi
+  #define cbi(reg, bitmask) *reg &= ~bitmask
+#endif
+#ifndef sbi
+  #define sbi(reg, bitmask) *reg |= bitmask
+#endif
 
-//typedef bool boolean;
+typedef unsigned int word;
+typedef bool boolean __attribute__((deprecated));
 typedef uint8_t byte;
-
-
-//void _FORCE_INLINE_ test(void)
 
 
 #define _FORCE_INLINE_ __attribute__((__always_inline__)) __inline__

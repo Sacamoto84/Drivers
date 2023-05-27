@@ -9,6 +9,12 @@ extern "C" {
 #include "dwt.h"
 #include "tim.h"
 
+#include "itoa.h"
+
+#include "macros.h"
+
+#include <stdio.h>
+#include <string.h>
 
 extern uint32_t micros1(void);
 
