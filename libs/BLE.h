@@ -48,7 +48,7 @@ public:
 
 	//Кольцевой входной буффер
 	unsigned char cycleBuf[SIZE_BUF]; // __attribute__((section(".my_ccmram"))); //Кольцевой приемный буффер 8K
-	char big_buffer[1024 * 2];
+	char big_buffer[1024 * 4];
 	uint8_t local_crc;  //
 	uint8_t str_crc[3]; //
 	char temp;

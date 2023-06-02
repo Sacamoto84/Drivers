@@ -135,6 +135,7 @@ void BLE::BLE_UART_Decode(void) {
 	do {
 		temp = GetChar();
 		big_buffer[i++] = temp;
+		if(i>4096) return;
 	} while (temp != '$');
 
 	PosE = i - 1; //Позиция конца пакета
@@ -221,7 +222,7 @@ void BLE::BLE_UART_Decode(void) {
 		ii++;
 	}
 
-	Log.i(comand);
+	//Log.i(comand);
 
 
 	if (MyCallback) {
@@ -234,7 +235,7 @@ void BLE::Task(void) {
 
 	if (fPacketEnd) {
 		fPacketEnd = 0;
-		Log.w("Принят символ конец пакета %d", countCommand);
+		//Log.w("Принят символ конец пакета %d", countCommand);
 	}
 
 	while (countCommand) {
