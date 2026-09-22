@@ -1,5 +1,7 @@
 #include "FontClassic.h"
+#if defined(TFT_PLATFORM_STM32)
 #include "main.h"
+#endif
 
 const uint16_t Font7x10 [] = {
 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,  // sp

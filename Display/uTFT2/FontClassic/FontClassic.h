@@ -1,7 +1,10 @@
 #ifndef FONTCLASSIC_FONTCLASSIC_H_
 #define FONTCLASSIC_FONTCLASSIC_H_
 
+#include "../TFT_define.h"
+#if defined(TFT_PLATFORM_STM32)
 #include "main.h"
+#endif
 
 #include "../TFT.h"
 

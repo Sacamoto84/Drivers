@@ -8,8 +8,13 @@
 #if defined(TFT_DRIVER_ST7789)
 
 #include <stdbool.h>
+#include <stdint.h>
+#include "../TFT_define.h"
+
+#if defined(TFT_PLATFORM_STM32)
 #include "main.h"
 #include "spi.h"
+#endif
 
 /****************************/
 #define ST7735_NOP     0x00

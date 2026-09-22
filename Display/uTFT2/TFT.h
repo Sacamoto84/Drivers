@@ -197,6 +197,11 @@ public:
 	}
 
 
+#if defined(TFT_USE_BL) || defined(LCD_USE_BL)
+	void initBacklight(uint8_t pin, uint8_t initial_percent = 100);
+	void setBrightness(uint8_t percent);
+#endif
+
 private:
 
 	int16_t LineMoveX; //Для LineTo

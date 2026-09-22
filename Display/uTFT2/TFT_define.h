@@ -12,7 +12,26 @@
 extern "C" {
 #endif
 
+#if defined(PICO_ON_DEVICE) || defined(PICO_BOARD) || defined(TARGET_PICO)
+  #ifndef TFT_PLATFORM_PICO
+    #define TFT_PLATFORM_PICO
+  #endif
+#else
+  #ifndef TFT_PLATFORM_STM32
+    #define TFT_PLATFORM_STM32
+  #endif
+#endif
+
+#if defined(TFT_PLATFORM_STM32)
 #include "main.h"
+#else
+#include <stdint.h>
+#include <stddef.h>
+#include <stdbool.h>
+#include "pico/stdlib.h"
+#include "hardware/spi.h"
+#include "hardware/gpio.h"
+#endif
 
 #include "TFT_config.h"
 
@@ -108,6 +127,37 @@ typedef struct {
 	LCD_DRIVER LCD_Driver; // 0-ST7735, 1-ST7789, 2-ILI9225 3-SSD1306 4-PCD8544
 	uint8_t Bit;             //Битность цвета: 16 8 4 1
 
+#if defined(TFT_PLATFORM_PICO)
+#ifdef TFT_USE_SPI
+	spi_inst_t *spi;
+	uint32_t baudrate;
+#else
+	uint32_t *notUse;
+#endif
+
+#ifdef TFT_USE_I2C
+	i2c_inst_t *i2c;
+#else
+	uint32_t *notUse2;
+#endif
+
+	uint8_t I2C_Adress;
+
+	uint16_t *buffer16;        //Буфер кадра для 16 бит
+	uint8_t *buffer8;         //Буфер кадра для 8/4/1 бит
+	uint16_t *palete;          //Палитра для 4/8 бит
+
+	uint16_t dx;               //Смещение активной области по X
+	uint16_t dy;               //Смещение активной области по Y
+	uint8_t pin_cs;
+	uint8_t pin_dc;
+	uint8_t pin_reset;
+	uint8_t pin_sck;
+	uint8_t pin_mosi;
+	uint8_t pin_bl;
+	_MADCTL MADCTL;
+	_ROTATE_DELTA ROTATE_DELTA; //
+#else
 #ifdef TFT_USE_SPI
 	  SPI_HandleTypeDef *hspi;
     #else
@@ -136,6 +186,7 @@ typedef struct {
 	uint16_t GPIO_Pin_RESET;
 	_MADCTL MADCTL;
 	_ROTATE_DELTA ROTATE_DELTA; //
+#endif
 
 } TFT_LCD_t;
 

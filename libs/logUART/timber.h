@@ -5,6 +5,12 @@
 #include "stdarg.h"
 #include "string.h"
 
+#if defined(PICO_ON_DEVICE) || defined(PICO_BOARD) || defined(TARGET_PICO)
+  #ifndef TIMBER_PRINTF
+    #define TIMBER_PRINTF
+  #endif
+#endif
+
 #if defined(TIMBER_UART)
 #include "usart.h"
 #elif defined(TIMBER_USB)
@@ -13,6 +19,8 @@
     #include "spi.h"
 #elif defined(TIMBER_RTT)
 #include "SEGGER_RTT.h"
+#elif defined(TIMBER_PRINTF)
+// Standard printf via stdio.h
 #else
 
 #endif
@@ -29,6 +37,8 @@ public:
 	/*---- init ----*/
 #if defined(TIMBER_UART)
 	void init(UART_HandleTypeDef *_huart) {  huart = _huart;  }
+#elif defined(TIMBER_PRINTF)
+	void init() { }
 #elif defined(TIMBER_USB)
 	void init() {	 }
 #elif defined(TIMBER_SPI)
@@ -68,16 +78,23 @@ public:
 	//---------------------------------------------------
 	void print(char const *format) {
 #if defined(TIMBER_UART)
-		HAL_UART_Transmit(huart, (uint8_t*) format, strlen(str), 1000);
+		HAL_UART_Transmit(huart, (uint8_t*) format, strlen(format), 1000);
 #endif
 
 #if defined(TIMBER_RTT)
 		SEGGER_RTT_WriteString(0, format);
 #endif
+
+#if defined(TIMBER_PRINTF)
+		printf("%s", format);
+#endif
 	}
 
 	template<typename ... Args> void print(char const *const format,
 			Args const &... args) noexcept {
+#if defined(TIMBER_PRINTF)
+		printf(format, args ...);
+#else
 		sprintf(str, format, args ...);
 
 #if defined(TIMBER_UART)
@@ -87,11 +104,15 @@ public:
 #if defined(TIMBER_RTT)
 		SEGGER_RTT_WriteString(0, str);
 #endif
-
+#endif
 	}
 
 	template<typename ... Args>
 	void println(char const *const format, Args const &... args) noexcept {
+#if defined(TIMBER_PRINTF)
+		printf(format, args ...);
+		putchar('\n');
+#else
 		sprintf(str, format, args ...);
 		strcat(str, "\n");
 
@@ -102,19 +123,21 @@ public:
 #if defined(TIMBER_RTT)
 		SEGGER_RTT_WriteString(0, str);
 #endif
-
+#endif
 	}
 
 	void println(char const *format) {
-
 #if defined(TIMBER_UART)
-		HAL_UART_Transmit(huart, (uint8_t*) format, strlen(str), 1000);
+		HAL_UART_Transmit(huart, (uint8_t*) format, strlen(format), 1000);
 #endif
 
 #if defined(TIMBER_RTT)
 		SEGGER_RTT_WriteString(0, format);
 #endif
 
+#if defined(TIMBER_PRINTF)
+		printf("%s\n", format);
+#endif
 	}
 	//---------------------------------------------------
 
@@ -188,4 +211,4 @@ private:
 
 extern Timber timber;
 
-#endif /* UTILS_LOGUART_H_ */
+#endif /* UTILS_TIMBER_H_ */

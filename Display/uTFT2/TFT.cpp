@@ -284,3 +284,40 @@ uint16_t TFT::alphaBlend(uint8_t alpha, uint16_t fgc, uint16_t bgc) {
 	// Combine RGB565 colours into 16 bits
 	return (r << 11) | (g << 5) | (b << 0);
 }
+
+#if defined(TFT_USE_BL) || defined(LCD_USE_BL)
+#if defined(TFT_PLATFORM_PICO)
+#include "hardware/pwm.h"
+
+void TFT::initBacklight(uint8_t pin, uint8_t initial_percent) {
+	if (LCD != NULL) {
+		LCD->pin_bl = pin;
+	}
+	gpio_set_function(pin, GPIO_FUNC_PWM);
+	uint slice = pwm_gpio_to_slice_num(pin);
+	pwm_config config = pwm_get_default_config();
+	pwm_config_set_clkdiv(&config, 100.0f);
+	pwm_init(slice, &config, true);
+	pwm_set_wrap(slice, 255);
+	setBrightness(initial_percent);
+}
+
+void TFT::setBrightness(uint8_t percent) {
+	if (percent > 100) percent = 100;
+	if (LCD != NULL && LCD->pin_bl != 0xFF) {
+		uint slice = pwm_gpio_to_slice_num(LCD->pin_bl);
+		uint channel = pwm_gpio_to_channel(LCD->pin_bl);
+		pwm_set_chan_level(slice, channel, (percent * 255) / 100);
+	}
+}
+#else
+void TFT::initBacklight(uint8_t pin, uint8_t initial_percent) {
+	(void)pin;
+	(void)initial_percent;
+}
+void TFT::setBrightness(uint8_t percent) {
+	(void)percent;
+}
+#endif
+#endif
+

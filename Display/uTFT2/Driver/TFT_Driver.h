@@ -11,6 +11,15 @@
   #endif
 #endif
 
+#if !defined(TFT_PLATFORM_STM32)
+typedef enum {
+  HAL_OK       = 0x00U,
+  HAL_ERROR    = 0x01U,
+  HAL_BUSY     = 0x02U,
+  HAL_TIMEOUT  = 0x03U
+} HAL_StatusTypeDef;
+#endif
+
 #ifdef __cplusplus
 class TFT_Driver {
 public:
@@ -20,6 +29,10 @@ public:
 #ifdef TFT_USE_SPI
 	  TFT_SPI SPI;
     #endif
+
+#if defined(TFT_PLATFORM_PICO)
+	int dma_channel;
+#endif
 
 	//Флаг завершения DMA-передачи. Пользователь ОБЯЗАН определить HAL_SPI_TxCpltCallback
 	//и выставлять в нем DMA_TX_Complete = 1 (для активного hspi),
@@ -37,6 +50,9 @@ public:
 		DMA_TX_Complete = 1; //1 = передачи нет, можно стартовать
 		blockUpdate = 0;
 		needUpdate = 0;
+#if defined(TFT_PLATFORM_PICO)
+		dma_channel = -1;
+#endif
 
 		switch (LCD->LCD_Driver) {
 
