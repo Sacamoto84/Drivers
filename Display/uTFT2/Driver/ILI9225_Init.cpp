@@ -97,7 +97,7 @@ void TFT_Driver::ILI9225_init(void)
   //Перевод на 16 bit формат
   //LCD->hspi->Instance->CR1 |=  SPI_CR1_SPE; //Включаем SPI
 
-  //Сброс экрана
+#if defined(TFT_PLATFORM_STM32)
   if (LCD->GPIO_RESET != NULL) {
   		SPI.LCD_Reset();
   	}
@@ -105,14 +105,24 @@ void TFT_Driver::ILI9225_init(void)
   if (LCD->GPIO_CS != NULL) {
   		CS_0;
   	}
+#else
+  SPI.LCD_Reset();
+  CS_0;
+#endif
 
   SPI.Spi8to16(); //Перевод на 16 бит
 
   ILI9225_init_table16(ILI9225_regValues, sizeof(ILI9225_regValues));
 
+  SPI.Spi16to8(); //Возврат в стандартный 8-битный режим
+
+#if defined(TFT_PLATFORM_STM32)
   if (LCD->GPIO_CS != NULL) {
   		CS_1;
   	}
+#else
+  CS_1;
+#endif
 }
 
 #endif /* TFT_Driver_ILI9225 */

@@ -83,13 +83,13 @@ static inline char FontClassicPutc(TFT * tft, char ch, FontDef_t* Font, uint8_t 
 
 /**
   * @brief  Вывод строки
-  * @param  htim TIM handle.
-  * @param  sMasterConfig pointer to a TIM_MasterConfigTypeDef structure that
-  *         contains the selected trigger output (TRGO) and the Master/Slave
-  *         mode.
-  * @retval HAL status
+  * @param  tft указатель на экземпляр TFT
+  * @param  str указатель на нуль-терминированную строку
+  * @param  Font указатель на структуру шрифта FontDef_t
+  * @param  NoBack 1 если не нужен задний фон, 0 - выводить цвет фона
+  * @retval 0 при успешном выводе всей строки или первый не выведенный символ
   */
-static inline char FontClassicPuts(TFT * tft, char* str, FontDef_t* Font, uint8_t NoBack) {
+static inline char FontClassicPuts(TFT * tft, const char* str, FontDef_t* Font, uint8_t NoBack) {
 	while (*str) {
 		if (FontClassicPutc(tft, *str, Font, NoBack) != *str) {
 			return *str;
@@ -101,7 +101,7 @@ static inline char FontClassicPuts(TFT * tft, char* str, FontDef_t* Font, uint8_
 }
 
 // Длина строки
-static inline char* FontClassicGetStringSize(char* str, FONTS_SIZE_t* SizeStruct, FontDef_t* Font) {
+static inline const char* FontClassicGetStringSize(const char* str, FONTS_SIZE_t* SizeStruct, FontDef_t* Font) {
 	/* Fill settings */
 	SizeStruct->Height = Font->FontHeight;
 	SizeStruct->Length = Font->FontWidth * strlen(str);

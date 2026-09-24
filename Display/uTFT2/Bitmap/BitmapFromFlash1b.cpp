@@ -1,7 +1,8 @@
 #include "bitmap.h"
 
-void BitmapFromFlash1b(TFT * tft, int16_t X, int16_t Y, Bitmap *bmp)
+void BitmapFromFlash1b(TFT * tft, int16_t X, int16_t Y, const Bitmap *bmp)
 {
+	if (tft == NULL || tft->LCD == NULL || bmp == NULL) return;
 	if (bmp->bit == 1) {
 
 		int32_t pX;

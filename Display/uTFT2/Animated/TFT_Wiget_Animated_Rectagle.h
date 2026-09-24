@@ -8,7 +8,16 @@
 #ifndef TFT_WIGET_ANIMATED_RECTAGLE_H_
 #define TFT_WIGET_ANIMATED_RECTAGLE_H_
 
+#include "../TFT_define.h"
+
+#if defined(TFT_PLATFORM_STM32)
 #include "main.h"
+#define TFT_GET_TICK() HAL_GetTick()
+#elif defined(TFT_PLATFORM_PICO)
+#define TFT_GET_TICK() to_ms_since_boot(get_absolute_time())
+#else
+#define TFT_GET_TICK() 0
+#endif
 
 #include "../Animated/EasingProvider.h"
 #include "../TFT.h"
@@ -38,6 +47,7 @@ public:
 
     void run()
     {
+       if (tft == NULL || tft->LCD == NULL) return;
 
        float temp;
 
@@ -45,7 +55,7 @@ public:
 
     	if (P)
     	{
-    	  temp = (float)( (float)( uwTick - animation_start_time_P ) / animation_max_time_P ); //Получаем время 0..1 анимации
+    	  temp = (float)( (float)( TFT_GET_TICK() - animation_start_time_P ) / animation_max_time_P ); //Получаем время 0..1 анимации
     	  if (temp >= 1.0F) {P = 0; temp = 1.0F; } //Анимацию больше не использовать
     	  Gloabal_percent = temp;
 
@@ -73,7 +83,7 @@ public:
 
     	if (N)
     	{
-    	  temp = (1.0F - Gloabal_percent) + (float)( (float)( uwTick - animation_start_time_N ) / animation_max_time_N ); //Получаем время 0..1 анимации
+    	  temp = (1.0F - Gloabal_percent) + (float)( (float)( TFT_GET_TICK() - animation_start_time_N ) / animation_max_time_N ); //Получаем время 0..1 анимации
 
     	  if (temp >= 1.0F) {N = 0; temp = 1.0F; } //Анимацию больше не использовать
     	  temp = constrain(temp, 0.0F, 1.0F);
@@ -116,7 +126,7 @@ public:
 		{
 		  P = 1;
 		  N = 0;
-		  animation_start_time_P = uwTick;
+		  animation_start_time_P = TFT_GET_TICK();
 		  _select_last = s;
 		  return;
 		}
@@ -125,7 +135,7 @@ public:
 		{
            P = 0;
 		   N = 1;
-		   animation_start_time_N =  uwTick;
+		   animation_start_time_N =  TFT_GET_TICK();
 		}
 
 		_select_last = s;

@@ -5,7 +5,10 @@
 
 #if defined (TFT_DRIVER_ILI9225)
 
+#include "TFT_define.h"
+#if defined(TFT_PLATFORM_STM32)
 #include "main.h"
+#endif
 
 #define MADCTLGRAPHICS 0x6
 #define MADCTLBMP      0x2
@@ -53,8 +56,12 @@
 #define ILI9225C_INVOFF  0x20
 #define ILI9225C_INVON   0x21
 
+#ifndef LOW
 #define LOW  0
+#endif
+#ifndef HIGH
 #define HIGH 1
+#endif
 
 #define LCD_C LOW
 #define LCD_D HIGH

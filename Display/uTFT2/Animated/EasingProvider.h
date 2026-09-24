@@ -105,6 +105,7 @@ private:
 
    float getElasticIn(float elapsedTimeRate, double amplitude, double period) {
        if (elapsedTimeRate == 0 || elapsedTimeRate == 1) return elapsedTimeRate;
+       if (amplitude < 1.0) amplitude = 1.0;
        double pi2 = PI * 2;
        double s = period / pi2 * asin(1.0F / amplitude);
        float e = elapsedTimeRate - 1.0F;
@@ -113,13 +114,14 @@ private:
 
    float getElasticOut(float elapsedTimeRate, double amplitude, double period) {
        if (elapsedTimeRate == 0 || elapsedTimeRate == 1) return elapsedTimeRate;
-
+       if (amplitude < 1.0) amplitude = 1.0;
        double pi2 = PI * 2;
        double s = period / pi2 * asin(1 / amplitude);
        return (float) (amplitude * pow(2, -10 * elapsedTimeRate) * sin((elapsedTimeRate - s) * pi2 / period) + 1);
    }
 
    float getElasticInOut(float elapsedTimeRate, double amplitude, double period) {
+       if (amplitude < 1.0) amplitude = 1.0;
        double pi2 = PI * 2;
        double s = period / pi2 * asin(1.0F / amplitude);
 

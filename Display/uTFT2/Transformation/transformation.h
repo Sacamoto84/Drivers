@@ -13,11 +13,16 @@
 class transformation {
 public:
 
-	transformation(TFT * _tft) {
-		tft =_tft;
+	transformation(TFT * _tft = NULL) {
+		tft = _tft;
 
-		_iwidth  = tft->LCD->TFT_WIDTH;
-		_iheight = tft->LCD->TFT_HEIGHT;
+		if (tft != NULL && tft->LCD != NULL) {
+			_iwidth  = tft->LCD->TFT_WIDTH;
+			_iheight = tft->LCD->TFT_HEIGHT;
+		} else {
+			_iwidth  = 0;
+			_iheight = 0;
+		}
 
 		_sx = 0;
 		_sy = 0;
@@ -25,6 +30,16 @@ public:
 		_sh = _iheight;
 
 		_scolor = 0;
+	}
+
+	void init(TFT * _tft) {
+		tft = _tft;
+		if (tft != NULL && tft->LCD != NULL) {
+			_iwidth  = tft->LCD->TFT_WIDTH;
+			_iheight = tft->LCD->TFT_HEIGHT;
+			_sw = _iwidth;
+			_sh = _iheight;
+		}
 	}
 
 	bool pushRotated(TFT * tft ,TFT * tft_src, int16_t angle, int32_t transp);

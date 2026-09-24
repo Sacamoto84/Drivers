@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-#if defined(PICO_ON_DEVICE) || defined(PICO_BOARD) || defined(TARGET_PICO)
+#if defined(TFT_PLATFORM_PICO) || defined(PICO_ON_DEVICE) || defined(PICO_BOARD) || defined(TARGET_PICO)
   #ifndef TFT_PLATFORM_PICO
     #define TFT_PLATFORM_PICO
   #endif
@@ -24,6 +24,9 @@ extern "C" {
 
 #if defined(TFT_PLATFORM_STM32)
 #include "main.h"
+#ifndef TFT_GET_TICK
+#define TFT_GET_TICK() HAL_GetTick()
+#endif
 #else
 #include <stdint.h>
 #include <stddef.h>
@@ -31,6 +34,15 @@ extern "C" {
 #include "pico/stdlib.h"
 #include "hardware/spi.h"
 #include "hardware/gpio.h"
+#ifndef HAL_Delay
+#define HAL_Delay(ms) sleep_ms(ms)
+#endif
+#ifndef HAL_GetTick
+#define HAL_GetTick() to_ms_since_boot(get_absolute_time())
+#endif
+#ifndef TFT_GET_TICK
+#define TFT_GET_TICK() to_ms_since_boot(get_absolute_time())
+#endif
 #endif
 
 #include "TFT_config.h"
@@ -43,8 +55,12 @@ extern "C" {
   #define TFT_USE_16BIT
 #endif
 
+#ifndef ABS
 #define ABS(x)   ((x) > 0 ? (x) : -(x))
+#endif
+#ifndef constrain
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
+#endif
 
 #define  u8  uint8_t
 #define  u16 uint16_t

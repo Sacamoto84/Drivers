@@ -177,6 +177,8 @@ public:
 	void ST7789_Transmit_Array(char dc, uint8_t *data, int nbytes);
 	void ST7789_Update_DMA_Cicle_On(void);
 	void ST7789_Update_DMA_Cicle_Off(void);
+	inline void ST7789_Update_DMA_Cycle_On(void) { ST7789_Update_DMA_Cicle_On(); }
+	inline void ST7789_Update_DMA_Cycle_Off(void) { ST7789_Update_DMA_Cicle_Off(); }
 #endif
 
 #if defined(TFT_DRIVER_LCD_USB)

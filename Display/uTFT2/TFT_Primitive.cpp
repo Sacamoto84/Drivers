@@ -45,7 +45,7 @@ void TFT::Line(int32_t x0, int32_t y0, int32_t x1, int32_t y1, uint16_t c) {
 void TFT::LineV(int32_t X, int32_t Y1, int32_t Y2, uint16_t color) {
 
 	//Клиппинг
-	if (X < 0 || X >= LCD->TFT_WIDTH) return;
+	if (LCD == NULL || X < 0 || X >= LCD->TFT_WIDTH) return;
 	if (Y1 > Y2) { int32_t t = Y1; Y1 = Y2; Y2 = t; }
 	if (Y1 < 0) Y1 = 0;
 	if (Y2 >= LCD->TFT_HEIGHT) Y2 = LCD->TFT_HEIGHT - 1;
@@ -88,7 +88,7 @@ void TFT::LineH(int32_t Y, int32_t X1, int32_t X2, uint16_t color) {
 	int32_t i;
 
 	//Клиппинг
-	if (Y < 0 || Y >= LCD->TFT_HEIGHT) return;
+	if (LCD == NULL || Y < 0 || Y >= LCD->TFT_HEIGHT) return;
 	if (X1 > X2) { int32_t t = X1; X1 = X2; X2 = t; }
 	if (X1 < 0) X1 = 0;
 	if (X2 >= LCD->TFT_WIDTH) X2 = LCD->TFT_WIDTH - 1;
@@ -144,7 +144,7 @@ void TFT::LineH16(int32_t Y, int32_t X1, int32_t X2, uint16_t color) {
 	int32_t i;
 
 	//Клиппинг
-	if (Y < 0 || Y >= LCD->TFT_HEIGHT) return;
+	if (LCD == NULL || Y < 0 || Y >= LCD->TFT_HEIGHT) return;
 	if (X1 > X2) { int32_t t = X1; X1 = X2; X2 = t; }
 	if (X1 < 0) X1 = 0;
 	if (X2 >= LCD->TFT_WIDTH) X2 = LCD->TFT_WIDTH - 1;
@@ -180,7 +180,7 @@ void TFT::LineMoveXY(int32_t x, int32_t y) {
 //Рамка прямоугольника размером w x h пикселей
 void TFT::Rectangle(int32_t x, int32_t y, uint16_t w, uint16_t h, uint16_t c) {
 	/* Check input parameters */
-	if (w == 0 || h == 0) return;
+	if (LCD == NULL || w == 0 || h == 0) return;
 	if (x >= LCD->TFT_WIDTH || y >= LCD->TFT_HEIGHT) return;
 
 	/* Draw 4 lines */
@@ -195,7 +195,7 @@ void TFT::Rectangle(int32_t x, int32_t y, uint16_t w, uint16_t h, uint16_t c) {
 void TFT::RectangleFilled(int32_t x, int32_t y, uint16_t w, uint16_t h,
 		uint16_t c) {
 	/* Check input parameters */
-	if (w == 0 || h == 0) return;
+	if (LCD == NULL || w == 0 || h == 0) return;
 	int32_t x1 = x;
 	int32_t y1 = y;
 	int32_t x2 = x + (int32_t)w - 1;
@@ -231,6 +231,7 @@ void TFT::RectangleFilled(int32_t x, int32_t y, uint16_t w, uint16_t h,
 
 //Инверсия прямоугольника размером w x h пикселей
 void TFT::InvertRectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h) {
+	if (LCD == NULL) return;
 	for (int32_t ii = y; ii < (int32_t)y + h; ii++)
 		for (int32_t i = x; i < (int32_t)x + w; i++) {
 			u16 p = GetPixel(i, ii);
@@ -242,6 +243,7 @@ void TFT::InvertRectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h) {
 //Замена цветов в данном прямоугольнике размером w x h пикселей
 void TFT::ChangeColorRectangle(int32_t x, int32_t y, uint32_t w, int32_t h,
 		uint16_t sColor, uint16_t dColor) {
+	if (LCD == NULL) return;
 	for (int32_t ii = y; ii < y + h; ii++)
 		for (int32_t i = x; i < x + (int32_t)w; i++) {
 			if (GetPixel(i, ii) == sColor)
@@ -250,6 +252,7 @@ void TFT::ChangeColorRectangle(int32_t x, int32_t y, uint32_t w, int32_t h,
 }
 
 void TFT::Circle(int16_t x0, int16_t y0, int16_t r, uint16_t c) {
+	if (LCD == NULL) return;
 
 	int16_t f = 1 - r;
 	int16_t ddF_x = 1;
@@ -285,6 +288,7 @@ void TFT::Circle(int16_t x0, int16_t y0, int16_t r, uint16_t c) {
 }
 
 void TFT::CircleFilled(int16_t x0, int16_t y0, int16_t r, uint16_t c) {
+	if (LCD == NULL) return;
 
 	int16_t f = 1 - r;
 	int16_t ddF_x = 1;
@@ -318,67 +322,68 @@ void TFT::CircleFilled(int16_t x0, int16_t y0, int16_t r, uint16_t c) {
 
 void TFT::Triangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2,
 		uint16_t x3, uint16_t y3, uint16_t color) {
+	if (LCD == NULL) return;
 	/* Draw lines */
 	Line(x1, y1, x2, y2, color);
 	Line(x2, y2, x3, y3, color);
 	Line(x3, y3, x1, y1, color);
 }
 
-void TFT::TriangleFilled(int16_t x1, int16_t y1, int16_t x2, int16_t y2,
-		int16_t x3, int16_t y3, uint16_t color) {
+void TFT::TriangleFilled(int16_t x0, int16_t y0, int16_t x1, int16_t y1,
+		int16_t x2, int16_t y2, uint16_t color) {
+	if (LCD == NULL) return;
+	int16_t a, b, y, last;
 
-	int16_t deltax = 0, deltay = 0, x = 0, y = 0, xinc1 = 0, xinc2 = 0, yinc1 =
-			0, yinc2 = 0, den = 0, num = 0, numadd = 0, numpixels = 0,
-			curpixel = 0;
-
-	deltax = ABS(x2 - x1);
-	deltay = ABS(y2 - y1);
-	x = x1;
-	y = y1;
-
-	if (x2 >= x1) {
-		xinc1 = 1;
-		xinc2 = 1;
-	} else {
-		xinc1 = -1;
-		xinc2 = -1;
+	// Сортировка вершин по возрастанию Y (y0 <= y1 <= y2)
+	if (y0 > y1) {
+		int16_t t = y0; y0 = y1; y1 = t;
+		t = x0; x0 = x1; x1 = t;
+	}
+	if (y1 > y2) {
+		int16_t t = y2; y2 = y1; y1 = t;
+		t = x2; x2 = x1; x1 = t;
+	}
+	if (y0 > y1) {
+		int16_t t = y0; y0 = y1; y1 = t;
+		t = x0; x0 = x1; x1 = t;
 	}
 
-	if (y2 >= y1) {
-		yinc1 = 1;
-		yinc2 = 1;
-	} else {
-		yinc1 = -1;
-		yinc2 = -1;
+	if (y0 == y2) { // Все вершины на одной горизонтали
+		a = b = x0;
+		if (x1 < a) a = x1;
+		else if (x1 > b) b = x1;
+		if (x2 < a) a = x2;
+		else if (x2 > b) b = x2;
+		LineH(y0, a, b, color);
+		return;
 	}
 
-	if (deltax >= deltay) {
-		xinc1 = 0;
-		yinc2 = 0;
-		den = deltax;
-		num = deltax / 2;
-		numadd = deltay;
-		numpixels = deltax;
-	} else {
-		xinc2 = 0;
-		yinc1 = 0;
-		den = deltay;
-		num = deltay / 2;
-		numadd = deltax;
-		numpixels = deltay;
+	int32_t dx01 = x1 - x0, dy01 = y1 - y0;
+	int32_t dx02 = x2 - x0, dy02 = y2 - y0;
+	int32_t dx12 = x2 - x1, dy12 = y2 - y1;
+	int32_t sa = 0, sb = 0;
+
+	// Верхняя часть треугольника (отрезки 0-1 и 0-2)
+	if (y1 == y2) last = y1;
+	else          last = y1 - 1;
+
+	for (y = y0; y <= last; y++) {
+		a = x0 + sa / dy01;
+		b = x0 + sb / dy02;
+		sa += dx01;
+		sb += dx02;
+		LineH(y, a, b, color);
 	}
 
-	for (curpixel = 0; curpixel <= numpixels; curpixel++) {
-		Line(x, y, x3, y3, color);
-
-		num += numadd;
-		if (num >= den) {
-			num -= den;
-			x += xinc1;
-			y += yinc1;
-		}
-		x += xinc2;
-		y += yinc2;
+	// Нижняя часть треугольника (отрезки 1-2 и 0-2)
+	sa = (int32_t)dx12 * (y - y1);
+	sb = (int32_t)dx02 * (y - y0);
+	for (; y <= y2; y++) {
+		a = x1 + sa / dy12;
+		b = x0 + sb / dy02;
+		sa += dx12;
+		sb += dx02;
+		LineH(y, a, b, color);
 	}
 }
 
@@ -390,7 +395,7 @@ void TFT::Gradient_Vertical(uint32_t x0, uint32_t y0, uint32_t w, uint32_t h,
   uint8_t otR, uint8_t otG ,uint8_t otB,
   uint8_t doR, uint8_t doG, uint8_t doB){
 
-	if (w == 0 || h == 0) return;
+	if (LCD == NULL || w == 0 || h == 0) return;
 
 	uint8_t a[3];
 	uint16_t color;

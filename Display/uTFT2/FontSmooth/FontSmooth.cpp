@@ -88,6 +88,7 @@ uint8_t *gxAdvance = NULL; //setWidth
 int16_t *gdY = NULL;       //topExtent
 int8_t *gdX = NULL;       //leftExtent
 uint32_t *gBitmap = NULL;   //file pointer to greyscale bitmap
+static bool gUnicodeSorted = false; //Флаг сортировки кодов для O(log N) поиска
 
 static const unsigned char *p;
 static const unsigned char *p_start; //Стартовый индекс массива для выделения глифа
@@ -149,9 +150,13 @@ static int Font_Smooth_loadMetrics(uint16_t gCount) {
 	}
 
 	uint16_t gNum = 0;
+	gUnicodeSorted = true;
 
 	while (gNum < gCount) {
 		gUnicode[gNum]  = (uint16_t) readInt32(); // Unicode code point value
+		if (gNum > 0 && gUnicode[gNum] < gUnicode[gNum - 1]) {
+			gUnicodeSorted = false;
+		}
 		gHeight[gNum]   = (uint8_t) readInt32(); // Height of glyph
 		gWidth[gNum]    = (uint8_t) readInt32(); // Width of glyph
 		gxAdvance[gNum] = (uint8_t) readInt32(); // xAdvance - to move x cursor
@@ -233,6 +238,26 @@ bool Font_Smooth_getUnicodeIndex(uint16_t unicode, uint16_t *index) {
 
 		if (unicode > 0x44F) unicode -= 0xC0; //Глюк Эклипса
     }
+
+	if (gUnicode == NULL || gFont.gCount == 0) return false;
+
+	if (gUnicodeSorted) {
+		int32_t low = 0;
+		int32_t high = (int32_t)gFont.gCount - 1;
+		while (low <= high) {
+			int32_t mid = low + (high - low) / 2;
+			if (gUnicode[mid] == unicode) {
+				*index = (uint16_t)mid;
+				return true;
+			}
+			if (gUnicode[mid] < unicode) {
+				low = mid + 1;
+			} else {
+				high = mid - 1;
+			}
+		}
+		return false;
+	}
 
 	for (uint16_t i = 0; i < gFont.gCount; i++) {
 		if (gUnicode[i] == unicode) {

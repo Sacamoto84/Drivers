@@ -8,7 +8,10 @@
 #ifndef FONTMICROELECTRONIKA_FONTMICROELECTRONIKA_H_
 #define FONTMICROELECTRONIKA_FONTMICROELECTRONIKA_H_
 
+#include "../TFT_define.h"
+#if defined(TFT_PLATFORM_STM32)
 #include "main.h"
+#endif
 
 #include <stdlib.h>
 #include <string.h>
@@ -31,12 +34,12 @@ typedef struct {
 extern void FontMicroSetFont(FontDefMicroElectronika_t *uFont);
 // Вывод символа
 extern void FontMicroPutc(TFT * tft, uint8_t ch, uint8_t dx = 1, uint8_t transparrent = 0);
-extern void FontMicroPuts(TFT * tft, char *str, uint8_t dx = 1, uint8_t transparrent = 0);
+extern void FontMicroPuts(TFT * tft, const char *str, uint8_t dx = 1, uint8_t transparrent = 0);
 //Определение длины строки в пикселях по типу текущего шрифта
-uint16_t FontMicroFindLenStr(char *str, FontDefMicroElectronika_t *uFont, uint8_t dx = 1);
+uint16_t FontMicroFindLenStr(const char *str, FontDefMicroElectronika_t *uFont, uint8_t dx = 1);
 #else
 extern void FontMicroSetFont(FontDefMicroElectronika_t *uFont);
-uint16_t FontMicroFindLenStr(char *str, FontDefMicroElectronika_t *uFont, uint8_t dx);
+uint16_t FontMicroFindLenStr(const char *str, FontDefMicroElectronika_t *uFont, uint8_t dx);
 #endif
 
 #ifdef __cplusplus

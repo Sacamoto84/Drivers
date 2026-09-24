@@ -32,27 +32,36 @@ void TFT_Driver::ILI9225_setWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16
 void TFT_Driver::ILI9225_UpdateScreen(void)
 {
 
+#if defined(TFT_PLATFORM_STM32)
 	if (LCD->GPIO_CS != NULL) {
 		CS_0;
 	}
+#else
+	CS_0;
+#endif
+
+	SPI.Spi8to16();
 
 	ILI9225_setWindow(0, 0, LCD->TFT_WIDTH - 1, LCD->TFT_HEIGHT - 1);
 
 	DATA;
 
+#if defined(TFT_PLATFORM_STM32)
 	if (LCD->Bit == 4)
 	{
-		for(uint32_t i = 0; i < (uint32_t)LCD->TFT_WIDTH * LCD->TFT_HEIGHT; i++)
+		uint32_t stride = ((uint32_t)LCD->TFT_WIDTH + 1) / 2;
+		for (int32_t y = 0; y < LCD->TFT_HEIGHT; y++)
 		{
-			if (i % 2)
+			const uint8_t *src_line = &LCD->buffer8[y * stride];
+			for (int32_t x = 0; x < LCD->TFT_WIDTH; x++)
 			{
-				LCD->hspi->Instance->DR = LCD->palete[(LCD->buffer8[i/2]) & 0x0F]; //4 bit
-				while( (LCD->hspi->Instance->SR & SPI_FLAG_TXE) == 0 );
-			}
-			else
-			{
-				LCD->hspi->Instance->DR = LCD->palete[(LCD->buffer8[i/2]) >> 4]; //4 bit
-				while( (LCD->hspi->Instance->SR & SPI_FLAG_TXE) == 0 );
+				uint8_t b = src_line[x / 2];
+				uint16_t c = (x & 1) ? LCD->palete[b & 0x0F] : LCD->palete[b >> 4];
+				LCD->hspi->Instance->DR = c;
+				uint32_t wait_start = HAL_GetTick();
+				while ((LCD->hspi->Instance->SR & SPI_FLAG_TXE) == 0) {
+					if (HAL_GetTick() - wait_start > 50) break;
+				}
 			}
 		}
 	}
@@ -62,17 +71,54 @@ void TFT_Driver::ILI9225_UpdateScreen(void)
 		for(uint32_t i = 0; i < (uint32_t)LCD->TFT_WIDTH * LCD->TFT_HEIGHT; i++)
 		{
 				LCD->hspi->Instance->DR = LCD->buffer16[i];
-				while( (LCD->hspi->Instance->SR & SPI_FLAG_TXE) == 0 );
+				uint32_t wait_start = HAL_GetTick();
+				while( (LCD->hspi->Instance->SR & SPI_FLAG_TXE) == 0 ) {
+					if (HAL_GetTick() - wait_start > 50) break;
+				}
 		}
 	}
 
 	//Ждем фактического завершения передачи перед сменой DFF
-	while( (LCD->hspi->Instance->SR & SPI_FLAG_TXE) == 0 );
-	while( LCD->hspi->Instance->SR & SPI_FLAG_BSY );
+	uint32_t wait_start = HAL_GetTick();
+	while( (LCD->hspi->Instance->SR & SPI_FLAG_TXE) == 0 ) {
+		if (HAL_GetTick() - wait_start > 50) break;
+	}
+	while( LCD->hspi->Instance->SR & SPI_FLAG_BSY ) {
+		if (HAL_GetTick() - wait_start > 50) break;
+	}
+#else // TFT_PLATFORM_PICO
+	if (LCD->Bit == 4)
+	{
+		uint32_t stride = ((uint32_t)LCD->TFT_WIDTH + 1) / 2;
+		for (int32_t y = 0; y < LCD->TFT_HEIGHT; y++)
+		{
+			const uint8_t *src_line = &LCD->buffer8[y * stride];
+			for (int32_t x = 0; x < LCD->TFT_WIDTH; x++)
+			{
+				uint8_t b = src_line[x / 2];
+				uint16_t c = (x & 1) ? LCD->palete[b & 0x0F] : LCD->palete[b >> 4];
+				spi_write16_blocking(LCD->spi, &c, 1);
+			}
+		}
+	}
 
+	if (LCD->Bit == 16)
+	{
+		spi_write16_blocking(LCD->spi, LCD->buffer16, (size_t)LCD->TFT_WIDTH * LCD->TFT_HEIGHT);
+	}
+
+	while (spi_get_hw(LCD->spi)->sr & SPI_SSPSR_BSY_BITS);
+#endif
+
+	SPI.Spi16to8();
+
+#if defined(TFT_PLATFORM_STM32)
 	if (LCD->GPIO_CS != NULL) {
 		CS_1;
 	}
+#else
+	CS_1;
+#endif
 
 
 }

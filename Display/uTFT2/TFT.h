@@ -18,8 +18,8 @@ uint8_t *getResAdressFontID(uint32_t id);
 #define FontId3 (u8 *)(getResAdressFontID(3))
 
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-#define CREATE_SPRITE16(name, x , y) u16 name##_buffer16[x * y + 4];\
-TFT_LCD_t name={x , y, SPRITE_RAM, 16, NULL , NULL, 0, &name##_buffer16[0],};
+#define CREATE_SPRITE16(name, x , y) u16 name##_buffer16[((x) * (y)) + 4];\
+TFT_LCD_t name={(x) , (y), SPRITE_RAM, 16, NULL , NULL, 0, &name##_buffer16[0],};
 
 //Выделение памяти
 //CREATE_SPRITE16(S1, 32 , 32);

@@ -109,8 +109,14 @@
 #if defined(TFT_PLATFORM_STM32)
 	 	    __NOP();
 	 		LCD->hspi->Instance->DR = cmd;
-	 		while( (LCD->hspi->Instance->SR & SPI_FLAG_TXE) == 0 );
-	 		while( (LCD->hspi->Instance->SR & SPI_FLAG_BSY) != 0 );
+	 		uint32_t wait_start = HAL_GetTick();
+	 		while( (LCD->hspi->Instance->SR & SPI_FLAG_TXE) == 0 ) {
+	 			if (HAL_GetTick() - wait_start > 50) break;
+	 		}
+	 		wait_start = HAL_GetTick();
+	 		while( (LCD->hspi->Instance->SR & SPI_FLAG_BSY) != 0 ) {
+	 			if (HAL_GetTick() - wait_start > 50) break;
+	 		}
 #else
 			spi_write16_blocking(LCD->spi, &cmd, 1);
 #endif
@@ -123,8 +129,14 @@
 #if defined(TFT_PLATFORM_STM32)
 	 	    __NOP();
 	 		LCD->hspi->Instance->DR = data;
-	 		while( (LCD->hspi->Instance->SR & SPI_FLAG_TXE) == 0 );
-	 		while( (LCD->hspi->Instance->SR & SPI_FLAG_BSY) != 0 );
+	 		uint32_t wait_start = HAL_GetTick();
+	 		while( (LCD->hspi->Instance->SR & SPI_FLAG_TXE) == 0 ) {
+	 			if (HAL_GetTick() - wait_start > 50) break;
+	 		}
+	 		wait_start = HAL_GetTick();
+	 		while( (LCD->hspi->Instance->SR & SPI_FLAG_BSY) != 0 ) {
+	 			if (HAL_GetTick() - wait_start > 50) break;
+	 		}
 #else
 			spi_write16_blocking(LCD->spi, &data, 1);
 #endif
@@ -136,7 +148,12 @@
 	 	{
 #if defined(TFT_PLATFORM_STM32)
 	 		LCD->hspi->Instance->CR1 &= ~SPI_CR1_SPE; //OFF SPI
+#if defined(SPI_CR1_DFF)
 	 		LCD->hspi->Instance->CR1 |=  SPI_CR1_DFF;
+#elif defined(SPI_CR2_DS)
+	 		LCD->hspi->Instance->CR2 = (LCD->hspi->Instance->CR2 & ~SPI_CR2_DS)
+	 				| (SPI_CR2_DS_0 | SPI_CR2_DS_1 | SPI_CR2_DS_2 | SPI_CR2_DS_3);
+#endif
 	 		LCD->hspi->Instance->CR1 |=  SPI_CR1_SPE; //ON  SPI
 #else
 			spi_set_format(LCD->spi, 16, SPI_CPOL_1, SPI_CPHA_1, SPI_MSB_FIRST);
@@ -148,7 +165,12 @@
 	 	{
 #if defined(TFT_PLATFORM_STM32)
 	 	    LCD->hspi->Instance->CR1 &= ~SPI_CR1_SPE; //OFF SPI
+#if defined(SPI_CR1_DFF)
 	 		LCD->hspi->Instance->CR1 &= ~SPI_CR1_DFF;
+#elif defined(SPI_CR2_DS)
+	 		LCD->hspi->Instance->CR2 = (LCD->hspi->Instance->CR2 & ~SPI_CR2_DS)
+	 				| (SPI_CR2_DS_0 | SPI_CR2_DS_1 | SPI_CR2_DS_2);
+#endif
 	 		LCD->hspi->Instance->CR1 |=  SPI_CR1_SPE; //ON  SPI
 #else
 			spi_set_format(LCD->spi, 8, SPI_CPOL_1, SPI_CPHA_1, SPI_MSB_FIRST);

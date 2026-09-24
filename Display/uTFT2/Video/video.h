@@ -12,7 +12,9 @@
 
 #if defined(TFT_UNIT_VIDEO) && (FAT_FS)
 
+#if defined(TFT_PLATFORM_STM32)
 #include "main.h"
+#endif
 
 #include "../TFT.h"
 
@@ -29,7 +31,7 @@
 extern uint32_t (*videoCallBackFunc)(uint32_t);          //Некая функция, используется для остановки видео по событию во время проигрования
 extern uint32_t video_stop;                              //Для user как некая временная переменная (прекратить повторный запуск)
 
-extern void video_play(TFT * tft, char * Name, uint8_t delay);
+extern void video_play(TFT * tft, const char * Name, uint8_t delay);
 
 #endif /* TFT_UNIT_VIDEO && FAT_FS */
 

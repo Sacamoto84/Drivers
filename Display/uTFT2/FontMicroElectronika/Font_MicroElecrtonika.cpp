@@ -17,6 +17,15 @@ void FontMicroSetFont(FontDefMicroElectronika_t * uFont) {
 
 // Вывод символа
 void FontMicroPutc(TFT * tft, uint8_t ch, uint8_t dx, uint8_t transparrent) {
+	if (tft == NULL || tft->LCD == NULL) return;
+
+	if (ch == '\r') return;
+	if (ch == '\n') {
+		tft->uTFT.CurrentX = 0;
+		tft->uTFT.CurrentY += Font.FontHeightEng ? Font.FontHeightEng : 16;
+		return;
+	}
+
 	int32_t i, j, index;
 	const uint8_t *peng = &Font.dataEng[0];
 	const uint8_t *prus = &Font.dataRus[0];
@@ -90,7 +99,7 @@ void FontMicroPutc(TFT * tft, uint8_t ch, uint8_t dx, uint8_t transparrent) {
 	tft->uTFT.CurrentX += *offset + dx;
 }
 
-void FontMicroPuts(TFT * tft, char *str, uint8_t dx, uint8_t transparrent) {
+void FontMicroPuts(TFT * tft, const char *str, uint8_t dx, uint8_t transparrent) {
 	while (*str) {
 		FontMicroPutc(tft, *str, dx, transparrent);
 		str++;
@@ -98,7 +107,7 @@ void FontMicroPuts(TFT * tft, char *str, uint8_t dx, uint8_t transparrent) {
 }
 
 //Определение длинны строки в пикселях по типу текущего шрифта
-uint16_t FontMicroFindLenStr(char *str, FontDefMicroElectronika_t * uFont, uint8_t dx)
+uint16_t FontMicroFindLenStr(const char *str, FontDefMicroElectronika_t * uFont, uint8_t dx)
 {
 	const uint8_t *p;
 

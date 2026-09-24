@@ -11,14 +11,30 @@
 #define RGB565(R,G,B)    ((((R) >> 3) << 11) | (((G) >> 2) << 5) | ((B) >> 3))
 
 /*  Colors are 565 RGB (5 bits Red, 6 bits green, 5 bits blue) */
+#ifndef BLACK
 #define BLACK           0x0000
+#endif
+#ifndef BLUE
 #define BLUE            0x001F
+#endif
+#ifndef GREEN
 #define GREEN           0x07E0
+#endif
+#ifndef CYAN
 #define CYAN            0x07FF
+#endif
+#ifndef RED
 #define RED             0xF800
-#define MAGENTA         0xF81F       
-#define YELLOW          0xFFE0  
-#define WHITE           0xFFFF	
+#endif
+#ifndef MAGENTA
+#define MAGENTA         0xF81F
+#endif
+#ifndef YELLOW
+#define YELLOW          0xFFE0
+#endif
+#ifndef WHITE
+#define WHITE           0xFFFF
+#endif
 
 /* RGB 24-bits color table definition (RGB888). */
 #define RGB888_RGB565(color) (((((color) >> 19) & 0x1f) << 11) | ((((color) >> 10) & 0x3f) << 5) | (((color) >> 3) & 0x1f))
@@ -60,6 +76,41 @@
 #define COLOR_ORANGE         RGB888_RGB565(0xFFA500u)
 #define COLOR_SNOW           RGB888_RGB565(0xFFFAFAu)
 #define COLOR_YELLOW         RGB888_RGB565(0xFFFF00u)
+
+/* Common color aliases used in examples and Adafruit/TFT_eSPI code */
+#ifndef NAVY
+#define NAVY            COLOR_NAVY
+#endif
+#ifndef DARKGREEN
+#define DARKGREEN       COLOR_DARKGREEN
+#endif
+#ifndef DARKCYAN
+#define DARKCYAN        COLOR_DARKCYAN
+#endif
+#ifndef MAROON
+#define MAROON          COLOR_DARKRED
+#endif
+#ifndef PURPLE
+#define PURPLE          RGB888_RGB565(0x800080u)
+#endif
+#ifndef OLIVE
+#define OLIVE           COLOR_OLIVE
+#endif
+#ifndef LIGHTGREY
+#define LIGHTGREY       COLOR_LIGHTGREY
+#endif
+#ifndef DARKGREY
+#define DARKGREY        COLOR_DARKGRAY
+#endif
+#ifndef ORANGE
+#define ORANGE          COLOR_ORANGE
+#endif
+#ifndef GREENYELLOW
+#define GREENYELLOW     COLOR_GREENYELLOW
+#endif
+#ifndef PINK
+#define PINK            RGB888_RGB565(0xFFC0CBu)
+#endif
 
 #ifdef __cplusplus
 }

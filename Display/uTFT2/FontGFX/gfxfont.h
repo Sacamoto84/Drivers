@@ -7,7 +7,10 @@
 #ifndef _GFXFONT_H_
 #define _GFXFONT_H_
 
+#include "../TFT_define.h"
+#if defined(TFT_PLATFORM_STM32)
 #include "main.h"
+#endif
 #include "TFT.h"
 
 #include "string.h"
@@ -48,7 +51,7 @@ public:
 	}
 
 
-	void Puts(char *str) {
+	void Puts(const char *str) {
 		while (*str) {
 			drawChar(*str);
 			str++;
@@ -56,7 +59,7 @@ public:
 		}
 	}
 
-	void Puts(int x, int y, char *str) {
+	void Puts(int x, int y, const char *str) {
 		_tft->uTFT.CurrentX = x;
 		_tft->uTFT.CurrentY = y;
 
@@ -67,7 +70,7 @@ public:
 		}
 	}
 
-	void Puts(int x, int y, char *str, int limit) {
+	void Puts(int x, int y, const char *str, int limit) {
 		_tft->uTFT.CurrentX = x;
 		_tft->uTFT.CurrentY = y;
 
@@ -82,7 +85,7 @@ public:
 		}
 	}
 
-	void Puts(int x, int y, char *str, uint16_t color) {
+	void Puts(int x, int y, const char *str, uint16_t color) {
 		_tft->uTFT.CurrentX = x;
 		_tft->uTFT.CurrentY = y;
 		_tft->uTFT.Color = color;
@@ -164,7 +167,7 @@ public:
 #define GFX_MAX_STRING 255
 char target[GFX_MAX_STRING + 1] = "";
 
-char *utf8rus2(char *source)
+char *utf8rus2(const char *source)
 {
   int i = 0, j = 0;
   target[0] = '\0';

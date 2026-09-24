@@ -17,14 +17,15 @@ uint32_t video_stop;                              //Для user как нека�
 //Video только для экранов с 16-битным фреймбуфером, размер кадра = TFT_WIDTH * TFT_HEIGHT * 2
 void video_load(TFT * tft, uint8_t delay)
 {
+	if (tft == NULL || tft->LCD == NULL) return;
     uint32_t index;
 	uint32_t fsize = f_size(&SDFile);
 	//Размер кадра в байтах - из параметров экрана (без хардкода 115200)
 	uint32_t frame_size = (uint32_t)tft->LCD->TFT_WIDTH * (uint32_t)tft->LCD->TFT_HEIGHT * 2;
 	UINT bytesread;
-	uint32_t start_time = uwTick;    //Запоменаем время начала кадра
-	int32_t delta;                   //Время которое нужно подождать до delay
-	video_stop = 0;                  //Сброс временной переменной
+	uint32_t start_time = HAL_GetTick();    //Запоминаем время начала кадра
+	int32_t delta;                          //Время которое нужно подождать до delay
+	video_stop = 0;                         //Сброс временной переменной
 
 	if (frame_size == 0 || tft->LCD->Bit != 16 || tft->LCD->buffer16 == NULL) return;
 
@@ -48,11 +49,11 @@ void video_load(TFT * tft, uint8_t delay)
 		//──────────────────────────────────────────────────────────────────────┘│
 		                                                                       //│
 		//─ Задержка кадра ─────────────────────────────────────────────────────┐│
-		delta =  delay - (uwTick - start_time) - 1;    //Время до времени кадра ││
+		delta =  (int32_t)delay - (int32_t)(HAL_GetTick() - start_time) - 1;   //Время до времени кадра ││
 		                                                                      //││
 		if ((delay) && (delta > 0)){                                          //││
-			  uint32_t tickstart = uwTick;                                    //││
-			  while((uwTick - tickstart) < (uint32_t)delta){                  //││
+			  uint32_t tickstart = HAL_GetTick();                             //││
+			  while((HAL_GetTick() - tickstart) < (uint32_t)delta){           //││
 				if (videoCallBackFunc){                                       //││
 				    uint32_t (*fcnPtr)(uint32_t) = videoCallBackFunc;         //││
 					if(fcnPtr(0)){                                            //││
@@ -64,7 +65,7 @@ void video_load(TFT * tft, uint8_t delay)
 				}                                                             //││
 			  }                                                               //││
 		}                                                                     //││
-		start_time = uwTick;                                                  //││
+		start_time = HAL_GetTick();                                           //││
 		//──────────────────────────────────────────────────────────────────────┘│
 	}                                                                          //│
 	//───────────────────────────────────────────────────────────────────────────┘
@@ -73,7 +74,8 @@ void video_load(TFT * tft, uint8_t delay)
 #endif
 }
 
-void video_play(TFT * tft, char * Name, uint8_t delay){
+void video_play(TFT * tft, const char * Name, uint8_t delay){
+	if (tft == NULL || tft->LCD == NULL || Name == NULL) return;
 	char str[32];
 	snprintf(str, sizeof(str), "%s", Name);
 	ConvertStringDosTo1251 ( str );

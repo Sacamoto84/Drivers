@@ -2,9 +2,10 @@
 
 //32 бит BMP с альфа каналом Сохранять как инвертированая альфа и свап  , customAlpha = 1.0 полная альфа
 //Формат: [alpha][R][G][B] на пиксель
-void BitmapFromFlash32b(TFT * tft, int16_t x0, int16_t y0,	Bitmap *bmp) {
+void BitmapFromFlash32b(TFT * tft, int16_t x0, int16_t y0, const Bitmap *bmp) {
+	if (tft == NULL || tft->LCD == NULL || bmp == NULL) return;
 	//Прямая запись в buffer16 - только для 16-битного фреймбуфера
-	if (tft->LCD->Bit != 16) return;
+	if (tft->LCD->Bit != 16 || tft->LCD->buffer16 == NULL) return;
 
 	uint32_t sColor;
 	uint32_t dColor;

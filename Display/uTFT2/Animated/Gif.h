@@ -49,7 +49,17 @@
 
 #if (FAT_FS)
 
+#include "../TFT_define.h"
+
+#if defined(TFT_PLATFORM_STM32)
 #include "main.h"
+#define TFT_GIF_GET_TICK() HAL_GetTick()
+#elif defined(TFT_PLATFORM_PICO)
+#define TFT_GIF_GET_TICK() to_ms_since_boot(get_absolute_time())
+#else
+#define TFT_GIF_GET_TICK() 0
+#endif
+
 #include "TFT.h"
 
 #include "fatfs.h"
@@ -155,13 +165,13 @@ public:
 
 	void run(void) {calculate();}
 
-	void setName(char *name) {
+	void setName(const char *name) {
 		snprintf(name_gif, sizeof(name_gif), "%s", name);
 
 		//Читаем настройки
-		char current_patch[64]; //Полный путь к файлу
-		snprintf(current_patch, sizeof(current_patch), "/Gif/%s/i.txt", name_gif); //Собираем полный путь в файлу
-		int res = f_open(&SDFile, current_patch, FA_READ);
+		char current_path[64]; //Полный путь к файлу
+		snprintf(current_path, sizeof(current_path), "/Gif/%s/i.txt", name_gif); //Собираем полный путь к файлу
+		int res = f_open(&SDFile, current_path, FA_READ);
 		char BMP_From_File_buf[64];
 
 		int b = 0;
@@ -244,7 +254,7 @@ private:
     //│ Открыть картирку по индексу 16 и 24 бит                         │ private: │
 	//└─────────────────────────────────────────────────────────────────┴──────────┤
 	void openBMPfromIndex(uint16_t i) {
-
+		if (tft == NULL || tft->LCD == NULL) return;
 		if (i > index_max) return;
 
 		char current_patch[32]; //Полный путь к файлу
@@ -377,9 +387,10 @@ private:
     //│ Логика отрисовки                                                │ private: │
 	//└─────────────────────────────────────────────────────────────────┴──────────┤
 	void calculate(void) {
+		if (tft == NULL || tft->LCD == NULL) return;
 
 		//Расчет следующего интекса с учетом времени кадра
-		if ((uwTick - start_time) <= delay)
+		if ((TFT_GIF_GET_TICK() - start_time) <= delay)
 			return;
 
 		{
@@ -404,7 +415,7 @@ private:
 					else
 					  openBMPfromIndex(index_current);
 
-					start_time = uwTick; //Запомнили начало
+					start_time = TFT_GIF_GET_TICK(); //Запомнили начало
 					return;
 				}
 
@@ -425,7 +436,7 @@ private:
 					else
 					  openBMPfromIndex(index_current);
 
-					start_time = uwTick; //Запомнили начало
+					start_time = TFT_GIF_GET_TICK(); //Запомнили начало
 					return;
 
 				}
@@ -445,7 +456,7 @@ private:
 					}
 
 
-					start_time = uwTick; //Запомнили начало
+					start_time = TFT_GIF_GET_TICK(); //Запомнили начало
 					return;
 				}
 
@@ -460,7 +471,7 @@ private:
 							index_current = index_max - 1;
 						}
 
-						start_time = uwTick; //Запомнили начало
+						start_time = TFT_GIF_GET_TICK(); //Запомнили начало
 						return;
 
 					} else {
@@ -473,7 +484,7 @@ private:
 						}
 
 
-						start_time = uwTick; //Запомнили начало
+						start_time = TFT_GIF_GET_TICK(); //Запомнили начало
 						return;
 
 					}
@@ -491,7 +502,7 @@ private:
 					if (index_current > index_max)
 						index_current = 0;
 
-					start_time = uwTick; //Запомнили начало
+					start_time = TFT_GIF_GET_TICK(); //Запомнили начало
 					return;
 				}
 
@@ -504,7 +515,7 @@ private:
 						default: openBMPfromIndex(0); break; //Когда нет картинки в ресурсах
 					}
 
-					start_time = uwTick; //Запомнили начало
+					start_time = TFT_GIF_GET_TICK(); //Запомнили начало
 					return;
 				}
 
@@ -523,7 +534,7 @@ private:
 						default: openBMPfromIndex(index_max); break; //Когда нет картинки в ресурсах
 					}
 
-					start_time = uwTick; //Запомнили начало
+					start_time = TFT_GIF_GET_TICK(); //Запомнили начало
 					return;
 				}
 
@@ -539,7 +550,7 @@ private:
 						state_animation = STOP;
 					}
 
-					start_time = uwTick; //Запомнили начало
+					start_time = TFT_GIF_GET_TICK(); //Запомнили начало
 					return;
 				}
 			}
@@ -569,7 +580,7 @@ private:
 
 
 		}
-		start_time = uwTick; //Запомнили начало
+		start_time = TFT_GIF_GET_TICK(); //Запомнили начало
 	}
 
 };

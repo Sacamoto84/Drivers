@@ -1,9 +1,10 @@
 #include "bitmap.h"
 
 //Формат: [alpha][color_lo][color_hi] на пиксель
-void BitmapFromFlash24b(TFT * tft, int16_t X, int16_t Y, Bitmap *bmp) {
+void BitmapFromFlash24b(TFT * tft, int16_t X, int16_t Y, const Bitmap *bmp) {
+	if (tft == NULL || tft->LCD == NULL || bmp == NULL) return;
 	//Прямая запись в buffer16 - только для 16-битного фреймбуфера
-	if (tft->LCD->Bit != 16) return;
+	if (tft->LCD->Bit != 16 || tft->LCD->buffer16 == NULL) return;
 
 	int32_t x0 = (X < 0) ? 0 : X;
 	int32_t y0 = (Y < 0) ? 0 : Y;

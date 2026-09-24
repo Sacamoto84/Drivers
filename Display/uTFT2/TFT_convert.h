@@ -182,48 +182,50 @@ static uint16_t C1251toUTF8(char c){
 // Конвертирование строки из UTF8 в Win1251
 static inline int ConvertStringUTF8to1251 (const char* utf8, char* windows1251, size_t n)
 {
-	 int i = 0;
-	        int j = 0;
-	        for(; i < (int)n && utf8[i] != 0; ++i) {
-	                char prefix = utf8[i];
-	                char suffix = utf8[i+1];
-	                if ((prefix & 0x80) == 0) {
-	                        windows1251[j] = (char)prefix;
-	                        ++j;
-	                } else if ((~prefix) & 0x20) {
-	                        int first5bit = prefix & 0x1F;
-	                        first5bit <<= 6;
-	                        int sec6bit = suffix & 0x3F;
-	                        int unicode_char = first5bit + sec6bit;
+	if (utf8 == NULL || windows1251 == NULL || n == 0) return 0;
 
+	size_t i = 0;
+	size_t j = 0;
+	while (utf8[i] != '\0' && j + 1 < n) {
+		uint8_t prefix = (uint8_t)utf8[i];
+		if ((prefix & 0x80) == 0) {
+			windows1251[j++] = (char)prefix;
+			i++;
+		} else if ((prefix & 0xE0) == 0xC0) {
+			if (utf8[i + 1] == '\0') break;
+			uint8_t suffix = (uint8_t)utf8[i + 1];
+			int unicode_char = ((prefix & 0x1F) << 6) | (suffix & 0x3F);
 
-	                        if ( unicode_char >= 0x410 && unicode_char <= 0x44F ) {
-	                                windows1251[j] = (char)(unicode_char - 0x350);
-	                        } else if (unicode_char >= 0x80 && unicode_char <= 0xFF) {
-	                                windows1251[j] = (char)(unicode_char);
-	                        } else if (unicode_char >= 0x402 && unicode_char <= 0x403) {
-	                                windows1251[j] = (char)(unicode_char - 0x382);
-	                        } else {
-	                                int count = sizeof(g_letters) / sizeof(Letter);
-	                                for (int k = 0; k < count; ++k) {
-	                                        if (unicode_char == g_letters[k].unicode) {
-	                                                windows1251[j] = g_letters[k].win1251;
-	                                                goto NEXT_LETTER;
-	                                        }
-	                                }
-	                                // can't convert this char
-	                                return 0;
-	                        }
-	NEXT_LETTER:
-	                        ++i;
-	                        ++j;
-	                } else {
-	                        // can't convert this chars
-	                        return 0;
-	                }
-	        }
-	        windows1251[j] = 0;
-	        return 1;
+			if (unicode_char >= 0x410 && unicode_char <= 0x44F) {
+				windows1251[j++] = (char)(unicode_char - 0x350);
+			} else if (unicode_char >= 0x80 && unicode_char <= 0xFF) {
+				windows1251[j++] = (char)(unicode_char);
+			} else if (unicode_char >= 0x402 && unicode_char <= 0x403) {
+				windows1251[j++] = (char)(unicode_char - 0x382);
+			} else {
+				int count = sizeof(g_letters) / sizeof(Letter);
+				int found = 0;
+				for (int k = 0; k < count; ++k) {
+					if (unicode_char == g_letters[k].unicode) {
+						windows1251[j++] = g_letters[k].win1251;
+						found = 1;
+						break;
+					}
+				}
+				if (!found) {
+					windows1251[j] = '\0';
+					return 0;
+				}
+			}
+			i += 2;
+		} else {
+			// can't convert 3/4-byte chars
+			windows1251[j] = '\0';
+			return 0;
+		}
+	}
+	windows1251[j] = '\0';
+	return 1;
 }
 
 

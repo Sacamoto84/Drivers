@@ -1,10 +1,11 @@
 #include "bitmap.h"
 
-void BitmapFromFlashTransparent(TFT * tft, uint16_t X, uint16_t Y,	Bitmap bmp, uint16_t TrColor) {
+void BitmapFromFlashTransparent(TFT * tft, uint16_t X, uint16_t Y,	const Bitmap *bmp, uint16_t TrColor) {
+	if (tft == NULL || tft->LCD == NULL || bmp == NULL) return;
 
-	if (bmp.bit == 1) {
+	if (bmp->bit == 1) {
 		const uint8_t *p;
-		p = (uint8_t *)bmp.data;
+		p = (uint8_t *)bmp->data;
 
 		int32_t pX;
 		int32_t pY;
@@ -12,16 +13,16 @@ void BitmapFromFlashTransparent(TFT * tft, uint16_t X, uint16_t Y,	Bitmap bmp, u
 		uint8_t bL;
 
 		pY = Y;
-		while (pY < (int32_t)Y + bmp.H) {
+		while (pY < (int32_t)Y + bmp->H) {
 			pX = X;
-			while (pX < (int32_t)X + bmp.W) {
+			while (pX < (int32_t)X + bmp->W) {
 				bL = 0;
 				tmpCh = *p++;
 				if (tmpCh) {
 					while (bL < 8) {
 						//pY + bL < Y + H: биты дополнения последнего
 						//байта не рисуют ниже картинки
-						if ((tmpCh & 0x01) && (pY + bL < (int32_t)Y + bmp.H)
+						if ((tmpCh & 0x01) && (pY + bL < (int32_t)Y + bmp->H)
 								&& (TrColor != 1))
 							tft->SetPixel(pX, pY + bL, 1);
 						tmpCh >>= 1;
@@ -41,14 +42,14 @@ void BitmapFromFlashTransparent(TFT * tft, uint16_t X, uint16_t Y,	Bitmap bmp, u
 
 	}
 
-	if (bmp.bit == 16) {
+	if (bmp->bit == 16) {
 		//Прямая запись в buffer16 - только для 16-битного фреймбуфера
-		if (tft->LCD->Bit != 16) return;
+		if (tft->LCD->Bit != 16 || tft->LCD->buffer16 == NULL) return;
 		//X, Y - uint16_t, отрицательными быть не могут
 		int32_t x0 = X;
 		int32_t y0 = Y;
-		int32_t x1 = (int32_t)X + bmp.W; //эксклюзивная граница
-		int32_t y1 = (int32_t)Y + bmp.H;
+		int32_t x1 = (int32_t)X + bmp->W; //эксклюзивная граница
+		int32_t y1 = (int32_t)Y + bmp->H;
 		int32_t W = tft->LCD->TFT_WIDTH;
 		int32_t H = tft->LCD->TFT_HEIGHT;
 
@@ -61,13 +62,13 @@ void BitmapFromFlashTransparent(TFT * tft, uint16_t X, uint16_t Y,	Bitmap bmp, u
 		uint32_t skip_rows = (uint32_t)(y0 - Y);
 
 		//steam16 заполнен getResBitmapID; для вручную собранных Bitmap - data
-		const uint16_t *p16 = ((bmp.steam16 != NULL) ? bmp.steam16
-				: (const uint16_t *)bmp.data)
-				+ skip_rows * bmp.W + skip_cols;
+		const uint16_t *p16 = ((bmp->steam16 != NULL) ? bmp->steam16
+				: (const uint16_t *)bmp->data)
+				+ skip_rows * bmp->W + skip_cols;
 
 		for (int32_t pY = y0; pY < y1; pY++) {
 			const uint16_t *src = p16;
-			p16 += bmp.W;
+			p16 += bmp->W;
 			uint16_t *dst = &tft->LCD->buffer16[pY * W + x0];
 			for (int32_t pX = x0; pX < x1; pX++) {
 				uint16_t temp = *src++;

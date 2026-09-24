@@ -3,10 +3,10 @@
 
 // 756us 216MHz
 //Копирует bmp->steam16 размером с весь экран в buffer16
-void BitmapFromFlashBackground16bit(TFT * tft, Bitmap *bmp) {
-
+void BitmapFromFlashBackground16bit(TFT * tft, const Bitmap *bmp) {
+	if (tft == NULL || tft->LCD == NULL || bmp == NULL) return;
 	//Прямая запись в buffer16 - только для 16-битного фреймбуфера
-	if (tft->LCD->Bit != 16) return;
+	if (tft->LCD->Bit != 16 || tft->LCD->buffer16 == NULL) return;
 	//Источник должен покрывать весь экран, иначе чтение за его границей
 	if (bmp->W < tft->LCD->TFT_WIDTH || bmp->H < tft->LCD->TFT_HEIGHT) return;
 

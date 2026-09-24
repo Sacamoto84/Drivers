@@ -5,6 +5,11 @@ static uint32_t resurce_count = 0;
 static uint32_t resurce_start_adress = 0; //Начало ресурсов
 
 void setResStartAdress(uint32_t i) {
+  if (i == 0 || (i & 3u) != 0) {
+    resurce_start_adress = 0;
+    resurce_count = 0;
+    return;
+  }
   uint32_t *p = (uint32_t *)i;
   resurce_start_adress = i;
   resurce_count = *p;               //Получить количество записей

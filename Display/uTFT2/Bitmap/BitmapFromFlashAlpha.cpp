@@ -1,10 +1,11 @@
 #include "bitmap.h"
 
 //32 бит BMP с альфа каналом Сохранять как инвертированая альфа и свап  , customAlpha = 1.0 полная альфа
-void BitmapFromFlashAlpha(TFT * tft, int32_t x0, int32_t y0, Bitmap *bmp, float customAlpha) {
+void BitmapFromFlashAlpha(TFT * tft, int32_t x0, int32_t y0, const Bitmap *bmp, float customAlpha) {
 
 	//Прямая запись в buffer16 - только для 16-битного фреймбуфера
-	if (tft->LCD->Bit != 16 || tft->LCD->buffer16 == NULL || bmp == NULL) return;
+	if (tft == NULL || tft->LCD == NULL || bmp == NULL) return;
+	if (tft->LCD->Bit != 16 || tft->LCD->buffer16 == NULL) return;
 	if (bmp->W == 0 || bmp->H == 0) return;
 
 	//steam32 заполнен getResBitmapID; для вручную собранных Bitmap - data

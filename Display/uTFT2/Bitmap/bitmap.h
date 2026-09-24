@@ -19,16 +19,41 @@
 
   } Bitmap;
 
-  extern void BitmapFromFlashBackground16bit(TFT * tft, Bitmap *bmp);
+  extern void BitmapFromFlashBackground16bit(TFT * tft, const Bitmap *bmp);
+  static inline void BitmapFromFlashBackground16bit(TFT * tft, Bitmap bmp) {
+    BitmapFromFlashBackground16bit(tft, &bmp);
+  }
 
-  extern void BitmapFromFlash16b(TFT * tft, int16_t X, int16_t Y, Bitmap *bmp);
-  extern void BitmapFromFlash24b(TFT * tft, int16_t X, int16_t Y, Bitmap *bmp);
-  extern void BitmapFromFlash32b(TFT * tft, int16_t X, int16_t Y, Bitmap *bmp);
-  extern void BitmapFromFlash1b(TFT * tft, int16_t X, int16_t Y, Bitmap *bmp);
+  extern void BitmapFromFlash16b(TFT * tft, int16_t X, int16_t Y, const Bitmap *bmp);
+  static inline void BitmapFromFlash16b(TFT * tft, int16_t X, int16_t Y, Bitmap bmp) {
+    BitmapFromFlash16b(tft, X, Y, &bmp);
+  }
+
+  extern void BitmapFromFlash24b(TFT * tft, int16_t X, int16_t Y, const Bitmap *bmp);
+  static inline void BitmapFromFlash24b(TFT * tft, int16_t X, int16_t Y, Bitmap bmp) {
+    BitmapFromFlash24b(tft, X, Y, &bmp);
+  }
+
+  extern void BitmapFromFlash32b(TFT * tft, int16_t X, int16_t Y, const Bitmap *bmp);
+  static inline void BitmapFromFlash32b(TFT * tft, int16_t X, int16_t Y, Bitmap bmp) {
+    BitmapFromFlash32b(tft, X, Y, &bmp);
+  }
+
+  extern void BitmapFromFlash1b(TFT * tft, int16_t X, int16_t Y, const Bitmap *bmp);
+  static inline void BitmapFromFlash1b(TFT * tft, int16_t X, int16_t Y, Bitmap bmp) {
+    BitmapFromFlash1b(tft, X, Y, &bmp);
+  }
 
   //32 бит BMP с альфа каналом Сохранять как инвертированая альфа и свап  , customAlpha = 1.0 полная альфа
-  extern void BitmapFromFlashAlpha(TFT * tft, int32_t x0, int32_t y0, Bitmap *bmp, float customAlpha);
-  extern void BitmapFromFlashTransparent(TFT * tft, uint16_t X, uint16_t Y,	Bitmap bmp, uint16_t TrColor);
+  extern void BitmapFromFlashTransparent(TFT * tft, uint16_t X, uint16_t Y, const Bitmap *bmp, uint16_t TrColor);
+  static inline void BitmapFromFlashTransparent(TFT * tft, uint16_t X, uint16_t Y, Bitmap bmp, uint16_t TrColor) {
+    BitmapFromFlashTransparent(tft, X, Y, &bmp, TrColor);
+  }
+
+  extern void BitmapFromFlashAlpha(TFT * tft, int32_t x0, int32_t y0, const Bitmap *bmp, float customAlpha = 1.0f);
+  static inline void BitmapFromFlashAlpha(TFT * tft, int32_t x0, int32_t y0, Bitmap bmp, float customAlpha = 1.0f) {
+    BitmapFromFlashAlpha(tft, x0, y0, &bmp, customAlpha);
+  }
 
 #if (FAT_FS)
   #include "fatfs.h"

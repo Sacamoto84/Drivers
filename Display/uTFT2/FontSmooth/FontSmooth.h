@@ -3,7 +3,9 @@
 
 #include "../TFT.h"
 
+#if defined(TFT_PLATFORM_STM32)
 #include "main.h"
+#endif
 
 #include "stdlib.h"
 #include "string.h"

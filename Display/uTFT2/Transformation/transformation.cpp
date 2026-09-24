@@ -4,8 +4,9 @@
 #include "string.h"
 
 bool transformation::pushRotated(TFT * tft ,TFT * tft_src, int16_t angle, int32_t transp) {
+	if (tft == NULL || tft->LCD == NULL || tft_src == NULL || tft_src->LCD == NULL) return false;
 	//Прямое чтение buffer16 источника - поддерживается только 16 бит
-	if (tft_src->LCD->Bit != 16) return false;
+	if (tft_src->LCD->Bit != 16 || tft_src->LCD->buffer16 == NULL) return false;
 
 	//_xPivot = LCD->TFT_WIDTH / 2;
 	//_yPivot = LCD->TFT_HEIGHT / 2;
@@ -56,6 +57,11 @@ bool transformation::pushRotated(TFT * tft ,TFT * tft_src, int16_t angle, int32_
 // Intentionally not constrained to viewport area
 void transformation::setScrollRect(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t color)
 {
+  if (tft == NULL || tft->LCD == NULL) return;
+  if (_iwidth == 0 || _iheight == 0) {
+    _iwidth  = tft->LCD->TFT_WIDTH;
+    _iheight = tft->LCD->TFT_HEIGHT;
+  }
   if ((x >= _iwidth) || (y >= _iheight)) return;
 
   if (x < 0) { w += x; x = 0; }
@@ -81,6 +87,14 @@ void transformation::setScrollRect(int32_t x, int32_t y, int32_t w, int32_t h, u
 ***************************************************************************************/
 void transformation::scroll(int16_t dx, int16_t dy)
 {
+	  if (tft == NULL || tft->LCD == NULL) return;
+	  if (_iwidth == 0 || _iheight == 0) {
+	    _iwidth  = tft->LCD->TFT_WIDTH;
+	    _iheight = tft->LCD->TFT_HEIGHT;
+	    _sw = _iwidth;
+	    _sh = _iheight;
+	  }
+
 	  if (abs(dx) >= _sw || abs(dy) >= _sh)
 	  {
 	    tft->RectangleFilled(_sx, _sy, _sw, _sh, _scolor);

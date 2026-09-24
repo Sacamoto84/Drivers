@@ -15,6 +15,7 @@
 
 void TFT_Driver::SSD1306_WRITECOMMAND(uint8_t data) {
 #ifdef TFT_USE_I2C
+#if defined(TFT_PLATFORM_STM32)
 	if (LCD->hi2c)  //I2C
 	{
 		uint8_t dt[2];
@@ -23,6 +24,14 @@ void TFT_Driver::SSD1306_WRITECOMMAND(uint8_t data) {
 		HAL_I2C_Master_Transmit(LCD->hi2c, LCD->I2C_Adress, dt, 2, 1000);
 		return;
 	}
+#else
+	if (LCD->i2c)
+	{
+		uint8_t dt[2] = {0, data};
+		i2c_write_blocking(LCD->i2c, LCD->I2C_Adress, dt, 2, false);
+		return;
+	}
+#endif
 #endif
 #if defined(TFT_USE_SPI)
 	SPI.SendCmd(data);
@@ -31,6 +40,7 @@ void TFT_Driver::SSD1306_WRITECOMMAND(uint8_t data) {
 
 void TFT_Driver::SSD1306_WRITEDATA(uint8_t data) {
 #ifdef TFT_USE_I2C
+#if defined(TFT_PLATFORM_STM32)
 	if (LCD->hi2c)  //I2C
 	{
 		uint8_t dt[2];
@@ -39,6 +49,14 @@ void TFT_Driver::SSD1306_WRITEDATA(uint8_t data) {
 		HAL_I2C_Master_Transmit(LCD->hi2c, LCD->I2C_Adress, dt, 2, 1000);
 		return;
 	}
+#else
+	if (LCD->i2c)
+	{
+		uint8_t dt[2] = {0x40, data};
+		i2c_write_blocking(LCD->i2c, LCD->I2C_Adress, dt, 2, false);
+		return;
+	}
+#endif
 #endif
 #if defined(TFT_USE_SPI)
 	SPI.SendData(data);
@@ -50,11 +68,16 @@ void TFT_Driver::SSD1306_Init(void) {
 
 #if defined(TFT_USE_SPI)
 	//Только для SPI
+#if defined(TFT_PLATFORM_STM32)
 	if (LCD->GPIO_RESET != NULL)	
 		SPI.LCD_Reset();
 	
 	if (LCD->GPIO_CS != NULL)	
 		CS_0;
+#else
+	SPI.LCD_Reset();
+	CS_0;
+#endif
 #endif
 
 	/* Init LCD */
@@ -98,15 +121,17 @@ void TFT_Driver::SSD1306_Init(void) {
 	SSD1306_WRITECOMMAND(0xAF); //--turn on SSD1306 panel
 
 #if defined(TFT_USE_SPI)
+#if defined(TFT_PLATFORM_STM32)
 	if (LCD->GPIO_CS != NULL)	
 		CS_1;
-    #endif
+#else
+	CS_1;
+#endif
+#endif
 	/* Set default values */
 	//uTFT.CurrentX = 0;
 	//uTFT.CurrentY = 0;
 }
-
-static volatile HAL_StatusTypeDef res;
 
 //490uS-72MHz
 void TFT_Driver::SSD1306_UpdateScreen(void) {
@@ -119,6 +144,7 @@ void TFT_Driver::SSD1306_UpdateScreen(void) {
 	SSD1306_WRITECOMMAND((uint8_t)((LCD->TFT_HEIGHT / 8) - 1));
 
 #ifdef TFT_USE_I2C
+#if defined(TFT_PLATFORM_STM32)
 	if (LCD->hi2c)  //I2C
 	{
 #if defined(LCD_osDelay)
@@ -126,15 +152,26 @@ void TFT_Driver::SSD1306_UpdateScreen(void) {
 #endif
 		//Протокол SSD1306 I2C: [Control byte 0x40][данные...].
 		//HAL_I2C_Mem_Write отправляет ровно эту последовательность.
-		res = HAL_I2C_Mem_Write(LCD->hi2c, LCD->I2C_Adress, 0x40,
+		HAL_I2C_Mem_Write(LCD->hi2c, LCD->I2C_Adress, 0x40,
 				I2C_MEMADD_SIZE_8BIT, &LCD->buffer8[0],
 				((uint32_t)LCD->TFT_HEIGHT * LCD->TFT_WIDTH) / 8, 1000);
 
 		return;
 	}
+#else
+	if (LCD->i2c)
+	{
+		uint32_t count = ((uint32_t)LCD->TFT_HEIGHT * LCD->TFT_WIDTH) / 8;
+		uint8_t ctrl = 0x40;
+		i2c_write_blocking(LCD->i2c, LCD->I2C_Adress, &ctrl, 1, true);
+		i2c_write_blocking(LCD->i2c, LCD->I2C_Adress, &LCD->buffer8[0], count, false);
+		return;
+	}
+#endif
 #endif
 
 #if defined(TFT_USE_SPI)
+#if defined(TFT_PLATFORM_STM32)
     if (LCD->GPIO_CS != NULL)	
     	CS_0;
 
@@ -144,16 +181,30 @@ void TFT_Driver::SSD1306_UpdateScreen(void) {
 		uint32_t count = ((uint32_t)LCD->TFT_HEIGHT * LCD->TFT_WIDTH) / 8;
 		for (uint32_t i = 0; i < count; i++) {
 			LCD->hspi->Instance->DR = LCD->buffer8[i];
-			while ((LCD->hspi->Instance->SR & SPI_FLAG_TXE) == 0);
+			uint32_t wait_start = HAL_GetTick();
+			while ((LCD->hspi->Instance->SR & SPI_FLAG_TXE) == 0) {
+				if (HAL_GetTick() - wait_start > 50) break;
+			}
 		}
 
 		//Ждем фактического завершения передачи перед поднятием CS
-		while ((LCD->hspi->Instance->SR & SPI_FLAG_TXE) == 0);
-		while (LCD->hspi->Instance->SR & SPI_SR_BSY);
+		uint32_t wait_start = HAL_GetTick();
+		while ((LCD->hspi->Instance->SR & SPI_FLAG_TXE) == 0) {
+			if (HAL_GetTick() - wait_start > 50) break;
+		}
+		while (LCD->hspi->Instance->SR & SPI_SR_BSY) {
+			if (HAL_GetTick() - wait_start > 50) break;
+		}
 
 		if (LCD->GPIO_CS != NULL)	
 			CS_1;
-
+#else
+		CS_0;
+		DATA;
+		uint32_t count = ((uint32_t)LCD->TFT_HEIGHT * LCD->TFT_WIDTH) / 8;
+		spi_write_blocking(LCD->spi, LCD->buffer8, count);
+		CS_1;
+#endif
 #endif
 
 	}
